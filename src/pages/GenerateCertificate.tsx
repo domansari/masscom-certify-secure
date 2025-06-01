@@ -20,11 +20,12 @@ const GenerateCertificate = () => {
   const certificateRef = useRef<HTMLDivElement>(null);
   const [formData, setFormData] = useState({
     studentName: "",
+    fatherName: "",
     courseName: "",
     duration: "",
     completionDate: "",
     grade: "",
-    instructorName: "",
+    studentCoordinator: "",
     certificateId: "",
   });
 
@@ -64,11 +65,12 @@ const GenerateCertificate = () => {
           .from('certificates')
           .update({
             student_name: formData.studentName,
+            father_name: formData.fatherName,
             course_name: formData.courseName,
             duration: formData.duration || null,
             completion_date: formData.completionDate,
             grade: formData.grade || null,
-            instructor_name: formData.instructorName || null,
+            student_coordinator: formData.studentCoordinator || null,
             qr_code_data: verificationUrl,
             updated_at: new Date().toISOString(),
           })
@@ -87,11 +89,12 @@ const GenerateCertificate = () => {
           .insert({
             certificate_id: formData.certificateId,
             student_name: formData.studentName,
+            father_name: formData.fatherName,
             course_name: formData.courseName,
             duration: formData.duration || null,
             completion_date: formData.completionDate,
             grade: formData.grade || null,
-            instructor_name: formData.instructorName || null,
+            student_coordinator: formData.studentCoordinator || null,
             qr_code_data: verificationUrl,
             created_by: user?.id,
           });
@@ -147,11 +150,12 @@ const GenerateCertificate = () => {
   const resetForm = () => {
     setFormData({
       studentName: "",
+      fatherName: "",
       courseName: "",
       duration: "",
       completionDate: "",
       grade: "",
-      instructorName: "",
+      studentCoordinator: "",
       certificateId: "",
     });
     setShowPreview(false);
@@ -162,11 +166,12 @@ const GenerateCertificate = () => {
   const handleEditCertificate = (certificate: any) => {
     setFormData({
       studentName: certificate.student_name,
+      fatherName: certificate.father_name || "",
       courseName: certificate.course_name,
       duration: certificate.duration || "",
       completionDate: certificate.completion_date,
       grade: certificate.grade || "",
-      instructorName: certificate.instructor_name || "",
+      studentCoordinator: certificate.student_coordinator || "",
       certificateId: certificate.certificate_id,
     });
     setEditingCertificate(certificate);
@@ -239,6 +244,18 @@ const GenerateCertificate = () => {
                 </div>
 
                 <div className="space-y-2">
+                  <Label htmlFor="fatherName">Father's Name *</Label>
+                  <Input
+                    id="fatherName"
+                    value={formData.fatherName}
+                    onChange={(e) => setFormData({ ...formData, fatherName: e.target.value })}
+                    placeholder="Enter father's full name"
+                    required
+                    disabled={saved && !editingCertificate}
+                  />
+                </div>
+
+                <div className="space-y-2">
                   <Label htmlFor="courseName">Course Name *</Label>
                   <Select 
                     value={formData.courseName} 
@@ -305,12 +322,12 @@ const GenerateCertificate = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="instructorName">Instructor Name</Label>
+                  <Label htmlFor="studentCoordinator">Student Co-ordinator</Label>
                   <Input
-                    id="instructorName"
-                    value={formData.instructorName}
-                    onChange={(e) => setFormData({ ...formData, instructorName: e.target.value })}
-                    placeholder="Enter instructor's name"
+                    id="studentCoordinator"
+                    value={formData.studentCoordinator}
+                    onChange={(e) => setFormData({ ...formData, studentCoordinator: e.target.value })}
+                    placeholder="Enter student co-ordinator's name"
                     disabled={saved && !editingCertificate}
                   />
                 </div>

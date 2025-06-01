@@ -3,11 +3,12 @@ import { QrCode } from "lucide-react";
 
 interface CertificateData {
   studentName: string;
+  fatherName: string;
   courseName: string;
   duration: string;
   completionDate: string;
   grade: string;
-  instructorName: string;
+  studentCoordinator: string;
   certificateId: string;
 }
 
@@ -31,8 +32,18 @@ const CertificatePreview = ({ data }: CertificatePreviewProps) => {
         margin: '0 auto'
       }}
     >
-      {/* Header with Logo and Institution Name */}
-      <div className="absolute top-8 left-8 right-8 text-center">
+      {/* Certificate ID - Extreme Left Top Corner */}
+      <div className="absolute top-4 left-4 text-sm font-bold text-black bg-white bg-opacity-80 px-2 py-1 rounded">
+        Certificate ID: {data.certificateId || "Generated ID"}
+      </div>
+
+      {/* QR Code - Extreme Right Top Corner */}
+      <div className="absolute top-4 right-4 w-20 h-20 bg-white bg-opacity-90 rounded flex items-center justify-center">
+        <QrCode className="h-16 w-16 text-gray-700" />
+      </div>
+
+      {/* Header with Institution Name */}
+      <div className="absolute top-16 left-8 right-8 text-center">
         <h1 className="text-5xl font-bold text-blue-800 mb-2">
           MASSCOM INFOTECH EDUCATION
         </h1>
@@ -40,15 +51,21 @@ const CertificatePreview = ({ data }: CertificatePreviewProps) => {
       </div>
 
       {/* Certificate Content */}
-      <div className="absolute top-32 left-8 right-8 text-center">
+      <div className="absolute top-36 left-8 right-8 text-center">
         <p className="text-3xl text-black mb-8 font-serif italic">
           This Certificate is Awarded to M.R./M.S.
         </p>
         
-        <div className="border-b-2 border-black pb-2 mb-8 mx-16">
+        <div className="border-b-2 border-black pb-2 mb-6 mx-16">
           <h2 className="text-4xl font-bold text-black">
             {data.studentName || "Student Name"}
           </h2>
+        </div>
+
+        <div className="border-b-2 border-black pb-2 mb-8 mx-20">
+          <p className="text-2xl text-black">
+            S/O, D/O: {data.fatherName || "Father's Name"}
+          </p>
         </div>
 
         <div className="grid grid-cols-2 gap-8 mb-8">
@@ -86,7 +103,9 @@ const CertificatePreview = ({ data }: CertificatePreviewProps) => {
         <div className="grid grid-cols-3 gap-8 items-end">
           <div className="text-center">
             <div className="border-t-2 border-red-600 pt-2">
-              <p className="text-lg font-semibold text-black">Student Co-ordinator</p>
+              <p className="text-lg font-semibold text-black">
+                {data.studentCoordinator || "Student Co-ordinator"}
+              </p>
             </div>
           </div>
           
@@ -111,16 +130,6 @@ const CertificatePreview = ({ data }: CertificatePreviewProps) => {
         <p className="text-sm text-black">
           1st Floor Mohsin Market, Yusufpur Mohammadabad Ghazipur-233227, info@masscom.co.in, +91-9628355656
         </p>
-      </div>
-
-      {/* Certificate ID */}
-      <div className="absolute top-8 left-8 text-xs text-black">
-        Certificate ID: {data.certificateId || "Generated ID"}
-      </div>
-
-      {/* QR Code placeholder */}
-      <div className="absolute top-8 right-8 w-16 h-16 bg-white bg-opacity-80 rounded flex items-center justify-center">
-        <QrCode className="h-12 w-12 text-gray-700" />
       </div>
     </div>
   );
