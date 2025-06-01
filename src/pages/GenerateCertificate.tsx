@@ -5,14 +5,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Download, QrCode } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import CertificatePreview from "@/components/CertificatePreview";
+import QRCodeGenerator from "@/components/QRCodeGenerator";
 
 const GenerateCertificate = () => {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     studentName: "",
     courseName: "",
@@ -24,13 +27,15 @@ const GenerateCertificate = () => {
   });
 
   const [showPreview, setShowPreview] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
 
   const generateCertificateId = () => {
     const id = `MIE-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`.toUpperCase();
     setFormData({ ...formData, certificateId: id });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.studentName || !formData.courseName || !formData.completionDate) {
       toast({
@@ -45,11 +50,46 @@ const GenerateCertificate = () => {
       generateCertificateId();
     }
 
-    setShowPreview(true);
-    toast({
-      title: "Certificate Generated!",
-      description: "Your certificate has been generated successfully.",
-    });
+    setSaving(true);
+
+    try {
+      // Generate QR code data (URL for verification)
+      const verificationUrl = `${window.location.origin}/verify?id=${formData.certificateId}`;
+      
+      // Save certificate to database
+      const { error } = await supabase
+        .from('certificates')
+        .insert({
+          certificate_id: formData.certificateId,
+          student_name: formData.studentName,
+          course_name: formData.courseName,
+          duration: formData.duration || null,
+          completion_date: formData.completionDate,
+          grade: formData.grade || null,
+          instructor_name: formData.instructorName || null,
+          qr_code_data: verificationUrl,
+          created_by: user?.id,
+        });
+
+      if (error) {
+        throw error;
+      }
+
+      setShowPreview(true);
+      setSaved(true);
+      toast({
+        title: "Certificate Generated!",
+        description: "Your certificate has been generated and saved successfully.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to save certificate.",
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleDownload = () => {
@@ -57,6 +97,20 @@ const GenerateCertificate = () => {
       title: "Download Started",
       description: "Your certificate PDF is being prepared for download.",
     });
+  };
+
+  const resetForm = () => {
+    setFormData({
+      studentName: "",
+      courseName: "",
+      duration: "",
+      completionDate: "",
+      grade: "",
+      instructorName: "",
+      certificateId: "",
+    });
+    setShowPreview(false);
+    setSaved(false);
   };
 
   return (
@@ -94,12 +148,13 @@ const GenerateCertificate = () => {
                     onChange={(e) => setFormData({ ...formData, studentName: e.target.value })}
                     placeholder="Enter student's full name"
                     required
+                    disabled={saved}
                   />
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="courseName">Course Name *</Label>
-                  <Select onValueChange={(value) => setFormData({ ...formData, courseName: value })}>
+                  <Select onValueChange={(value) => setFormData({ ...formData, courseName: value })} disabled={saved}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select a course" />
                     </SelectTrigger>
@@ -124,6 +179,7 @@ const GenerateCertificate = () => {
                       value={formData.duration}
                       onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
                       placeholder="e.g., 3 months"
+                      disabled={saved}
                     />
                   </div>
                   <div className="space-y-2">
@@ -134,13 +190,14 @@ const GenerateCertificate = () => {
                       value={formData.completionDate}
                       onChange={(e) => setFormData({ ...formData, completionDate: e.target.value })}
                       required
+                      disabled={saved}
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="grade">Grade/Performance</Label>
-                  <Select onValueChange={(value) => setFormData({ ...formData, grade: value })}>
+                  <Select onValueChange={(value) => setFormData({ ...formData, grade: value })} disabled={saved}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select grade" />
                     </SelectTrigger>
@@ -160,6 +217,7 @@ const GenerateCertificate = () => {
                     value={formData.instructorName}
                     onChange={(e) => setFormData({ ...formData, instructorName: e.target.value })}
                     placeholder="Enter instructor's name"
+                    disabled={saved}
                   />
                 </div>
 
@@ -173,16 +231,38 @@ const GenerateCertificate = () => {
                       placeholder="Auto-generated ID"
                       readOnly
                     />
-                    <Button type="button" variant="outline" onClick={generateCertificateId}>
+                    <Button type="button" variant="outline" onClick={generateCertificateId} disabled={saved}>
                       Generate
                     </Button>
                   </div>
                 </div>
 
-                <Button type="submit" className="w-full">
-                  <QrCode className="mr-2 h-4 w-4" />
-                  Generate Certificate
-                </Button>
+                <div className="flex space-x-2">
+                  <Button 
+                    type="submit" 
+                    className="flex-1" 
+                    disabled={saving || saved}
+                  >
+                    {saving ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Saving...
+                      </>
+                    ) : saved ? (
+                      "Certificate Saved"
+                    ) : (
+                      <>
+                        <QrCode className="mr-2 h-4 w-4" />
+                        Generate Certificate
+                      </>
+                    )}
+                  </Button>
+                  {saved && (
+                    <Button type="button" variant="outline" onClick={resetForm}>
+                      New Certificate
+                    </Button>
+                  )}
+                </div>
               </form>
             </CardContent>
           </Card>
@@ -190,23 +270,41 @@ const GenerateCertificate = () => {
           {/* Preview Section */}
           <div className="space-y-6">
             {showPreview ? (
-              <Card>
-                <CardHeader>
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <CardTitle>Certificate Preview</CardTitle>
-                      <CardDescription>Preview your generated certificate</CardDescription>
+              <>
+                <Card>
+                  <CardHeader>
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <CardTitle>Certificate Preview</CardTitle>
+                        <CardDescription>Preview your generated certificate</CardDescription>
+                      </div>
+                      <Button onClick={handleDownload}>
+                        <Download className="mr-2 h-4 w-4" />
+                        Download PDF
+                      </Button>
                     </div>
-                    <Button onClick={handleDownload}>
-                      <Download className="mr-2 h-4 w-4" />
-                      Download PDF
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <CertificatePreview data={formData} />
-                </CardContent>
-              </Card>
+                  </CardHeader>
+                  <CardContent>
+                    <CertificatePreview data={formData} />
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>QR Code</CardTitle>
+                    <CardDescription>
+                      QR code for certificate verification
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="flex justify-center">
+                    <QRCodeGenerator
+                      data={`${window.location.origin}/verify?id=${formData.certificateId}`}
+                      filename={`${formData.studentName.replace(/\s+/g, '_')}_${formData.certificateId}`}
+                      size={200}
+                    />
+                  </CardContent>
+                </Card>
+              </>
             ) : (
               <Card className="h-64 flex items-center justify-center border-dashed">
                 <div className="text-center text-gray-500">

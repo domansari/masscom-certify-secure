@@ -5,38 +5,23 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, CheckCircle, XCircle, QrCode, Search } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect } from "react";
 
 const VerifyCertificate = () => {
   const { toast } = useToast();
-  const [certificateId, setCertificateId] = useState("");
+  const [searchParams] = useSearchParams();
+  const [certificateId, setCertificateId] = useState(searchParams.get('id') || "");
   const [verificationResult, setVerificationResult] = useState<any>(null);
   const [isVerifying, setIsVerifying] = useState(false);
 
-  // Mock certificate data - in a real app, this would come from a database
-  const mockCertificates = {
-    "MIE-1704067200000-ABC123DEF": {
-      studentName: "John Doe",
-      courseName: "Web Development",
-      duration: "6 months",
-      completionDate: "2024-01-15",
-      grade: "Excellent",
-      instructorName: "Prof. Smith",
-      issueDate: "2024-01-20",
-      isValid: true,
-    },
-    "MIE-1704153600000-XYZ789GHI": {
-      studentName: "Jane Smith",
-      courseName: "Digital Marketing",
-      duration: "3 months",
-      completionDate: "2024-01-10",
-      grade: "Very Good",
-      instructorName: "Prof. Johnson",
-      issueDate: "2024-01-15",
-      isValid: true,
-    },
-  };
+  useEffect(() => {
+    if (searchParams.get('id')) {
+      handleVerify();
+    }
+  }, []);
 
   const handleVerify = async () => {
     if (!certificateId.trim()) {
@@ -50,14 +35,28 @@ const VerifyCertificate = () => {
 
     setIsVerifying(true);
 
-    // Simulate API call delay
-    setTimeout(() => {
-      const certificate = mockCertificates[certificateId as keyof typeof mockCertificates];
-      
-      if (certificate) {
+    try {
+      const { data, error } = await supabase
+        .from('certificates')
+        .select('*')
+        .eq('certificate_id', certificateId.trim())
+        .maybeSingle();
+
+      if (error) {
+        throw error;
+      }
+
+      if (data) {
         setVerificationResult({
-          ...certificate,
-          certificateId,
+          isValid: true,
+          certificateId: data.certificate_id,
+          studentName: data.student_name,
+          courseName: data.course_name,
+          duration: data.duration,
+          completionDate: data.completion_date,
+          grade: data.grade,
+          instructorName: data.instructor_name,
+          issueDate: new Date(data.created_at).toLocaleDateString(),
           verifiedAt: new Date().toISOString(),
         });
         toast({
@@ -75,8 +74,19 @@ const VerifyCertificate = () => {
           variant: "destructive",
         });
       }
+    } catch (error: any) {
+      setVerificationResult({
+        isValid: false,
+        error: "Error verifying certificate",
+      });
+      toast({
+        title: "Verification Error",
+        description: error.message || "An error occurred while verifying the certificate.",
+        variant: "destructive",
+      });
+    } finally {
       setIsVerifying(false);
-    }, 1500);
+    }
   };
 
   const handleQRScan = () => {
@@ -84,9 +94,6 @@ const VerifyCertificate = () => {
       title: "QR Scanner",
       description: "QR scanner would open here in a real implementation.",
     });
-    // In a real implementation, this would open the camera for QR scanning
-    // For demo purposes, we'll use a mock certificate ID
-    setCertificateId("MIE-1704067200000-ABC123DEF");
   };
 
   return (
@@ -123,7 +130,7 @@ const VerifyCertificate = () => {
                       id="certificateId"
                       value={certificateId}
                       onChange={(e) => setCertificateId(e.target.value)}
-                      placeholder="Enter certificate ID (e.g., MIE-1704067200000-ABC123DEF)"
+                      placeholder="Enter certificate ID"
                       className="flex-1"
                     />
                     <Button variant="outline" onClick={handleQRScan}>
@@ -145,40 +152,6 @@ const VerifyCertificate = () => {
                     </>
                   )}
                 </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Demo Certificate IDs */}
-          <Card className="bg-blue-50 border-blue-200">
-            <CardHeader>
-              <CardTitle className="text-blue-900">Demo Certificate IDs</CardTitle>
-              <CardDescription className="text-blue-700">
-                Try these sample certificate IDs for testing:
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between bg-white p-3 rounded border">
-                  <code className="text-sm">MIE-1704067200000-ABC123DEF</code>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => setCertificateId("MIE-1704067200000-ABC123DEF")}
-                  >
-                    Use This ID
-                  </Button>
-                </div>
-                <div className="flex items-center justify-between bg-white p-3 rounded border">
-                  <code className="text-sm">MIE-1704153600000-XYZ789GHI</code>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => setCertificateId("MIE-1704153600000-XYZ789GHI")}
-                  >
-                    Use This ID
-                  </Button>
-                </div>
               </div>
             </CardContent>
           </Card>
@@ -220,14 +193,18 @@ const VerifyCertificate = () => {
                           <dt className="text-sm text-gray-600">Course:</dt>
                           <dd className="text-sm font-medium">{verificationResult.courseName}</dd>
                         </div>
-                        <div className="flex justify-between">
-                          <dt className="text-sm text-gray-600">Duration:</dt>
-                          <dd className="text-sm font-medium">{verificationResult.duration}</dd>
-                        </div>
-                        <div className="flex justify-between">
-                          <dt className="text-sm text-gray-600">Grade:</dt>
-                          <dd className="text-sm font-medium">{verificationResult.grade}</dd>
-                        </div>
+                        {verificationResult.duration && (
+                          <div className="flex justify-between">
+                            <dt className="text-sm text-gray-600">Duration:</dt>
+                            <dd className="text-sm font-medium">{verificationResult.duration}</dd>
+                          </div>
+                        )}
+                        {verificationResult.grade && (
+                          <div className="flex justify-between">
+                            <dt className="text-sm text-gray-600">Grade:</dt>
+                            <dd className="text-sm font-medium">{verificationResult.grade}</dd>
+                          </div>
+                        )}
                       </dl>
                     </div>
                     <div>
@@ -239,11 +216,17 @@ const VerifyCertificate = () => {
                         </div>
                         <div className="flex justify-between">
                           <dt className="text-sm text-gray-600">Completion Date:</dt>
-                          <dd className="text-sm font-medium">{verificationResult.completionDate}</dd>
+                          <dd className="text-sm font-medium">{new Date(verificationResult.completionDate).toLocaleDateString()}</dd>
                         </div>
+                        {verificationResult.instructorName && (
+                          <div className="flex justify-between">
+                            <dt className="text-sm text-gray-600">Instructor:</dt>
+                            <dd className="text-sm font-medium">{verificationResult.instructorName}</dd>
+                          </div>
+                        )}
                         <div className="flex justify-between">
-                          <dt className="text-sm text-gray-600">Instructor:</dt>
-                          <dd className="text-sm font-medium">{verificationResult.instructorName}</dd>
+                          <dt className="text-sm text-gray-600">Issue Date:</dt>
+                          <dd className="text-sm font-medium">{verificationResult.issueDate}</dd>
                         </div>
                         <div className="flex justify-between">
                           <dt className="text-sm text-gray-600">Verified At:</dt>
