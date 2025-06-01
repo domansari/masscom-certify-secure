@@ -94,4 +94,35 @@
     border: 8px solid;
     border-image: linear-gradient(45deg, #2563eb, #fbbf24, #2563eb) 1;
   }
+
+  /* A4 Landscape Certificate Styles */
+  .certificate-container {
+    /* A4 landscape: 297mm x 210mm */
+    width: 297mm;
+    height: 210mm;
+    /* Scale down for preview */
+    transform: scale(0.3);
+    transform-origin: top left;
+  }
+
+  @media print {
+    .certificate-container {
+      transform: none;
+      width: 297mm;
+      height: 210mm;
+    }
+  }
+
+  /* Ensure proper scaling for different screen sizes */
+  @media (max-width: 768px) {
+    .certificate-container {
+      transform: scale(0.2);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .certificate-container {
+      transform: scale(0.15);
+    }
+  }
 }
