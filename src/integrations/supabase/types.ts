@@ -17,10 +17,12 @@ export type Database = {
           created_at: string
           created_by: string
           duration: string | null
+          father_name: string | null
           grade: string | null
           id: string
           instructor_name: string | null
           qr_code_data: string
+          student_coordinator: string | null
           student_name: string
           updated_at: string
         }
@@ -31,10 +33,12 @@ export type Database = {
           created_at?: string
           created_by: string
           duration?: string | null
+          father_name?: string | null
           grade?: string | null
           id?: string
           instructor_name?: string | null
           qr_code_data: string
+          student_coordinator?: string | null
           student_name: string
           updated_at?: string
         }
@@ -45,10 +49,12 @@ export type Database = {
           created_at?: string
           created_by?: string
           duration?: string | null
+          father_name?: string | null
           grade?: string | null
           id?: string
           instructor_name?: string | null
           qr_code_data?: string
+          student_coordinator?: string | null
           student_name?: string
           updated_at?: string
         }

@@ -13,8 +13,8 @@ export const generateCertificatePDF = async (certificateElement: HTMLElement, fi
       useCORS: true,
       allowTaint: true,
       backgroundColor: '#ffffff',
-      width: 1122, // A4 landscape width in pixels at 96 DPI
-      height: 794   // A4 landscape height in pixels at 96 DPI
+      width: 794,   // A4 portrait width in pixels at 96 DPI
+      height: 1122  // A4 portrait height in pixels at 96 DPI
     });
     
     // Restore original transform
@@ -22,11 +22,11 @@ export const generateCertificatePDF = async (certificateElement: HTMLElement, fi
     
     const imgData = canvas.toDataURL('image/png');
     
-    // Create PDF in landscape orientation
-    const pdf = new jsPDF('landscape', 'mm', 'a4');
+    // Create PDF in portrait orientation
+    const pdf = new jsPDF('portrait', 'mm', 'a4');
     
-    // A4 landscape dimensions: 297mm x 210mm
-    pdf.addImage(imgData, 'PNG', 0, 0, 297, 210);
+    // A4 portrait dimensions: 210mm x 297mm
+    pdf.addImage(imgData, 'PNG', 0, 0, 210, 297);
     
     pdf.save(`${filename}.pdf`);
     

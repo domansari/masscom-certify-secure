@@ -9,6 +9,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect } from "react";
+import CertificatePreview from "@/components/CertificatePreview";
 
 const VerifyCertificate = () => {
   const { toast } = useToast();
@@ -51,13 +52,26 @@ const VerifyCertificate = () => {
           isValid: true,
           certificateId: data.certificate_id,
           studentName: data.student_name,
+          fatherName: data.father_name,
           courseName: data.course_name,
           duration: data.duration,
           completionDate: data.completion_date,
           grade: data.grade,
-          instructorName: data.instructor_name,
+          studentCoordinator: data.student_coordinator,
+          rollNo: data.roll_no,
           issueDate: new Date(data.created_at).toLocaleDateString(),
           verifiedAt: new Date().toISOString(),
+          certificateData: {
+            studentName: data.student_name,
+            fatherName: data.father_name || "",
+            courseName: data.course_name,
+            duration: data.duration || "",
+            completionDate: data.completion_date,
+            grade: data.grade || "",
+            studentCoordinator: data.student_coordinator || "",
+            certificateId: data.certificate_id,
+            rollNo: data.roll_no || "",
+          }
         });
         toast({
           title: "Certificate Verified!",
@@ -190,6 +204,16 @@ const VerifyCertificate = () => {
                           <dd className="text-sm font-medium">{verificationResult.studentName}</dd>
                         </div>
                         <div className="flex justify-between">
+                          <dt className="text-sm text-gray-600">Father's Name:</dt>
+                          <dd className="text-sm font-medium">{verificationResult.fatherName}</dd>
+                        </div>
+                        {verificationResult.rollNo && (
+                          <div className="flex justify-between">
+                            <dt className="text-sm text-gray-600">Roll No:</dt>
+                            <dd className="text-sm font-medium">{verificationResult.rollNo}</dd>
+                          </div>
+                        )}
+                        <div className="flex justify-between">
                           <dt className="text-sm text-gray-600">Course:</dt>
                           <dd className="text-sm font-medium">{verificationResult.courseName}</dd>
                         </div>
@@ -218,10 +242,10 @@ const VerifyCertificate = () => {
                           <dt className="text-sm text-gray-600">Completion Date:</dt>
                           <dd className="text-sm font-medium">{new Date(verificationResult.completionDate).toLocaleDateString()}</dd>
                         </div>
-                        {verificationResult.instructorName && (
+                        {verificationResult.studentCoordinator && (
                           <div className="flex justify-between">
-                            <dt className="text-sm text-gray-600">Instructor:</dt>
-                            <dd className="text-sm font-medium">{verificationResult.instructorName}</dd>
+                            <dt className="text-sm text-gray-600">Student Co-ordinator:</dt>
+                            <dd className="text-sm font-medium">{verificationResult.studentCoordinator}</dd>
                           </div>
                         )}
                         <div className="flex justify-between">
@@ -239,6 +263,21 @@ const VerifyCertificate = () => {
                   </div>
                 </CardContent>
               )}
+            </Card>
+          )}
+
+          {/* Certificate Preview */}
+          {verificationResult && verificationResult.isValid && verificationResult.certificateData && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Certificate Preview</CardTitle>
+                <CardDescription>
+                  Preview of the verified certificate
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <CertificatePreview data={verificationResult.certificateData} />
+              </CardContent>
             </Card>
           )}
         </div>

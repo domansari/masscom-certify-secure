@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Download, Edit, Search } from "lucide-react";
+import { Download, Edit, Search, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -18,6 +18,7 @@ interface Certificate {
   grade: string | null;
   instructor_name: string | null;
   duration: string | null;
+  roll_no: string | null;
   created_at: string;
 }
 
@@ -31,6 +32,7 @@ const CertificateManager = ({ onEditCertificate }: CertificateManagerProps) => {
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [deleting, setDeleting] = useState<string | null>(null);
 
   const fetchCertificates = async (search?: string) => {
     if (!isAdmin()) return;
@@ -43,7 +45,7 @@ const CertificateManager = ({ onEditCertificate }: CertificateManagerProps) => {
         .order('created_at', { ascending: false });
 
       if (search) {
-        query = query.or(`student_name.ilike.%${search}%,certificate_id.ilike.%${search}%,course_name.ilike.%${search}%`);
+        query = query.or(`student_name.ilike.%${search}%,certificate_id.ilike.%${search}%,course_name.ilike.%${search}%,roll_no.ilike.%${search}%`);
       }
 
       const { data, error } = await query;
@@ -72,6 +74,40 @@ const CertificateManager = ({ onEditCertificate }: CertificateManagerProps) => {
     fetchCertificates(searchTerm);
   };
 
+  const handleDelete = async (certificateId: string) => {
+    if (!window.confirm("Are you sure you want to delete this certificate? This action cannot be undone.")) {
+      return;
+    }
+
+    setDeleting(certificateId);
+    try {
+      const { error } = await supabase
+        .from('certificates')
+        .delete()
+        .eq('id', certificateId);
+
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: "Certificate Deleted",
+        description: "The certificate has been successfully deleted.",
+      });
+
+      // Refresh the list
+      fetchCertificates(searchTerm);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete certificate.",
+        variant: "destructive",
+      });
+    } finally {
+      setDeleting(null);
+    }
+  };
+
   const handleDownloadQR = (certificateId: string, studentName: string) => {
     // This will trigger the QR code download
     const event = new CustomEvent('downloadQR', { 
@@ -89,13 +125,13 @@ const CertificateManager = ({ onEditCertificate }: CertificateManagerProps) => {
       <CardHeader>
         <CardTitle>Certificate Management</CardTitle>
         <CardDescription>
-          Search, view, edit, and download previously generated certificates
+          Search, view, edit, and delete previously generated certificates
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="flex space-x-2 mb-6">
           <Input
-            placeholder="Search by student name, certificate ID, or course..."
+            placeholder="Search by student name, certificate ID, roll no, or course..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="flex-1"
@@ -118,6 +154,7 @@ const CertificateManager = ({ onEditCertificate }: CertificateManagerProps) => {
                 <TableRow>
                   <TableHead>Certificate ID</TableHead>
                   <TableHead>Student Name</TableHead>
+                  <TableHead>Roll No</TableHead>
                   <TableHead>Course</TableHead>
                   <TableHead>Completion Date</TableHead>
                   <TableHead>Grade</TableHead>
@@ -128,7 +165,7 @@ const CertificateManager = ({ onEditCertificate }: CertificateManagerProps) => {
               <TableBody>
                 {certificates.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8 text-gray-500">
+                    <TableCell colSpan={8} className="text-center py-8 text-gray-500">
                       No certificates found
                     </TableCell>
                   </TableRow>
@@ -137,6 +174,7 @@ const CertificateManager = ({ onEditCertificate }: CertificateManagerProps) => {
                     <TableRow key={cert.id}>
                       <TableCell className="font-mono text-sm">{cert.certificate_id}</TableCell>
                       <TableCell className="font-medium">{cert.student_name}</TableCell>
+                      <TableCell>{cert.roll_no || "-"}</TableCell>
                       <TableCell>{cert.course_name}</TableCell>
                       <TableCell>{new Date(cert.completion_date).toLocaleDateString()}</TableCell>
                       <TableCell>{cert.grade || "-"}</TableCell>
@@ -156,6 +194,18 @@ const CertificateManager = ({ onEditCertificate }: CertificateManagerProps) => {
                             onClick={() => handleDownloadQR(cert.certificate_id, cert.student_name)}
                           >
                             <Download className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDelete(cert.id)}
+                            disabled={deleting === cert.id}
+                          >
+                            {deleting === cert.id ? (
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-500"></div>
+                            ) : (
+                              <Trash2 className="h-4 w-4" />
+                            )}
                           </Button>
                         </div>
                       </TableCell>

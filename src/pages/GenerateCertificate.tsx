@@ -1,3 +1,4 @@
+
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,6 +28,7 @@ const GenerateCertificate = () => {
     grade: "",
     studentCoordinator: "",
     certificateId: "",
+    rollNo: "",
   });
 
   const [showPreview, setShowPreview] = useState(false);
@@ -61,19 +63,26 @@ const GenerateCertificate = () => {
       
       if (editingCertificate) {
         // Update existing certificate
+        const updateData: any = {
+          student_name: formData.studentName,
+          father_name: formData.fatherName,
+          course_name: formData.courseName,
+          duration: formData.duration || null,
+          completion_date: formData.completionDate,
+          grade: formData.grade || null,
+          student_coordinator: formData.studentCoordinator || null,
+          qr_code_data: verificationUrl,
+          updated_at: new Date().toISOString(),
+        };
+
+        // Only add roll_no if the field exists in the database
+        if (formData.rollNo) {
+          updateData.roll_no = formData.rollNo;
+        }
+
         const { error } = await supabase
           .from('certificates')
-          .update({
-            student_name: formData.studentName,
-            father_name: formData.fatherName,
-            course_name: formData.courseName,
-            duration: formData.duration || null,
-            completion_date: formData.completionDate,
-            grade: formData.grade || null,
-            student_coordinator: formData.studentCoordinator || null,
-            qr_code_data: verificationUrl,
-            updated_at: new Date().toISOString(),
-          })
+          .update(updateData)
           .eq('id', editingCertificate.id);
 
         if (error) throw error;
@@ -84,20 +93,27 @@ const GenerateCertificate = () => {
         });
       } else {
         // Create new certificate
+        const insertData: any = {
+          certificate_id: formData.certificateId,
+          student_name: formData.studentName,
+          father_name: formData.fatherName,
+          course_name: formData.courseName,
+          duration: formData.duration || null,
+          completion_date: formData.completionDate,
+          grade: formData.grade || null,
+          student_coordinator: formData.studentCoordinator || null,
+          qr_code_data: verificationUrl,
+          created_by: user?.id,
+        };
+
+        // Only add roll_no if the field exists in the database
+        if (formData.rollNo) {
+          insertData.roll_no = formData.rollNo;
+        }
+
         const { error } = await supabase
           .from('certificates')
-          .insert({
-            certificate_id: formData.certificateId,
-            student_name: formData.studentName,
-            father_name: formData.fatherName,
-            course_name: formData.courseName,
-            duration: formData.duration || null,
-            completion_date: formData.completionDate,
-            grade: formData.grade || null,
-            student_coordinator: formData.studentCoordinator || null,
-            qr_code_data: verificationUrl,
-            created_by: user?.id,
-          });
+          .insert(insertData);
 
         if (error) throw error;
         
@@ -157,6 +173,7 @@ const GenerateCertificate = () => {
       grade: "",
       studentCoordinator: "",
       certificateId: "",
+      rollNo: "",
     });
     setShowPreview(false);
     setSaved(false);
@@ -173,6 +190,7 @@ const GenerateCertificate = () => {
       grade: certificate.grade || "",
       studentCoordinator: certificate.student_coordinator || "",
       certificateId: certificate.certificate_id,
+      rollNo: certificate.roll_no || "",
     });
     setEditingCertificate(certificate);
     setShowPreview(true);
@@ -243,16 +261,28 @@ const GenerateCertificate = () => {
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="fatherName">Father's Name *</Label>
-                  <Input
-                    id="fatherName"
-                    value={formData.fatherName}
-                    onChange={(e) => setFormData({ ...formData, fatherName: e.target.value })}
-                    placeholder="Enter father's full name"
-                    required
-                    disabled={saved && !editingCertificate}
-                  />
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="fatherName">Father's Name *</Label>
+                    <Input
+                      id="fatherName"
+                      value={formData.fatherName}
+                      onChange={(e) => setFormData({ ...formData, fatherName: e.target.value })}
+                      placeholder="Enter father's full name"
+                      required
+                      disabled={saved && !editingCertificate}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="rollNo">Roll No.</Label>
+                    <Input
+                      id="rollNo"
+                      value={formData.rollNo}
+                      onChange={(e) => setFormData({ ...formData, rollNo: e.target.value })}
+                      placeholder="Enter roll number"
+                      disabled={saved && !editingCertificate}
+                    />
+                  </div>
                 </div>
 
                 <div className="space-y-2">
@@ -394,7 +424,7 @@ const GenerateCertificate = () => {
                     <div className="flex justify-between items-center">
                       <div>
                         <CardTitle>Certificate Preview</CardTitle>
-                        <CardDescription>A4 Landscape certificate with background</CardDescription>
+                        <CardDescription>A4 Portrait certificate with logo</CardDescription>
                       </div>
                       <Button onClick={handleDownload}>
                         <Download className="mr-2 h-4 w-4" />
