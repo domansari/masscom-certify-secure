@@ -1,24 +1,24 @@
 
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Download, Edit, Search, Trash2 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { Search, Edit, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 
 interface Certificate {
   id: string;
   certificate_id: string;
   student_name: string;
+  father_name: string;
   course_name: string;
+  duration: string;
   completion_date: string;
-  grade: string | null;
-  instructor_name: string | null;
-  duration: string | null;
-  roll_no: string | null;
+  grade: string;
+  student_coordinator: string;
+  roll_no?: string;
   created_at: string;
 }
 
@@ -28,31 +28,18 @@ interface CertificateManagerProps {
 
 const CertificateManager = ({ onEditCertificate }: CertificateManagerProps) => {
   const { toast } = useToast();
-  const { isAdmin } = useAuth();
   const [certificates, setCertificates] = useState<Certificate[]>([]);
-  const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [deleting, setDeleting] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const fetchCertificates = async (search?: string) => {
-    if (!isAdmin()) return;
-    
-    setLoading(true);
+  const fetchCertificates = async () => {
     try {
-      let query = supabase
+      const { data, error } = await supabase
         .from('certificates')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (search) {
-        query = query.or(`student_name.ilike.%${search}%,certificate_id.ilike.%${search}%,course_name.ilike.%${search}%,roll_no.ilike.%${search}%`);
-      }
-
-      const { data, error } = await query;
-
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
       setCertificates(data || []);
     } catch (error: any) {
@@ -66,152 +53,128 @@ const CertificateManager = ({ onEditCertificate }: CertificateManagerProps) => {
     }
   };
 
-  useEffect(() => {
-    fetchCertificates();
-  }, []);
-
-  const handleSearch = () => {
-    fetchCertificates(searchTerm);
-  };
-
-  const handleDelete = async (certificateId: string) => {
-    if (!window.confirm("Are you sure you want to delete this certificate? This action cannot be undone.")) {
+  const deleteCertificate = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this certificate?")) {
       return;
     }
 
-    setDeleting(certificateId);
     try {
       const { error } = await supabase
         .from('certificates')
         .delete()
-        .eq('id', certificateId);
+        .eq('id', id);
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
+      setCertificates(certificates.filter(cert => cert.id !== id));
       toast({
         title: "Certificate Deleted",
-        description: "The certificate has been successfully deleted.",
+        description: "The certificate has been deleted successfully.",
       });
-
-      // Refresh the list
-      fetchCertificates(searchTerm);
     } catch (error: any) {
       toast({
         title: "Error",
         description: error.message || "Failed to delete certificate.",
         variant: "destructive",
       });
-    } finally {
-      setDeleting(null);
     }
   };
 
-  const handleDownloadQR = (certificateId: string, studentName: string) => {
-    // This will trigger the QR code download
-    const event = new CustomEvent('downloadQR', { 
-      detail: { certificateId, studentName } 
-    });
-    window.dispatchEvent(event);
-  };
+  useEffect(() => {
+    fetchCertificates();
+  }, []);
 
-  if (!isAdmin()) {
-    return null;
+  const filteredCertificates = certificates.filter(cert =>
+    cert.student_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    cert.certificate_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    cert.course_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (cert.roll_no && cert.roll_no.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Manage Certificates</CardTitle>
+          <CardDescription>Loading certificates...</CardDescription>
+        </CardHeader>
+      </Card>
+    );
   }
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Certificate Management</CardTitle>
+        <CardTitle>Manage Certificates</CardTitle>
         <CardDescription>
-          Search, view, edit, and delete previously generated certificates
+          View, edit, and delete existing certificates
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="flex space-x-2 mb-6">
-          <Input
-            placeholder="Search by student name, certificate ID, roll no, or course..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="flex-1"
-          />
-          <Button onClick={handleSearch} disabled={loading}>
-            <Search className="mr-2 h-4 w-4" />
-            Search
-          </Button>
+        <div className="mb-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Input
+              placeholder="Search by student name, certificate ID, course, or roll number..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+          </div>
         </div>
 
-        {loading ? (
-          <div className="text-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-            <p className="mt-2 text-gray-600">Loading certificates...</p>
+        {filteredCertificates.length === 0 ? (
+          <div className="text-center text-gray-500 py-8">
+            {searchTerm ? "No certificates found matching your search." : "No certificates found."}
           </div>
         ) : (
-          <div className="rounded-md border">
+          <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Certificate ID</TableHead>
                   <TableHead>Student Name</TableHead>
                   <TableHead>Roll No</TableHead>
                   <TableHead>Course</TableHead>
-                  <TableHead>Completion Date</TableHead>
-                  <TableHead>Grade</TableHead>
-                  <TableHead>Created</TableHead>
+                  <TableHead>Certificate ID</TableHead>
+                  <TableHead>Date</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {certificates.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={8} className="text-center py-8 text-gray-500">
-                      No certificates found
+                {filteredCertificates.map((certificate) => (
+                  <TableRow key={certificate.id}>
+                    <TableCell className="font-medium">
+                      {certificate.student_name}
+                    </TableCell>
+                    <TableCell>{certificate.roll_no || "N/A"}</TableCell>
+                    <TableCell>{certificate.course_name}</TableCell>
+                    <TableCell className="font-mono text-xs">
+                      {certificate.certificate_id}
+                    </TableCell>
+                    <TableCell>
+                      {new Date(certificate.completion_date).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex space-x-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => onEditCertificate(certificate)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => deleteCertificate(certificate.id)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
-                ) : (
-                  certificates.map((cert) => (
-                    <TableRow key={cert.id}>
-                      <TableCell className="font-mono text-sm">{cert.certificate_id}</TableCell>
-                      <TableCell className="font-medium">{cert.student_name}</TableCell>
-                      <TableCell>{cert.roll_no || "-"}</TableCell>
-                      <TableCell>{cert.course_name}</TableCell>
-                      <TableCell>{new Date(cert.completion_date).toLocaleDateString()}</TableCell>
-                      <TableCell>{cert.grade || "-"}</TableCell>
-                      <TableCell>{new Date(cert.created_at).toLocaleDateString()}</TableCell>
-                      <TableCell>
-                        <div className="flex space-x-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => onEditCertificate(cert)}
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleDownloadQR(cert.certificate_id, cert.student_name)}
-                          >
-                            <Download className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleDelete(cert.id)}
-                            disabled={deleting === cert.id}
-                          >
-                            {deleting === cert.id ? (
-                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-500"></div>
-                            ) : (
-                              <Trash2 className="h-4 w-4" />
-                            )}
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
+                ))}
               </TableBody>
             </Table>
           </div>

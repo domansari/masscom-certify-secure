@@ -58,7 +58,7 @@ const VerifyCertificate = () => {
           completionDate: data.completion_date,
           grade: data.grade,
           studentCoordinator: data.student_coordinator,
-          rollNo: data.roll_no,
+          rollNo: data.roll_no || "",
           issueDate: new Date(data.created_at).toLocaleDateString(),
           verifiedAt: new Date().toISOString(),
           certificateData: {

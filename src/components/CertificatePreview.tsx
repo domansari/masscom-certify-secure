@@ -1,5 +1,7 @@
 
 import { QrCode } from "lucide-react";
+import { useEffect, useRef } from "react";
+import QRCode from 'qrcode';
 
 interface CertificateData {
   studentName: string;
@@ -18,16 +20,39 @@ interface CertificatePreviewProps {
 }
 
 const CertificatePreview = ({ data }: CertificatePreviewProps) => {
+  const qrCanvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const generateQR = async () => {
+      if (qrCanvasRef.current && data.certificateId) {
+        try {
+          const verificationUrl = `${window.location.origin}/verify?id=${data.certificateId}`;
+          await QRCode.toCanvas(qrCanvasRef.current, verificationUrl, {
+            width: 64,
+            margin: 1,
+          });
+        } catch (error) {
+          console.error('Error generating QR code:', error);
+        }
+      }
+    };
+
+    generateQR();
+  }, [data.certificateId]);
+
   return (
     <div 
-      className="certificate-container relative bg-white shadow-lg mx-auto"
+      className="certificate-container relative bg-white shadow-lg mx-auto certificate-bg"
       style={{
         width: '210mm',
         height: '297mm',
         transform: 'scale(0.4)',
         transformOrigin: 'top left',
         padding: '20mm',
-        fontFamily: 'Times, serif'
+        fontFamily: 'Times, serif',
+        background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+        border: '8px solid',
+        borderImage: 'linear-gradient(45deg, #2563eb, #fbbf24, #2563eb) 1'
       }}
     >
       {/* Certificate ID - Extreme Left Top Corner */}
@@ -37,7 +62,7 @@ const CertificatePreview = ({ data }: CertificatePreviewProps) => {
 
       {/* QR Code - Extreme Right Top Corner */}
       <div className="absolute top-4 right-4 w-16 h-16 bg-white border border-gray-300 rounded flex items-center justify-center">
-        <QrCode className="h-12 w-12 text-gray-700" />
+        <canvas ref={qrCanvasRef} className="w-full h-full" />
       </div>
 
       {/* Logo */}
@@ -123,7 +148,7 @@ const CertificatePreview = ({ data }: CertificatePreviewProps) => {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-8 text-left max-w-2xl mx-auto">
+        <div className="grid grid-cols-1 gap-8 text-left max-w-2xl mx-auto">
           <div>
             <p className="text-lg text-gray-700 mb-1">Completion Date:</p>
             <div className="border-b border-black pb-1">
@@ -141,17 +166,12 @@ const CertificatePreview = ({ data }: CertificatePreviewProps) => {
         </div>
       </div>
 
-      {/* Signatures */}
+      {/* Only Principal/Director Signature */}
       <div className="absolute bottom-32 left-20 right-20">
-        <div className="grid grid-cols-2 gap-32">
+        <div className="flex justify-center">
           <div className="text-center">
             <div className="border-t-2 border-black pt-2 mt-16">
               <p className="text-lg font-semibold">Principal/Director</p>
-            </div>
-          </div>
-          <div className="text-center">
-            <div className="border-t-2 border-black pt-2 mt-16">
-              <p className="text-lg font-semibold">Student</p>
             </div>
           </div>
         </div>

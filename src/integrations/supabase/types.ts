@@ -22,6 +22,7 @@ export type Database = {
           id: string
           instructor_name: string | null
           qr_code_data: string
+          roll_no: string | null
           student_coordinator: string | null
           student_name: string
           updated_at: string
@@ -38,6 +39,7 @@ export type Database = {
           id?: string
           instructor_name?: string | null
           qr_code_data: string
+          roll_no?: string | null
           student_coordinator?: string | null
           student_name: string
           updated_at?: string
@@ -54,6 +56,7 @@ export type Database = {
           id?: string
           instructor_name?: string | null
           qr_code_data?: string
+          roll_no?: string | null
           student_coordinator?: string | null
           student_name?: string
           updated_at?: string
