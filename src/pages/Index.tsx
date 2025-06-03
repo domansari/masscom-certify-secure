@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Award, Search, Edit, Shield, Printer } from "lucide-react";
@@ -7,10 +6,6 @@ import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
   const { isAdmin } = useAuth();
-
-  const handlePrint = () => {
-    window.print();
-  };
 
   if (!isAdmin()) {
     return (
@@ -100,21 +95,20 @@ const Index = () => {
               </Card>
             </Link>
 
-            {/* Print Option */}
-            <Card 
-              className="text-center hover:shadow-lg transition-shadow cursor-pointer h-48 flex flex-col justify-center"
-              onClick={handlePrint}
-            >
-              <CardHeader>
-                <div className="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Printer className="h-8 w-8 text-white" />
-                </div>
-                <CardTitle className="text-xl">Print Certificate</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600">Print current page or certificate</p>
-              </CardContent>
-            </Card>
+            {/* Print Certificate */}
+            <Link to="/print">
+              <Card className="text-center hover:shadow-lg transition-shadow cursor-pointer h-48 flex flex-col justify-center">
+                <CardHeader>
+                  <div className="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Printer className="h-8 w-8 text-white" />
+                  </div>
+                  <CardTitle className="text-xl">Print Certificate</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-600">Search and print certificates</p>
+                </CardContent>
+              </Card>
+            </Link>
 
           </div>
         </div>

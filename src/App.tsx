@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import GenerateCertificate from "./pages/GenerateCertificate";
+import PrintCertificate from "./pages/PrintCertificate";
 import VerifyCertificate from "./pages/VerifyCertificate";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
