@@ -43,7 +43,7 @@ const CertificatePreview = ({ data }: CertificatePreviewProps) => {
   return (
     <div 
       id="certificate-element"
-      className="certificate-container relative bg-white mx-auto"
+      className="certificate-container relative bg-white mx-auto print:mx-0"
       style={{
         width: '210mm',
         height: '297mm',
@@ -54,7 +54,7 @@ const CertificatePreview = ({ data }: CertificatePreviewProps) => {
         fontFamily: 'Times, serif',
         background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
         border: '12px solid',
-        borderImage: 'linear-gradient(45deg, #2563eb, #fbbf24, #dc2626, #059669, #7c3aed) 1',
+        borderImage: 'linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57, #ff9ff3) 1',
         boxSizing: 'border-box'
       }}
     >
@@ -69,11 +69,11 @@ const CertificatePreview = ({ data }: CertificatePreviewProps) => {
       </div>
 
       {/* Main Content Container */}
-      <div className="flex flex-col h-full" style={{ padding: '15mm 15mm 10mm 15mm' }}>
+      <div className="flex flex-col h-full" style={{ padding: '15mm 15mm 8mm 15mm' }}>
         {/* Logo */}
         <div className="flex justify-center mb-6">
           <img 
-            src="/lovable-uploads/945d2cdf-b885-4e7f-bc56-dc8153f8bc7d.png" 
+            src="/lovable-uploads/6bb1665e-2bc0-4761-a747-55431e93f784.png" 
             alt="Institute Logo" 
             className="h-32 w-auto object-contain"
           />
@@ -114,7 +114,7 @@ const CertificatePreview = ({ data }: CertificatePreviewProps) => {
             <div 
               className="mx-auto border-b-2 border-black"
               style={{ 
-                width: `${Math.max(200, (data.studentName?.length || 12) * 20)}px`
+                width: `${Math.max(200, (data.studentName?.length || 12) * 22)}px`
               }}
             ></div>
           </div>
@@ -170,36 +170,36 @@ const CertificatePreview = ({ data }: CertificatePreviewProps) => {
               <div 
                 className="border-b border-black mx-auto"
                 style={{ 
-                  width: `${Math.max(100, (data.completionDate ? new Date(data.completionDate).toLocaleDateString().length : 8) * 12)}px`
+                  width: `${Math.max(120, (data.completionDate ? new Date(data.completionDate).toLocaleDateString().length : 8) * 14)}px`
                 }}
               ></div>
             </div>
           </div>
         </div>
 
-        {/* Signatures Section */}
-        <div className="mt-8 mb-4">
-          <div className="flex justify-between items-end max-w-4xl mx-auto">
-            <div className="text-center flex-1 mx-8">
-              <div className="border-t-2 border-black pt-2 mt-16">
+        {/* Signatures Section - Properly positioned within borders */}
+        <div className="mt-6 mb-2">
+          <div className="flex justify-between items-end max-w-3xl mx-auto">
+            <div className="text-center flex-1 mx-6">
+              <div className="border-t-2 border-black pt-2 mt-12">
                 <p className="text-lg font-bold">Student Co-ordinator</p>
               </div>
             </div>
-            <div className="text-center flex-1 mx-8">
-              <div className="border-t-2 border-black pt-2 mt-16">
+            <div className="text-center flex-1 mx-6">
+              <div className="border-t-2 border-black pt-2 mt-12">
                 <p className="text-lg font-bold">Principal/Director</p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Address at Bottom - Inside border */}
-        <div className="text-center mt-4">
-          <p className="text-sm text-gray-700">
-            1st Floor Mohsin Market, Yusufpur, Mohammadabad, Uttar Pradesh 233227
-          </p>
+        {/* Email and Mobile at Bottom - Inside border */}
+        <div className="text-center mt-2">
           <p className="text-sm text-gray-700">
             info@masscom.co.in, +91-9628355656
+          </p>
+          <p className="text-sm text-gray-700">
+            1st Floor Mohsin Market, Yusufpur, Mohammadabad, Uttar Pradesh 233227
           </p>
         </div>
       </div>
