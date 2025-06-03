@@ -53,7 +53,7 @@ const CertificatePreview = ({ data }: CertificatePreviewProps) => {
         margin: '0',
         fontFamily: 'Times, serif',
         background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
-        border: '12px solid',
+        border: '12px solid transparent',
         borderImage: 'linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57, #ff9ff3) 1',
         boxSizing: 'border-box'
       }}
@@ -69,13 +69,13 @@ const CertificatePreview = ({ data }: CertificatePreviewProps) => {
       </div>
 
       {/* Main Content Container */}
-      <div className="flex flex-col h-full" style={{ padding: '15mm 15mm 8mm 15mm' }}>
+      <div className="flex flex-col h-full" style={{ padding: '15mm 15mm 5mm 15mm' }}>
         {/* Logo */}
-        <div className="flex justify-center mb-6">
+        <div className="flex justify-center mb-4">
           <img 
-            src="/lovable-uploads/6bb1665e-2bc0-4761-a747-55431e93f784.png" 
+            src="/lovable-uploads/945d2cdf-b885-4e7f-bc56-dc8153f8bc7d.png" 
             alt="Institute Logo" 
-            className="h-32 w-auto object-contain"
+            className="h-28 w-auto object-contain"
           />
         </div>
 
@@ -87,14 +87,14 @@ const CertificatePreview = ({ data }: CertificatePreviewProps) => {
         </div>
 
         {/* Subtitle */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-6">
           <p className="text-lg text-gray-700 italic">
             [An Autonomous Institution Registered Under The Public Trust Act.]
           </p>
         </div>
 
         {/* Certificate Title */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-6">
           <h2 className="text-3xl font-bold text-red-600 uppercase tracking-widest">
             CERTIFICATE
           </h2>
@@ -102,7 +102,7 @@ const CertificatePreview = ({ data }: CertificatePreviewProps) => {
         </div>
 
         {/* Certificate Content */}
-        <div className="flex-1 flex flex-col justify-center space-y-6">
+        <div className="flex-1 flex flex-col justify-center space-y-4">
           <p className="text-xl text-gray-800 text-center">
             This is to certify that
           </p>
@@ -114,7 +114,7 @@ const CertificatePreview = ({ data }: CertificatePreviewProps) => {
             <div 
               className="mx-auto border-b-2 border-black"
               style={{ 
-                width: `${Math.max(200, (data.studentName?.length || 12) * 22)}px`
+                width: `${Math.max(200, (data.studentName?.length || 12) * 20)}px`
               }}
             ></div>
           </div>
@@ -122,13 +122,23 @@ const CertificatePreview = ({ data }: CertificatePreviewProps) => {
           <div className="grid grid-cols-2 gap-8 text-left max-w-2xl mx-auto">
             <div>
               <p className="text-lg text-gray-700 mb-1">S/O, D/O:</p>
-              <div className="border-b border-black pb-1">
+              <div 
+                className="border-b border-black pb-1"
+                style={{ 
+                  width: `${Math.max(150, (data.fatherName?.length || 10) * 16)}px`
+                }}
+              >
                 <p className="text-xl font-semibold">{data.fatherName || "Father's Name"}</p>
               </div>
             </div>
             <div>
               <p className="text-lg text-gray-700 mb-1">Roll No:</p>
-              <div className="border-b border-black pb-1">
+              <div 
+                className="border-b border-black pb-1"
+                style={{ 
+                  width: `${Math.max(120, (data.rollNo?.length || 8) * 18)}px`
+                }}
+              >
                 <p className="text-xl font-semibold">{data.rollNo || "Roll Number"}</p>
               </div>
             </div>
@@ -170,31 +180,26 @@ const CertificatePreview = ({ data }: CertificatePreviewProps) => {
               <div 
                 className="border-b border-black mx-auto"
                 style={{ 
-                  width: `${Math.max(120, (data.completionDate ? new Date(data.completionDate).toLocaleDateString().length : 8) * 14)}px`
+                  width: `${Math.max(120, (data.completionDate ? new Date(data.completionDate).toLocaleDateString().length : 8) * 12)}px`
                 }}
               ></div>
             </div>
           </div>
         </div>
 
-        {/* Signatures Section - Properly positioned within borders */}
-        <div className="mt-6 mb-2">
+        {/* Signatures Section - Reduced space */}
+        <div className="mt-2 mb-1">
           <div className="flex justify-between items-end max-w-3xl mx-auto">
             <div className="text-center flex-1 mx-6">
-              <div className="border-t-2 border-black pt-2 mt-12">
-                <p className="text-lg font-bold">Student Co-ordinator</p>
-              </div>
-            </div>
-            <div className="text-center flex-1 mx-6">
-              <div className="border-t-2 border-black pt-2 mt-12">
+              <div className="border-t-2 border-black pt-2 mt-8">
                 <p className="text-lg font-bold">Principal/Director</p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Email and Mobile at Bottom - Inside border */}
-        <div className="text-center mt-2">
+        {/* Email and Mobile at Bottom - Inside border with reduced margin */}
+        <div className="text-center mt-1 mb-1">
           <p className="text-sm text-gray-700">
             info@masscom.co.in, +91-9628355656
           </p>
