@@ -53,8 +53,8 @@ const CertificatePreview = ({ data }: CertificatePreviewProps) => {
         margin: '0',
         fontFamily: 'Times, serif',
         background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
-        border: '8px solid',
-        borderImage: 'linear-gradient(45deg, #2563eb, #fbbf24, #2563eb) 1',
+        border: '12px solid',
+        borderImage: 'linear-gradient(45deg, #2563eb, #fbbf24, #dc2626, #059669, #7c3aed) 1',
         boxSizing: 'border-box'
       }}
     >
@@ -69,11 +69,11 @@ const CertificatePreview = ({ data }: CertificatePreviewProps) => {
       </div>
 
       {/* Main Content Container */}
-      <div className="flex flex-col h-full" style={{ padding: '15mm' }}>
+      <div className="flex flex-col h-full" style={{ padding: '15mm 15mm 10mm 15mm' }}>
         {/* Logo */}
         <div className="flex justify-center mb-6">
           <img 
-            src="/lovable-uploads/6bb1665e-2bc0-4761-a747-55431e93f784.png" 
+            src="/lovable-uploads/945d2cdf-b885-4e7f-bc56-dc8153f8bc7d.png" 
             alt="Institute Logo" 
             className="h-32 w-auto object-contain"
           />
@@ -81,7 +81,7 @@ const CertificatePreview = ({ data }: CertificatePreviewProps) => {
 
         {/* Institute Name - Single Line */}
         <div className="text-center mb-2">
-          <h1 className="text-3xl font-bold text-blue-800 uppercase tracking-wide">
+          <h1 className="text-2xl font-bold text-blue-800 uppercase tracking-wide">
             MASSCOM INFOTECH EDUCATION
           </h1>
         </div>
@@ -107,10 +107,16 @@ const CertificatePreview = ({ data }: CertificatePreviewProps) => {
             This is to certify that
           </p>
           
-          <div className="border-b-2 border-black pb-2 mx-16">
-            <h3 className="text-3xl font-bold text-black uppercase text-center">
+          <div className="text-center">
+            <h3 className="text-3xl font-bold text-black uppercase mb-2">
               {data.studentName || "Student Name"}
             </h3>
+            <div 
+              className="mx-auto border-b-2 border-black"
+              style={{ 
+                width: `${Math.max(200, (data.studentName?.length || 12) * 20)}px`
+              }}
+            ></div>
           </div>
 
           <div className="grid grid-cols-2 gap-8 text-left max-w-2xl mx-auto">
@@ -155,19 +161,24 @@ const CertificatePreview = ({ data }: CertificatePreviewProps) => {
             </div>
           </div>
 
-          <div className="text-center max-w-md mx-auto">
+          <div className="text-center">
             <p className="text-lg text-gray-700 mb-1">Date of Issue:</p>
-            <div className="inline-block border-b border-black pb-1">
-              <p className="text-xl font-semibold px-4">
+            <div className="inline-block">
+              <p className="text-xl font-semibold mb-1">
                 {data.completionDate ? new Date(data.completionDate).toLocaleDateString() : "Date"}
               </p>
+              <div 
+                className="border-b border-black mx-auto"
+                style={{ 
+                  width: `${Math.max(100, (data.completionDate ? new Date(data.completionDate).toLocaleDateString().length : 8) * 12)}px`
+                }}
+              ></div>
             </div>
           </div>
         </div>
 
-        {/* Signatures Section - Within border */}
-        <div className="mt-12 mb-8">
-          {/* Signature Lines */}
+        {/* Signatures Section */}
+        <div className="mt-8 mb-4">
           <div className="flex justify-between items-end max-w-4xl mx-auto">
             <div className="text-center flex-1 mx-8">
               <div className="border-t-2 border-black pt-2 mt-16">
@@ -182,8 +193,8 @@ const CertificatePreview = ({ data }: CertificatePreviewProps) => {
           </div>
         </div>
 
-        {/* Address at Bottom */}
-        <div className="text-center">
+        {/* Address at Bottom - Inside border */}
+        <div className="text-center mt-4">
           <p className="text-sm text-gray-700">
             1st Floor Mohsin Market, Yusufpur, Mohammadabad, Uttar Pradesh 233227
           </p>

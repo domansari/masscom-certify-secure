@@ -95,18 +95,23 @@
     border-image: linear-gradient(45deg, #2563eb, #fbbf24, #2563eb) 1;
   }
 
-  /* A4 Portrait Certificate Styles - Full Size */
+  /* A4 Portrait Certificate Styles - Exact Size */
   .certificate-container {
-    /* A4 portrait: 210mm x 297mm */
+    /* A4 portrait: exactly 210mm x 297mm */
     width: 210mm !important;
     height: 297mm !important;
-    /* Scale down for preview */
+    /* Scale down for preview only */
     transform: scale(0.4);
     transform-origin: top left;
     box-sizing: border-box;
     margin: 0;
     padding: 0;
     position: relative;
+    /* Ensure exact dimensions for PDF generation */
+    min-width: 210mm;
+    min-height: 297mm;
+    max-width: 210mm;
+    max-height: 297mm;
   }
 
   @media print {
@@ -117,15 +122,24 @@
       margin: 0 !important;
       padding: 0 !important;
       box-sizing: border-box;
+      min-width: 210mm !important;
+      min-height: 297mm !important;
+      max-width: 210mm !important;
+      max-height: 297mm !important;
     }
     
     @page {
-      size: A4 portrait;
+      size: 210mm 297mm;
       margin: 0;
+    }
+    
+    body {
+      margin: 0;
+      padding: 0;
     }
   }
 
-  /* Ensure proper scaling for different screen sizes */
+  /* Responsive scaling for preview */
   @media (max-width: 768px) {
     .certificate-container {
       transform: scale(0.25);
