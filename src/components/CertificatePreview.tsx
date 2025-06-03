@@ -42,6 +42,7 @@ const CertificatePreview = ({ data }: CertificatePreviewProps) => {
 
   return (
     <div 
+      id="certificate-element"
       className="certificate-container relative bg-white mx-auto"
       style={{
         width: '210mm',
@@ -68,11 +69,11 @@ const CertificatePreview = ({ data }: CertificatePreviewProps) => {
       </div>
 
       {/* Main Content Container */}
-      <div className="flex flex-col h-full" style={{ padding: '20mm' }}>
+      <div className="flex flex-col h-full" style={{ padding: '15mm' }}>
         {/* Logo */}
         <div className="flex justify-center mb-6">
           <img 
-            src="/lovable-uploads/945d2cdf-b885-4e7f-bc56-dc8153f8bc7d.png" 
+            src="/lovable-uploads/6bb1665e-2bc0-4761-a747-55431e93f784.png" 
             alt="Institute Logo" 
             className="h-32 w-auto object-contain"
           />
@@ -80,7 +81,7 @@ const CertificatePreview = ({ data }: CertificatePreviewProps) => {
 
         {/* Institute Name - Single Line */}
         <div className="text-center mb-2">
-          <h1 className="text-4xl font-bold text-blue-800 uppercase tracking-wide">
+          <h1 className="text-3xl font-bold text-blue-800 uppercase tracking-wide">
             MASSCOM INFOTECH EDUCATION
           </h1>
         </div>
@@ -154,34 +155,27 @@ const CertificatePreview = ({ data }: CertificatePreviewProps) => {
             </div>
           </div>
 
-          <div className="text-left max-w-2xl mx-auto">
-            <p className="text-lg text-gray-700 mb-1">Completion Date:</p>
-            <div className="border-b border-black pb-1">
-              <p className="text-xl font-semibold">
+          <div className="text-center max-w-md mx-auto">
+            <p className="text-lg text-gray-700 mb-1">Date of Issue:</p>
+            <div className="inline-block border-b border-black pb-1">
+              <p className="text-xl font-semibold px-4">
                 {data.completionDate ? new Date(data.completionDate).toLocaleDateString() : "Date"}
               </p>
             </div>
           </div>
         </div>
 
-        {/* Signatures Section */}
-        <div className="mt-16">
-          {/* Student Coordinator Name */}
-          {data.studentCoordinator && (
-            <div className="text-center mb-4">
-              <p className="text-lg font-semibold">{data.studentCoordinator}</p>
-            </div>
-          )}
-          
+        {/* Signatures Section - Within border */}
+        <div className="mt-12 mb-8">
           {/* Signature Lines */}
-          <div className="flex justify-between items-end">
-            <div className="text-center flex-1">
-              <div className="border-t-2 border-black pt-2 mt-12 mx-8">
+          <div className="flex justify-between items-end max-w-4xl mx-auto">
+            <div className="text-center flex-1 mx-8">
+              <div className="border-t-2 border-black pt-2 mt-16">
                 <p className="text-lg font-bold">Student Co-ordinator</p>
               </div>
             </div>
-            <div className="text-center flex-1">
-              <div className="border-t-2 border-black pt-2 mt-12 mx-8">
+            <div className="text-center flex-1 mx-8">
+              <div className="border-t-2 border-black pt-2 mt-16">
                 <p className="text-lg font-bold">Principal/Director</p>
               </div>
             </div>
@@ -189,7 +183,7 @@ const CertificatePreview = ({ data }: CertificatePreviewProps) => {
         </div>
 
         {/* Address at Bottom */}
-        <div className="text-center mt-8">
+        <div className="text-center">
           <p className="text-sm text-gray-700">
             1st Floor Mohsin Market, Yusufpur, Mohammadabad, Uttar Pradesh 233227
           </p>
