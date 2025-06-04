@@ -209,15 +209,16 @@ const CertificatePreview = ({ data, showPrintButton = false }: CertificatePrevie
               <div className="text-center flex-1 mx-8">
                 <div className="border-t-2 border-black pt-2 mt-8">
                   <p className="text-lg font-bold">Student Co-ordinator</p>
-                  <p className="text-sm text-gray-600 mt-1">
-                    {data.studentCoordinator || "Co-ordinator Name"}
-                  </p>
+                  {data.studentCoordinator && (
+                    <p className="text-sm text-gray-600 mt-1">
+                      {data.studentCoordinator}
+                    </p>
+                  )}
                 </div>
               </div>
               <div className="text-center flex-1 mx-8">
                 <div className="border-t-2 border-black pt-2 mt-8">
                   <p className="text-lg font-bold">Principal/Director</p>
-                  <p className="text-sm text-gray-600 mt-1">Director Signature</p>
                 </div>
               </div>
             </div>

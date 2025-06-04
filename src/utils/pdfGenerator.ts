@@ -1,6 +1,7 @@
 
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import QRCode from 'qrcode';
 
 export const generateCertificatePDF = async (certificateElement: HTMLElement, filename: string) => {
   try {
@@ -38,6 +39,18 @@ export const generateCertificatePDF = async (certificateElement: HTMLElement, fi
     clonedElement.style.padding = '0';
     clonedElement.style.overflow = 'hidden';
     
+    // Ensure QR code is visible in the cloned element
+    const originalQRCanvas = actualCertificate.querySelector('canvas');
+    const clonedQRCanvas = clonedElement.querySelector('canvas');
+    if (originalQRCanvas && clonedQRCanvas) {
+      const ctx = clonedQRCanvas.getContext('2d');
+      if (ctx) {
+        clonedQRCanvas.width = originalQRCanvas.width;
+        clonedQRCanvas.height = originalQRCanvas.height;
+        ctx.drawImage(originalQRCanvas, 0, 0);
+      }
+    }
+    
     tempContainer.appendChild(clonedElement);
     document.body.appendChild(tempContainer);
     
@@ -46,9 +59,9 @@ export const generateCertificatePDF = async (certificateElement: HTMLElement, fi
     
     console.log('Creating canvas for PDF...');
     
-    // Create canvas with exact A4 pixel dimensions
+    // Create canvas with exact A4 pixel dimensions at high resolution
     const canvas = await html2canvas(tempContainer, {
-      scale: 2,
+      scale: 3, // Higher scale for better quality
       useCORS: true,
       allowTaint: true,
       backgroundColor: '#ffffff',
