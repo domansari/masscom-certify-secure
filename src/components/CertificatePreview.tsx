@@ -124,7 +124,7 @@ const CertificatePreview = ({ data, showPrintButton = false }: CertificatePrevie
             <div className="text-center">
               <h3 className="text-3xl font-bold text-black uppercase mb-2">
                 {data.studentName || "Student Name"}
-              </h3>
+              </h3><div></div>
               <div 
                 className="mx-auto border-b-2 border-black"
                 style={{ 
