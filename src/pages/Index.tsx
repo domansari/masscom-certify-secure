@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowDown, ArrowUp, Printer } from "lucide-react";
+import { FileText, Search, Shield, Printer } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -32,7 +32,7 @@ const Index = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/verify">
                 <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-primary">
-                  <ArrowUp className="mr-2 h-5 w-5" />
+                  <Shield className="mr-2 h-5 w-5" />
                   Verify Certificate
                 </Button>
               </Link>
@@ -74,7 +74,7 @@ const Index = () => {
               <Card className="text-center hover:shadow-lg transition-shadow cursor-pointer h-48 flex flex-col justify-center bg-white/95 backdrop-blur-sm">
                 <CardHeader>
                   <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
-                    <ArrowDown className="h-8 w-8 text-white" />
+                    <FileText className="h-8 w-8 text-white" />
                   </div>
                   <CardTitle className="text-xl">Generate New Certificate</CardTitle>
                 </CardHeader>
@@ -89,7 +89,7 @@ const Index = () => {
               <Card className="text-center hover:shadow-lg transition-shadow cursor-pointer h-48 flex flex-col justify-center bg-white/95 backdrop-blur-sm">
                 <CardHeader>
                   <div className="w-16 h-16 bg-accent rounded-full flex items-center justify-center mx-auto mb-4">
-                    <ArrowUp className="h-8 w-8 text-white" />
+                    <Search className="h-8 w-8 text-white" />
                   </div>
                   <CardTitle className="text-xl">Search & Edit/Reissue</CardTitle>
                 </CardHeader>
@@ -104,7 +104,7 @@ const Index = () => {
               <Card className="text-center hover:shadow-lg transition-shadow cursor-pointer h-48 flex flex-col justify-center bg-white/95 backdrop-blur-sm">
                 <CardHeader>
                   <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <ArrowUp className="h-8 w-8 text-white" />
+                    <Shield className="h-8 w-8 text-white" />
                   </div>
                   <CardTitle className="text-xl">Verify Certificate</CardTitle>
                 </CardHeader>

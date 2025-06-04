@@ -43,6 +43,14 @@ const App = () => (
                   </ProtectedRoute>
                 } 
               />
+              <Route 
+                path="/print" 
+                element={
+                  <ProtectedRoute requireAdmin>
+                    <PrintCertificate />
+                  </ProtectedRoute>
+                } 
+              />
               <Route path="/verify" element={<VerifyCertificate />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
