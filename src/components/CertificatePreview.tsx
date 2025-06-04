@@ -97,7 +97,7 @@ const CertificatePreview = ({ data, showPrintButton = false }: CertificatePrevie
 
           {/* Institute Name - Single Line */}
           <div className="text-center mb-2">
-            <h1 className="text-5xl font-bold text-blue-800 uppercase tracking-wide">
+            <h1 className="text-4xl font-bold text-blue-800 uppercase tracking-wide">
               MASSCOM INFOTECH EDUCATION
             </h1>
           </div>
@@ -114,10 +114,8 @@ const CertificatePreview = ({ data, showPrintButton = false }: CertificatePrevie
             <h2 className="text-4xl font-bold text-red-700 italic tracking-widest">
               Cerificate
             </h2>
-            <p className="text-xl text-gray-700 mt-2">of Achievement</p>
-             <p className="text-xl text-gray-800 text-center">
-              This is to certify that
-            </p>
+            <p className="text-xl text-gray-700 mt-2">of Achievement This is to certify that</p>
+           
           </div>
 
           {/* Certificate Content */}
