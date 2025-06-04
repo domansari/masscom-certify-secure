@@ -1,4 +1,5 @@
-import { useState, useRef } from "react";
+
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -34,6 +35,24 @@ const GenerateCertificate = () => {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [editingCertificate, setEditingCertificate] = useState<any>(null);
+
+  // Course duration mapping
+  const courseDurations = {
+    "Diploma in Computer Application": "8 Months",
+    "Advance Diploma in Computer Application": "1 Year",
+    "Certificate Course in Accountancy(Tally ERP)": "4 Months",
+    "Certificate Course in Desktop Publishing": "4 Months"
+  };
+
+  // Auto-fill duration when course is selected
+  useEffect(() => {
+    if (formData.courseName && courseDurations[formData.courseName as keyof typeof courseDurations]) {
+      setFormData(prev => ({
+        ...prev,
+        duration: courseDurations[formData.courseName as keyof typeof courseDurations]
+      }));
+    }
+  }, [formData.courseName]);
 
   const generateCertificateId = () => {
     const id = `MIE-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`.toUpperCase();
@@ -295,14 +314,10 @@ const GenerateCertificate = () => {
                       <SelectValue placeholder="Select a course" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Web Development">Web Development</SelectItem>
-                      <SelectItem value="Digital Marketing">Digital Marketing</SelectItem>
-                      <SelectItem value="Graphic Design">Graphic Design</SelectItem>
-                      <SelectItem value="Data Entry">Data Entry</SelectItem>
-                      <SelectItem value="Computer Basics">Computer Basics</SelectItem>
-                      <SelectItem value="MS Office">MS Office</SelectItem>
-                      <SelectItem value="Tally">Tally</SelectItem>
-                      <SelectItem value="Programming">Programming</SelectItem>
+                      <SelectItem value="Diploma in Computer Application">Diploma in Computer Application</SelectItem>
+                      <SelectItem value="Advance Diploma in Computer Application">Advance Diploma in Computer Application</SelectItem>
+                      <SelectItem value="Certificate Course in Accountancy(Tally ERP)">Certificate Course in Accountancy(Tally ERP)</SelectItem>
+                      <SelectItem value="Certificate Course in Desktop Publishing">Certificate Course in Desktop Publishing</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -314,8 +329,9 @@ const GenerateCertificate = () => {
                       id="duration"
                       value={formData.duration}
                       onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-                      placeholder="e.g., 3 months"
+                      placeholder="Auto-filled based on course"
                       disabled={saved && !editingCertificate}
+                      readOnly
                     />
                   </div>
                   <div className="space-y-2">

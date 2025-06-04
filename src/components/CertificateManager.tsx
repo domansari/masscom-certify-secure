@@ -90,32 +90,41 @@ const CertificateManager = ({ onEditCertificate }: CertificateManagerProps) => {
         return;
       }
 
-      // If password is correct, proceed with deletion
+      // If password is correct, proceed with permanent deletion
       const { error } = await supabase
         .from('certificates')
         .delete()
         .eq('id', certificateToDelete.id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Delete error:', error);
+        throw error;
+      }
 
-      // Update local state immediately and refresh from database
-      setCertificates(certificates.filter(cert => cert.id !== certificateToDelete.id));
+      // Remove from local state immediately to prevent it from showing
+      const updatedCertificates = certificates.filter(cert => cert.id !== certificateToDelete.id);
+      setCertificates(updatedCertificates);
       
-      // Refresh the data from database to ensure consistency
-      await fetchCertificates();
-      
+      // Clear the deletion state
       setCertificateToDelete(null);
       setDeletePassword("");
       setDialogOpen(false);
       
       toast({
         title: "Certificate Deleted",
-        description: "The certificate has been permanently deleted from the database.",
+        description: `Certificate for ${certificateToDelete.student_name} has been permanently deleted from the database.`,
       });
+
+      // Force a fresh fetch from database to ensure consistency
+      setTimeout(() => {
+        fetchCertificates();
+      }, 500);
+      
     } catch (error: any) {
+      console.error('Full delete error:', error);
       toast({
         title: "Error",
-        description: error.message || "Failed to delete certificate.",
+        description: error.message || "Failed to delete certificate permanently from database.",
         variant: "destructive",
       });
     } finally {
@@ -222,10 +231,11 @@ const CertificateManager = ({ onEditCertificate }: CertificateManagerProps) => {
                           </DialogTrigger>
                           <DialogContent className="bg-white border border-gray-200 shadow-lg">
                             <DialogHeader>
-                              <DialogTitle>Confirm Deletion</DialogTitle>
+                              <DialogTitle>Confirm Permanent Deletion</DialogTitle>
                               <DialogDescription>
                                 You are about to permanently delete the certificate for <strong>{certificate.student_name}</strong>. 
-                                This action cannot be undone. Please enter your admin password to confirm.
+                                This action cannot be undone and the record will be permanently removed from the database. 
+                                Please enter your admin password to confirm.
                               </DialogDescription>
                             </DialogHeader>
                             <div className="space-y-4 py-4">
@@ -259,10 +269,10 @@ const CertificateManager = ({ onEditCertificate }: CertificateManagerProps) => {
                                 {isDeleting ? (
                                   <>
                                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                                    Deleting...
+                                    Deleting Permanently...
                                   </>
                                 ) : (
-                                  "Delete Certificate"
+                                  "Delete Permanently"
                                 )}
                               </Button>
                             </DialogFooter>

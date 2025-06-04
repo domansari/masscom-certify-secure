@@ -1,78 +1,168 @@
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Print styles */
-@media print {
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 240 9% 8%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 240 5.9% 10%;
+    --radius: 0.5rem;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
+}
+
+@layer base {
   * {
-    visibility: hidden;
+    @apply border-border;
   }
-  
-  .certificate-container, 
-  .certificate-container * {
-    visibility: visible;
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
   }
-  
-  .certificate-container {
-    position: absolute !important;
-    left: 0 !important;
-    top: 0 !important;
-    transform: scale(1) !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    width: 210mm !important;
-    height: 297mm !important;
-    max-width: none !important;
-    max-height: none !important;
-    page-break-inside: avoid !important;
-    background: white !important;
-  }
-  
-  #certificate-element {
-    transform: scale(1) !important;
-    width: 210mm !important;
-    height: 297mm !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow: hidden !important;
-  }
-  
-  .no-print {
-    display: none !important;
-    visibility: hidden !important;
-  }
-  
-  .print-only {
-    display: block !important;
-    visibility: visible !important;
-  }
-  
+}
+
+@media print {
   @page {
-    size: A4 portrait;
     margin: 0 !important;
+    size: A4 portrait;
   }
   
   body {
     margin: 0 !important;
     padding: 0 !important;
-    background: white !important;
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
   }
   
-  html {
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-only {
+    display: block !important;
+  }
+  
+  .certificate-container {
+    width: 210mm !important;
+    height: 297mm !important;
     margin: 0 !important;
     padding: 0 !important;
+    page-break-inside: avoid !important;
+    page-break-after: avoid !important;
+    page-break-before: avoid !important;
+    transform: none !important;
+    position: relative !important;
+    top: 0 !important;
+    left: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: white !important;
+    overflow: visible !important;
+  }
+
+  #certificate-element {
+    width: 210mm !important;
+    height: 297mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    transform: none !important;
+    position: relative !important;
+    page-break-inside: avoid !important;
+    overflow: visible !important;
+    box-sizing: border-box !important;
   }
 }
 
-.print-only {
-  display: none;
-}
-
+/* Ensure certificate fits A4 exactly */
 .certificate-container {
+  width: 210mm;
+  height: 297mm;
+  margin: 0 auto;
   background: white;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  page-break-inside: avoid;
+  position: relative;
+  overflow: hidden;
 }
 
-.gradient-bg {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+/* Override any conflicting styles for print */
+.print-certificate {
+  width: 210mm !important;
+  height: 297mm !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  position: relative !important;
+  overflow: visible !important;
+}
+
+/* Certificate content scaling */
+#certificate-element {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Home page icon backgrounds */
+.icon-container {
+  background: linear-gradient(135deg, currentColor 0%, currentColor 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-container svg {
+  color: white;
 }
