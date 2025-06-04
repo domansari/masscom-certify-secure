@@ -111,17 +111,17 @@ const CertificatePreview = ({ data, showPrintButton = false }: CertificatePrevie
 
           {/* Certificate Title */}
           <div className="text-center mb-6">
-            <h2 className="text-3xl font-bold text-red-600 italic tracking-widest">
-              CERTIFICATE
+            <h2 className="text-4xl font-bold text-red-700 italic tracking-widest">
+              Cerificate
             </h2>
             <p className="text-xl text-gray-700 mt-2">of Achievement</p>
+             <p className="text-xl text-gray-800 text-center">
+              This is to certify that
+            </p>
           </div>
 
           {/* Certificate Content */}
-          <div className="flex-1 flex flex-col justify-center space-y-1">
-            <p className="text-xl text-gray-800 text-center">
-              This is to certify that
-            </p>
+         
             
             <div className="text-center">
               <h3 className="text-3xl font-bold text-black uppercase mb-2">
@@ -133,7 +133,7 @@ const CertificatePreview = ({ data, showPrintButton = false }: CertificatePrevie
                   width: `${Math.max(200, (data.studentName?.length || 12) * 18)}px`
                 }}
               ></div>
-            </div>
+    
 
             <div className="grid grid-cols-2 gap-8 text-left max-w-2xl mx-auto">
               <div>
