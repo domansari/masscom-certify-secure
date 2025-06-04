@@ -204,33 +204,36 @@ const CertificatePreview = ({ data, showPrintButton = false }: CertificatePrevie
           </div>
 
           {/* Signatures Section */}
-          <div className="mt-2 mb-2">
+          <div className="mt-2 mb-1">
             <div className="flex justify-between items-end max-w-4xl mx-auto">
               <div className="text-center flex-1 mx-8">
                 <div className="border-t-2 border-black pt-2 mt-8">
-                  <p className="text-lg font-bold">Student Co-ordinator</p>
                   {data.studentCoordinator && (
-                    <p className="text-sm text-gray-600 mt-1">
+                    <p className="text-sm text-gray-600 mb-1">
                       {data.studentCoordinator}
                     </p>
                   )}
+                  <p className="text-lg font-bold">Student Co-ordinator</p>
                 </div>
               </div>
               <div className="text-center flex-1 mx-8">
                 <div className="border-t-2 border-black pt-2 mt-8">
+                  <p className="text-sm text-gray-600 mb-1">
+                    Akbar Ansari
+                  </p>
                   <p className="text-lg font-bold">Principal/Director</p>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Email and Mobile at Bottom */}
+          {/* Address and Contact Info at Bottom */}
           <div className="text-center mt-1 mb-1">
             <p className="text-sm text-gray-700">
-              info@masscom.co.in, +91-9628355656
+              1st Floor Mohsin Market, Yusufpur, Mohammadabad, Uttar Pradesh 233227
             </p>
             <p className="text-sm text-gray-700">
-              1st Floor Mohsin Market, Yusufpur, Mohammadabad, Uttar Pradesh 233227
+              info@masscom.co.in, +91-9628355656
             </p>
           </div>
         </div>

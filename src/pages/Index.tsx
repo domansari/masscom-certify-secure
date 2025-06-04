@@ -73,7 +73,7 @@ const Index = () => {
             <Link to="/generate">
               <Card className="text-center hover:shadow-lg transition-shadow cursor-pointer h-48 flex flex-col justify-center bg-white/95 backdrop-blur-sm">
                 <CardHeader>
-                  <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
+                  <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
                     <FileText className="h-8 w-8 text-white" />
                   </div>
                   <CardTitle className="text-xl">Generate New Certificate</CardTitle>
@@ -88,7 +88,7 @@ const Index = () => {
             <Link to="/generate">
               <Card className="text-center hover:shadow-lg transition-shadow cursor-pointer h-48 flex flex-col justify-center bg-white/95 backdrop-blur-sm">
                 <CardHeader>
-                  <div className="w-16 h-16 bg-accent rounded-full flex items-center justify-center mx-auto mb-4">
+                  <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Search className="h-8 w-8 text-white" />
                   </div>
                   <CardTitle className="text-xl">Search & Edit/Reissue</CardTitle>
@@ -103,7 +103,7 @@ const Index = () => {
             <Link to="/verify">
               <Card className="text-center hover:shadow-lg transition-shadow cursor-pointer h-48 flex flex-col justify-center bg-white/95 backdrop-blur-sm">
                 <CardHeader>
-                  <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <div className="w-16 h-16 bg-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Shield className="h-8 w-8 text-white" />
                   </div>
                   <CardTitle className="text-xl">Verify Certificate</CardTitle>
@@ -118,7 +118,7 @@ const Index = () => {
             <Link to="/print">
               <Card className="text-center hover:shadow-lg transition-shadow cursor-pointer h-48 flex flex-col justify-center bg-white/95 backdrop-blur-sm">
                 <CardHeader>
-                  <div className="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <div className="w-16 h-16 bg-orange-600 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Printer className="h-8 w-8 text-white" />
                   </div>
                   <CardTitle className="text-xl">Print Certificate</CardTitle>

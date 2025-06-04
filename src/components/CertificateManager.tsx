@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { ArrowUp, ArrowDown, Printer } from "lucide-react";
+import { Search, Edit, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
@@ -38,6 +38,7 @@ const CertificateManager = ({ onEditCertificate }: CertificateManagerProps) => {
   const [deletePassword, setDeletePassword] = useState("");
   const [certificateToDelete, setCertificateToDelete] = useState<Certificate | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const fetchCertificates = async () => {
     try {
@@ -97,9 +98,15 @@ const CertificateManager = ({ onEditCertificate }: CertificateManagerProps) => {
 
       if (error) throw error;
 
+      // Update local state immediately and refresh from database
       setCertificates(certificates.filter(cert => cert.id !== certificateToDelete.id));
+      
+      // Refresh the data from database to ensure consistency
+      await fetchCertificates();
+      
       setCertificateToDelete(null);
       setDeletePassword("");
+      setDialogOpen(false);
       
       toast({
         title: "Certificate Deleted",
@@ -149,7 +156,7 @@ const CertificateManager = ({ onEditCertificate }: CertificateManagerProps) => {
       <CardContent>
         <div className="mb-4">
           <div className="relative">
-            <ArrowUp className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
               placeholder="Search by student name, certificate ID, course, or roll number..."
               value={searchTerm}
@@ -197,20 +204,23 @@ const CertificateManager = ({ onEditCertificate }: CertificateManagerProps) => {
                           variant="outline"
                           onClick={() => onEditCertificate(certificate)}
                         >
-                          <ArrowUp className="h-4 w-4" />
+                          <Edit className="h-4 w-4" />
                         </Button>
-                        <Dialog>
+                        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                           <DialogTrigger asChild>
                             <Button
                               size="sm"
                               variant="outline"
-                              onClick={() => setCertificateToDelete(certificate)}
+                              onClick={() => {
+                                setCertificateToDelete(certificate);
+                                setDialogOpen(true);
+                              }}
                               className="text-red-600 hover:text-red-700"
                             >
-                              <ArrowDown className="h-4 w-4" />
+                              <Trash2 className="h-4 w-4" />
                             </Button>
                           </DialogTrigger>
-                          <DialogContent>
+                          <DialogContent className="bg-white border border-gray-200 shadow-lg">
                             <DialogHeader>
                               <DialogTitle>Confirm Deletion</DialogTitle>
                               <DialogDescription>
@@ -236,6 +246,7 @@ const CertificateManager = ({ onEditCertificate }: CertificateManagerProps) => {
                                 onClick={() => {
                                   setCertificateToDelete(null);
                                   setDeletePassword("");
+                                  setDialogOpen(false);
                                 }}
                               >
                                 Cancel
