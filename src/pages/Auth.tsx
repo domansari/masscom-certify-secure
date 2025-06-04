@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { LogIn } from "lucide-react";
+import { ArrowDown } from "lucide-react";
 
 const Auth = () => {
   const [email, setEmail] = useState("");
@@ -49,8 +49,17 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <Card className="w-full max-w-md">
+    <div 
+      className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
+      style={{
+        backgroundImage: `url('/lovable-uploads/3b58bcb9-fd05-4d05-81b0-30f76a01fd6a.png')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
+      <div className="absolute inset-0 bg-black bg-opacity-40"></div>
+      <Card className="w-full max-w-md relative z-10 backdrop-blur-sm bg-white/95">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">Administrator Login</CardTitle>
           <CardDescription>
@@ -95,7 +104,7 @@ const Auth = () => {
                 </>
               ) : (
                 <>
-                  <LogIn className="mr-2 h-4 w-4" />
+                  <ArrowDown className="mr-2 h-4 w-4" />
                   Sign In
                 </>
               )}

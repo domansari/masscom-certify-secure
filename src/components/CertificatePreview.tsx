@@ -1,5 +1,5 @@
 
-import { QrCode, Printer } from "lucide-react";
+import { Printer } from "lucide-react";
 import { useEffect, useRef } from "react";
 import QRCode from 'qrcode';
 import { Button } from "@/components/ui/button";
@@ -89,7 +89,7 @@ const CertificatePreview = ({ data, showPrintButton = false }: CertificatePrevie
           {/* Logo */}
           <div className="flex justify-center mb-4">
             <img 
-              src="/lovable-uploads/6bb1665e-2bc0-4761-a747-55431e93f784.png" 
+              src="/lovable-uploads/62c16412-d87b-42a8-9aa2-0daca4025461.png" 
               alt="Institute Logo" 
               className="h-28 w-auto object-contain"
             />
@@ -203,18 +203,27 @@ const CertificatePreview = ({ data, showPrintButton = false }: CertificatePrevie
             </div>
           </div>
 
-          {/* Signatures Section - Reduced space */}
-          <div className="mt-1 mb-1">
-            <div className="flex justify-between items-end max-w-3xl mx-auto">
-              <div className="text-center flex-1 mx-6">
-                <div className="border-t-2 border-black pt-2 mt-6">
+          {/* Signatures Section */}
+          <div className="mt-2 mb-2">
+            <div className="flex justify-between items-end max-w-4xl mx-auto">
+              <div className="text-center flex-1 mx-8">
+                <div className="border-t-2 border-black pt-2 mt-8">
+                  <p className="text-lg font-bold">Student Co-ordinator</p>
+                  <p className="text-sm text-gray-600 mt-1">
+                    {data.studentCoordinator || "Co-ordinator Name"}
+                  </p>
+                </div>
+              </div>
+              <div className="text-center flex-1 mx-8">
+                <div className="border-t-2 border-black pt-2 mt-8">
                   <p className="text-lg font-bold">Principal/Director</p>
+                  <p className="text-sm text-gray-600 mt-1">Director Signature</p>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Email and Mobile at Bottom - Inside border with reduced margin */}
+          {/* Email and Mobile at Bottom */}
           <div className="text-center mt-1 mb-1">
             <p className="text-sm text-gray-700">
               info@masscom.co.in, +91-9628355656

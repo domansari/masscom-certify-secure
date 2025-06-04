@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, CheckCircle, XCircle, QrCode, Search } from "lucide-react";
+import { ArrowDown, ArrowUp, Printer } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -111,12 +111,21 @@ const VerifyCertificate = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm border-b">
+    <div 
+      className="min-h-screen"
+      style={{
+        backgroundImage: `url('/lovable-uploads/3b58bcb9-fd05-4d05-81b0-30f76a01fd6a.png')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
+      <div className="absolute inset-0 bg-black bg-opacity-40"></div>
+      <nav className="relative z-10 bg-white/90 backdrop-blur-sm shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link to="/" className="flex items-center space-x-3 text-gray-900 hover:text-primary">
-              <ArrowLeft className="h-5 w-5" />
+              <ArrowDown className="h-5 w-5" />
               <span>Back to Home</span>
             </Link>
             <h1 className="text-xl font-semibold">Verify Certificate</h1>
@@ -125,10 +134,10 @@ const VerifyCertificate = () => {
         </div>
       </nav>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-8">
           {/* Verification Form */}
-          <Card>
+          <Card className="bg-white/95 backdrop-blur-sm">
             <CardHeader>
               <CardTitle>Certificate Verification</CardTitle>
               <CardDescription>
@@ -148,7 +157,7 @@ const VerifyCertificate = () => {
                       className="flex-1"
                     />
                     <Button variant="outline" onClick={handleQRScan}>
-                      <QrCode className="h-4 w-4" />
+                      <Printer className="h-4 w-4" />
                     </Button>
                   </div>
                 </div>
@@ -161,7 +170,7 @@ const VerifyCertificate = () => {
                     </>
                   ) : (
                     <>
-                      <Search className="mr-2 h-4 w-4" />
+                      <ArrowUp className="mr-2 h-4 w-4" />
                       Verify Certificate
                     </>
                   )}
@@ -172,13 +181,13 @@ const VerifyCertificate = () => {
 
           {/* Verification Result */}
           {verificationResult && (
-            <Card className={verificationResult.isValid ? "border-green-200 bg-green-50" : "border-red-200 bg-red-50"}>
+            <Card className={`${verificationResult.isValid ? "border-green-200 bg-green-50/95" : "border-red-200 bg-red-50/95"} backdrop-blur-sm`}>
               <CardHeader>
                 <div className="flex items-center space-x-3">
                   {verificationResult.isValid ? (
-                    <CheckCircle className="h-8 w-8 text-green-600" />
+                    <ArrowUp className="h-8 w-8 text-green-600" />
                   ) : (
-                    <XCircle className="h-8 w-8 text-red-600" />
+                    <ArrowDown className="h-8 w-8 text-red-600" />
                   )}
                   <div>
                     <CardTitle className={verificationResult.isValid ? "text-green-900" : "text-red-900"}>
@@ -268,7 +277,7 @@ const VerifyCertificate = () => {
 
           {/* Certificate Preview */}
           {verificationResult && verificationResult.isValid && verificationResult.certificateData && (
-            <Card>
+            <Card className="bg-white/95 backdrop-blur-sm">
               <CardHeader>
                 <CardTitle>Certificate Preview</CardTitle>
                 <CardDescription>

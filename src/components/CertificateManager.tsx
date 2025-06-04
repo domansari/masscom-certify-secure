@@ -3,10 +3,13 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Search, Edit, Trash2 } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ArrowUp, ArrowDown, Printer } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Certificate {
   id: string;
@@ -28,9 +31,13 @@ interface CertificateManagerProps {
 
 const CertificateManager = ({ onEditCertificate }: CertificateManagerProps) => {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
+  const [deletePassword, setDeletePassword] = useState("");
+  const [certificateToDelete, setCertificateToDelete] = useState<Certificate | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const fetchCertificates = async () => {
     try {
@@ -53,23 +60,50 @@ const CertificateManager = ({ onEditCertificate }: CertificateManagerProps) => {
     }
   };
 
-  const deleteCertificate = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this certificate?")) {
+  const confirmDelete = async () => {
+    if (!certificateToDelete || !deletePassword) {
+      toast({
+        title: "Missing Information",
+        description: "Please enter your admin password to confirm deletion.",
+        variant: "destructive",
+      });
       return;
     }
 
+    setIsDeleting(true);
+    
     try {
+      // Verify admin password by attempting to sign in
+      const { error: authError } = await supabase.auth.signInWithPassword({
+        email: user?.email || '',
+        password: deletePassword
+      });
+
+      if (authError) {
+        toast({
+          title: "Authentication Failed",
+          description: "Incorrect password. Deletion cancelled.",
+          variant: "destructive",
+        });
+        setIsDeleting(false);
+        return;
+      }
+
+      // If password is correct, proceed with deletion
       const { error } = await supabase
         .from('certificates')
         .delete()
-        .eq('id', id);
+        .eq('id', certificateToDelete.id);
 
       if (error) throw error;
 
-      setCertificates(certificates.filter(cert => cert.id !== id));
+      setCertificates(certificates.filter(cert => cert.id !== certificateToDelete.id));
+      setCertificateToDelete(null);
+      setDeletePassword("");
+      
       toast({
         title: "Certificate Deleted",
-        description: "The certificate has been deleted successfully.",
+        description: "The certificate has been permanently deleted from the database.",
       });
     } catch (error: any) {
       toast({
@@ -77,6 +111,8 @@ const CertificateManager = ({ onEditCertificate }: CertificateManagerProps) => {
         description: error.message || "Failed to delete certificate.",
         variant: "destructive",
       });
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -113,7 +149,7 @@ const CertificateManager = ({ onEditCertificate }: CertificateManagerProps) => {
       <CardContent>
         <div className="mb-4">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <ArrowUp className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
               placeholder="Search by student name, certificate ID, course, or roll number..."
               value={searchTerm}
@@ -161,16 +197,66 @@ const CertificateManager = ({ onEditCertificate }: CertificateManagerProps) => {
                           variant="outline"
                           onClick={() => onEditCertificate(certificate)}
                         >
-                          <Edit className="h-4 w-4" />
+                          <ArrowUp className="h-4 w-4" />
                         </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => deleteCertificate(certificate.id)}
-                          className="text-red-600 hover:text-red-700"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setCertificateToDelete(certificate)}
+                              className="text-red-600 hover:text-red-700"
+                            >
+                              <ArrowDown className="h-4 w-4" />
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Confirm Deletion</DialogTitle>
+                              <DialogDescription>
+                                You are about to permanently delete the certificate for <strong>{certificate.student_name}</strong>. 
+                                This action cannot be undone. Please enter your admin password to confirm.
+                              </DialogDescription>
+                            </DialogHeader>
+                            <div className="space-y-4 py-4">
+                              <div className="space-y-2">
+                                <Label htmlFor="password">Admin Password</Label>
+                                <Input
+                                  id="password"
+                                  type="password"
+                                  value={deletePassword}
+                                  onChange={(e) => setDeletePassword(e.target.value)}
+                                  placeholder="Enter your admin password"
+                                />
+                              </div>
+                            </div>
+                            <DialogFooter>
+                              <Button
+                                variant="outline"
+                                onClick={() => {
+                                  setCertificateToDelete(null);
+                                  setDeletePassword("");
+                                }}
+                              >
+                                Cancel
+                              </Button>
+                              <Button
+                                variant="destructive"
+                                onClick={confirmDelete}
+                                disabled={isDeleting || !deletePassword}
+                              >
+                                {isDeleting ? (
+                                  <>
+                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                                    Deleting...
+                                  </>
+                                ) : (
+                                  "Delete Certificate"
+                                )}
+                              </Button>
+                            </DialogFooter>
+                          </DialogContent>
+                        </Dialog>
                       </div>
                     </TableCell>
                   </TableRow>

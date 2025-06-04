@@ -10,12 +10,18 @@ export const generateCertificatePDF = async (certificateElement: HTMLElement, fi
     const noPrintElements = document.querySelectorAll('.no-print');
     noPrintElements.forEach(el => (el as HTMLElement).style.display = 'none');
     
-    // Create a clone of the element
-    const clonedElement = certificateElement.cloneNode(true) as HTMLElement;
+    // Find the actual certificate element
+    const actualCertificate = certificateElement.querySelector('#certificate-element') as HTMLElement;
+    if (!actualCertificate) {
+      throw new Error('Certificate element not found');
+    }
     
-    // Set up the clone for high-quality rendering
-    clonedElement.style.position = 'absolute';
-    clonedElement.style.left = '-9999px';
+    // Create a clone specifically for PDF generation
+    const clonedElement = actualCertificate.cloneNode(true) as HTMLElement;
+    
+    // Set up the clone for exact A4 rendering
+    clonedElement.style.position = 'fixed';
+    clonedElement.style.left = '0';
     clonedElement.style.top = '0';
     clonedElement.style.transform = 'scale(1)';
     clonedElement.style.transformOrigin = 'top left';
@@ -27,43 +33,37 @@ export const generateCertificatePDF = async (certificateElement: HTMLElement, fi
     clonedElement.style.display = 'block';
     clonedElement.style.visibility = 'visible';
     clonedElement.style.backgroundColor = 'white';
-    clonedElement.style.zIndex = '9999';
-    
-    // Find the actual certificate element inside the clone
-    const actualCertificate = clonedElement.querySelector('#certificate-element') as HTMLElement;
-    if (actualCertificate) {
-      actualCertificate.style.transform = 'scale(1)';
-      actualCertificate.style.transformOrigin = 'top left';
-      actualCertificate.style.margin = '0';
-    }
+    clonedElement.style.zIndex = '99999';
+    clonedElement.style.overflow = 'hidden';
     
     document.body.appendChild(clonedElement);
     
-    // Wait for rendering and fonts to load
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    // Wait for fonts and rendering
+    await new Promise(resolve => setTimeout(resolve, 3000));
     
-    console.log('Creating canvas...');
+    console.log('Creating high-resolution canvas...');
     
-    // Create canvas with exact A4 dimensions at high DPI
-    const canvas = await html2canvas(actualCertificate || clonedElement, {
-      scale: 3,
+    // Create canvas with high DPI for A4 dimensions
+    const canvas = await html2canvas(clonedElement, {
+      scale: 4, // Higher scale for better quality
       useCORS: true,
       allowTaint: true,
       backgroundColor: '#ffffff',
-      width: 794, // A4 width in pixels at 96 DPI
-      height: 1123, // A4 height in pixels at 96 DPI
+      width: 794, // A4 width in pixels at 96 DPI (210mm)
+      height: 1123, // A4 height in pixels at 96 DPI (297mm)
       removeContainer: false,
-      logging: true,
+      logging: false,
       foreignObjectRendering: true,
+      imageTimeout: 0,
       onclone: (clonedDoc) => {
-        // Ensure all styles are applied in the cloned document
-        const clonedCertificate = clonedDoc.querySelector('#certificate-element') as HTMLElement;
-        if (clonedCertificate) {
-          clonedCertificate.style.transform = 'scale(1)';
-          clonedCertificate.style.width = '210mm';
-          clonedCertificate.style.height = '297mm';
-          clonedCertificate.style.margin = '0';
-          clonedCertificate.style.padding = '0';
+        const clonedCert = clonedDoc.querySelector('#certificate-element') as HTMLElement;
+        if (clonedCert) {
+          clonedCert.style.transform = 'scale(1)';
+          clonedCert.style.width = '210mm';
+          clonedCert.style.height = '297mm';
+          clonedCert.style.margin = '0';
+          clonedCert.style.padding = '0';
+          clonedCert.style.overflow = 'hidden';
         }
       }
     });
@@ -87,15 +87,15 @@ export const generateCertificatePDF = async (certificateElement: HTMLElement, fi
       throw new Error('Failed to create image data from canvas');
     }
     
-    // Create PDF with exact A4 dimensions
+    // Create PDF with exact A4 dimensions, no margins
     const pdf = new jsPDF({
       orientation: 'portrait',
       unit: 'mm',
-      format: 'a4',
-      compress: false
+      format: [210, 297], // Exact A4 dimensions
+      compress: true
     });
     
-    // Add image to fill entire A4 page exactly
+    // Add image to fill entire A4 page with no margins
     pdf.addImage(imgData, 'PNG', 0, 0, 210, 297, '', 'FAST');
     
     console.log('Saving PDF...');

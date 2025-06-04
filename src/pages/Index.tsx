@@ -1,6 +1,7 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Award, Search, Edit, Shield, Printer } from "lucide-react";
+import { ArrowDown, ArrowUp, Printer } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -9,8 +10,17 @@ const Index = () => {
 
   if (!isAdmin()) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="gradient-bg text-white py-20">
+      <div 
+        className="min-h-screen"
+        style={{
+          backgroundImage: `url('/lovable-uploads/3b58bcb9-fd05-4d05-81b0-30f76a01fd6a.png')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      >
+        <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+        <div className="relative z-10 text-white py-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
               Masscom Infotech Education
@@ -22,7 +32,7 @@ const Index = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/verify">
                 <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-primary">
-                  <Shield className="mr-2 h-5 w-5" />
+                  <ArrowUp className="mr-2 h-5 w-5" />
                   Verify Certificate
                 </Button>
               </Link>
@@ -34,8 +44,17 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="gradient-bg text-white py-20">
+    <div 
+      className="min-h-screen"
+      style={{
+        backgroundImage: `url('/lovable-uploads/3b58bcb9-fd05-4d05-81b0-30f76a01fd6a.png')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
+      <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+      <div className="relative z-10 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl md:text-6xl font-bold mb-6">
             Masscom Infotech Education
@@ -46,16 +65,16 @@ const Index = () => {
         </div>
       </div>
 
-      <div className="py-20">
+      <div className="relative z-10 py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             
             {/* Generate New Certificate */}
             <Link to="/generate">
-              <Card className="text-center hover:shadow-lg transition-shadow cursor-pointer h-48 flex flex-col justify-center">
+              <Card className="text-center hover:shadow-lg transition-shadow cursor-pointer h-48 flex flex-col justify-center bg-white/95 backdrop-blur-sm">
                 <CardHeader>
                   <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Award className="h-8 w-8 text-white" />
+                    <ArrowDown className="h-8 w-8 text-white" />
                   </div>
                   <CardTitle className="text-xl">Generate New Certificate</CardTitle>
                 </CardHeader>
@@ -67,10 +86,10 @@ const Index = () => {
 
             {/* Search and Edit/Reissue */}
             <Link to="/generate">
-              <Card className="text-center hover:shadow-lg transition-shadow cursor-pointer h-48 flex flex-col justify-center">
+              <Card className="text-center hover:shadow-lg transition-shadow cursor-pointer h-48 flex flex-col justify-center bg-white/95 backdrop-blur-sm">
                 <CardHeader>
                   <div className="w-16 h-16 bg-accent rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Edit className="h-8 w-8 text-white" />
+                    <ArrowUp className="h-8 w-8 text-white" />
                   </div>
                   <CardTitle className="text-xl">Search & Edit/Reissue</CardTitle>
                 </CardHeader>
@@ -82,10 +101,10 @@ const Index = () => {
 
             {/* Verify Certificate */}
             <Link to="/verify">
-              <Card className="text-center hover:shadow-lg transition-shadow cursor-pointer h-48 flex flex-col justify-center">
+              <Card className="text-center hover:shadow-lg transition-shadow cursor-pointer h-48 flex flex-col justify-center bg-white/95 backdrop-blur-sm">
                 <CardHeader>
                   <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Shield className="h-8 w-8 text-white" />
+                    <ArrowUp className="h-8 w-8 text-white" />
                   </div>
                   <CardTitle className="text-xl">Verify Certificate</CardTitle>
                 </CardHeader>
@@ -97,7 +116,7 @@ const Index = () => {
 
             {/* Print Certificate */}
             <Link to="/print">
-              <Card className="text-center hover:shadow-lg transition-shadow cursor-pointer h-48 flex flex-col justify-center">
+              <Card className="text-center hover:shadow-lg transition-shadow cursor-pointer h-48 flex flex-col justify-center bg-white/95 backdrop-blur-sm">
                 <CardHeader>
                   <div className="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Printer className="h-8 w-8 text-white" />
