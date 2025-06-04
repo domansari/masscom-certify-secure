@@ -230,7 +230,7 @@ const CertificatePreview = ({ data, showPrintButton = false }: CertificatePrevie
           {/* Address and Contact Info at Bottom */}
           <div className="text-center mt-1 mb-1">
             <p className="text-sm text-gray-700">
-              1st Floor Mohsin Market, Yusufpur, Ghazipur,Mohammadabad, Uttar Pradesh 233227
+              1st Floor Mohsin Market, Yusufpur,Mohammadabad, Uttar Pradesh-India 233227
             </p>
             <p className="text-sm text-gray-700">
               info@masscom.co.in, +91-9628355656
