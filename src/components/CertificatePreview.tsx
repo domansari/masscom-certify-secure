@@ -95,7 +95,7 @@ const CertificatePreview = ({ data, showPrintButton = false }: CertificatePrevie
               className="h-48 w-48 object-contain"
             />
               {/* Institute Name - Single Line */}
-          <div className="text-center mb-2">
+          <div className="text-center mb-6">
             <h1 className="text-4xl font-bold text-blue-700 uppercase tracking-wide">
               MASSCOM INFOTECH EDUCATION
             </h1>
