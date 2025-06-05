@@ -8,7 +8,7 @@ const CertificateBody = ({ data }: CertificateBodyProps) => {
   return (
     <>
       {/* Certificate Title */}
-      <div className="text-center mb-3">
+      <div className="text-center mb-1">
         <h2 className="text-3xl font-bold italic tracking-widest mb-2" style={{ color: 'red' }}>
           Certificate
         </h2>
