@@ -9,7 +9,7 @@ const CertificateBody = ({ data }: CertificateBodyProps) => {
     <>
       {/* Certificate Title */}
       <div className="text-center mb-3">
-        <h2 className="text-6xl font-bold italic tracking-widest mb-2" style={{ color: '#FFD700' }}>
+        <h2 className="text-3xl font-bold italic tracking-widest mb-2" style={{ color: '#FFD700' }}>
           Certificate
         </h2>
         <p className="text-2xl text-gray-800 mt-2">of Achievement, This is to certify that</p>
