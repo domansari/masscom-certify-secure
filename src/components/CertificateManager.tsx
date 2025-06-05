@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,6 +9,7 @@ import { Search, Edit, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 interface Certificate {
   id: string;
@@ -32,34 +32,25 @@ interface CertificateManagerProps {
 const CertificateManager = ({ onEditCertificate }: CertificateManagerProps) => {
   const { toast } = useToast();
   const { user } = useAuth();
-  const [certificates, setCertificates] = useState<Certificate[]>([]);
+  const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
-  const [loading, setLoading] = useState(true);
   const [deletePassword, setDeletePassword] = useState("");
   const [certificateToDelete, setCertificateToDelete] = useState<Certificate | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  const fetchCertificates = async () => {
-    try {
+  const { data: certificates = [], isLoading } = useQuery({
+    queryKey: ['certificates'],
+    queryFn: async () => {
       const { data, error } = await supabase
         .from('certificates')
         .select('*')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-
-      setCertificates(data || []);
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to fetch certificates.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
+      return data || [];
     }
-  };
+  });
 
   const confirmDelete = async () => {
     if (!certificateToDelete || !deletePassword) {
@@ -101,8 +92,8 @@ const CertificateManager = ({ onEditCertificate }: CertificateManagerProps) => {
         throw deleteError;
       }
 
-      // Update local state immediately
-      setCertificates(prevCerts => prevCerts.filter(cert => cert.id !== certificateToDelete.id));
+      // Invalidate and refetch the certificates query
+      await queryClient.invalidateQueries({ queryKey: ['certificates'] });
       
       // Clear the deletion state
       setCertificateToDelete(null);
@@ -126,10 +117,6 @@ const CertificateManager = ({ onEditCertificate }: CertificateManagerProps) => {
     }
   };
 
-  useEffect(() => {
-    fetchCertificates();
-  }, []);
-
   const filteredCertificates = certificates.filter(cert =>
     cert.student_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     cert.certificate_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -137,7 +124,7 @@ const CertificateManager = ({ onEditCertificate }: CertificateManagerProps) => {
     (cert.roll_no && cert.roll_no.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
-  if (loading) {
+  if (isLoading) {
     return (
       <Card>
         <CardHeader>
