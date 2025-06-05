@@ -112,7 +112,7 @@ const CertificatePreview = ({ data, showPrintButton = false }: CertificatePrevie
 
           {/* Certificate Title */}
           <div className="text-center mb-6">
-            <h2 className="text-9xl font-bold italic tracking-widest mb-2" style={{ color: '#FFD700' }}>
+            <h2 className="text-5xl font-bold italic tracking-widest mb-2" style={{ color: '#FFD700' }}>
               Certificate
             </h2>
             <p className="text-xl text-gray-700 mt-2">of Achievement</p>
@@ -160,7 +160,7 @@ const CertificatePreview = ({ data, showPrintButton = false }: CertificatePrevie
               </div>
             </div>
 
-            <p className="text-xl text-gray-800 text-center mb-6">
+            <p className="text-2xl text-gray-800 text-center mb-6">
               has successfully completed the course of
             </p>
 
@@ -169,7 +169,7 @@ const CertificatePreview = ({ data, showPrintButton = false }: CertificatePrevie
               <img 
                 src="/lovable-uploads/dc9bc102-52f2-4cb0-ae96-01e99ea9fc4f.png" 
                 alt="Official Seal" 
-                className="h-24 w-24 object-contain"
+                className="h-48 w-48 object-contain"
               />
             </div>
 
