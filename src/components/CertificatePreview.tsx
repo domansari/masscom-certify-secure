@@ -59,7 +59,7 @@ const CertificatePreview = ({ data, showPrintButton = false }: CertificatePrevie
       
       <div 
         id="certificate-element"
-        className="certificate-container relative bg-"abs.jpg" mx-auto print:mx-0"
+        className="certificate-container relative mx-auto print:mx-0"
         style={{
           width: '210mm',
           height: '297mm',
@@ -68,9 +68,10 @@ const CertificatePreview = ({ data, showPrintButton = false }: CertificatePrevie
           padding: '0',
           margin: '0',
           fontFamily: 'Times, serif',
-          background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
-          border: '12px solid transparent',
-          borderImage: 'linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57, #ff9ff3) 1',
+          backgroundImage: `url('/lovable-uploads/f0d1378d-119b-4fea-80f3-ead49ffa08f1.png')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
           boxSizing: 'border-box'
         }}
       >
@@ -111,35 +112,30 @@ const CertificatePreview = ({ data, showPrintButton = false }: CertificatePrevie
 
           {/* Certificate Title */}
           <div className="text-center mb-6">
-            <h2 className="text-4xl font-bold text-red-600 italic tracking-widest">
+            <h2 className="text-6xl font-bold italic tracking-widest mb-2" style={{ color: '#FFD700' }}>
               Certificate
             </h2>
             <p className="text-xl text-gray-700 mt-2">of Achievement</p>
             <p className="text-xl text-gray-700 mt-2"> This is to certify that</p>
-           
           </div>
 
           {/* Certificate Content */}
-         
-            
-            <div className="text-center">
-              <h3 className="text-3xl font-bold text-black uppercase mb-2">
-                {data.studentName || "Student Name"}
-              </h3><div>
-                
-              </div>
+          <div className="text-center">
+            <h3 className="text-3xl font-bold text-black uppercase mb-2">
+              {data.studentName || "Student Name"}
+            </h3>
+            <div>
               <div 
                 className="mx-auto border-b-2 border-black"
                 style={{ 
                   width: `${Math.max(200, (data.studentName?.length || 12) * 18)}px`
                 }}
               >
-              
               </div>
-    
-  <p className="text-xl text-gray-700 mt-2"></p>
+            </div>
+
+            <p className="text-xl text-gray-700 mt-2"></p>
             <div className="grid grid-cols-2 gap-8 text-left max-w-2xl mx-auto">
-               
               <div>
                 <p className="text-lg text-gray-700 mb-1">S/O, D/O:</p>
                 <div 
@@ -160,16 +156,24 @@ const CertificatePreview = ({ data, showPrintButton = false }: CertificatePrevie
                   }}
                 >
                   <p className="text-xl font-semibold">{data.rollNo || "Roll Number"}</p>
-                    <p className="text-xl text-gray-700 mt-2"></p>
-  <p className="text-xl text-gray-700 mt-2"></p>
+                  <p className="text-xl text-gray-700 mt-2"></p>
+                  <p className="text-xl text-gray-700 mt-2"></p>
                 </div>
               </div>
             </div>
 
-
             <p className="text-xl text-gray-800 text-center">
               has successfully completed the course of
             </p>
+
+            {/* Seal Image - Center aligned above course name */}
+            <div className="flex justify-center my-4">
+              <img 
+                src="/lovable-uploads/945d2cdf-b885-4e7f-bc56-dc8153f8bc7d.png" 
+                alt="Official Seal" 
+                className="h-20 w-20 object-contain"
+              />
+            </div>
 
             <div className="border-b-2 border-black pb-2 mx-20">
               <h4 className="text-2xl font-bold text-black text-center">
@@ -182,7 +186,7 @@ const CertificatePreview = ({ data, showPrintButton = false }: CertificatePrevie
                 <p className="text-lg text-gray-700 mb-1">Duration:</p>
                 <div className="border-b border-black pb-1">
                   <p className="text-xl font-semibold">
-                    {data.duration ? `${data.duration} Months` : "Duration"}
+                    {data.duration ? `${data.duration}` : "Duration"}
                   </p>
                 </div>
               </div>
@@ -215,11 +219,9 @@ const CertificatePreview = ({ data, showPrintButton = false }: CertificatePrevie
             <div className="flex justify-between items-end max-w-4xl mx-auto">
               <div className="text-center flex-1 mx-8">
                 <div className="border-t-2 border-black pt-2 mt-8">
-                  {data.studentCoordinator && (
-                    <p className="text-sm text-gray-600 mb-1">
-                      {data.studentCoordinator}
-                    </p>
-                  )}
+                  <p className="text-sm text-gray-600 mb-1">
+                    {data.studentCoordinator || "Co-ordinator Name"}
+                  </p>
                   <p className="text-lg font-bold">Student Co-ordinator</p>
                 </div>
               </div>
