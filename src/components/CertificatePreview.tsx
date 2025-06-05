@@ -111,8 +111,8 @@ const CertificatePreview = ({ data, showPrintButton = false }: CertificatePrevie
 
           {/* Certificate Title */}
           <div className="text-center mb-6">
-            <h2 className="text-4xl font-bold text-red-900 italic tracking-widest">
-              Cerificate
+            <h2 className="text-4xl font-bold text-red-600 italic tracking-widest">
+              Certificate
             </h2>
             <p className="text-xl text-gray-700 mt-2">of Achievement</p>
             <p className="text-xl text-gray-700 mt-2"> This is to certify that</p>
@@ -160,12 +160,13 @@ const CertificatePreview = ({ data, showPrintButton = false }: CertificatePrevie
                   }}
                 >
                   <p className="text-xl font-semibold">{data.rollNo || "Roll Number"}</p>
+                    <p className="text-xl text-gray-700 mt-2"></p>
+  <p className="text-xl text-gray-700 mt-2"></p>
                 </div>
               </div>
             </div>
 
-  <p className="text-xl text-gray-700 mt-2"></p>
-  <p className="text-xl text-gray-700 mt-2"></p>
+
             <p className="text-xl text-gray-800 text-center">
               has successfully completed the course of
             </p>
