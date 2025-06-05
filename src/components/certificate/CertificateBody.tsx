@@ -73,7 +73,7 @@ const CertificateBody = ({ data }: CertificateBodyProps) => {
         <img 
           src="/lovable-uploads/ss.png" 
           alt="Official Seal" 
-          className="h-50 w-50 object-contain opacity-100"
+          className="h-49 w-49 object-contain opacity-100"
         />
       </div>
 
