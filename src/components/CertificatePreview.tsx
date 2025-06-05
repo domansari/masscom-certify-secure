@@ -115,8 +115,8 @@ const CertificatePreview = ({ data, showPrintButton = false }: CertificatePrevie
             <h2 className="text-5xl font-bold italic tracking-widest mb-2" style={{ color: '#FFD700' }}>
               Certificate
             </h2>
-            <p className="text-xl text-gray-700 mt-2">of Achievement</p>
-            <p className="text-xl text-gray-700 mt-2"> This is to certify that</p>
+            <p className="text-2xl text-gray-800 mt-2">of Achievement,This is to certify that</p>
+          
           </div>
 
           {/* Certificate Content */}
