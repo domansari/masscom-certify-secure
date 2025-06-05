@@ -1,4 +1,3 @@
-
 import { CertificateData } from "@/types/certificate";
 
 interface CertificateFooterProps {
@@ -9,9 +8,9 @@ const CertificateFooter = ({ data }: CertificateFooterProps) => {
   return (
     <>
       {/* Signatures Section - Proper space above */}
-      <div className="mt-6 mb-1">
+      <div className="mt-12 mb-1">
         <div className="flex justify-between items-end max-w-4xl mx-auto">
-          <div className="text-center flex-1 mx-8">
+          <div className="text-center flex-1 mx-12">
             <div className="border-t-2 border-black pt-2 mt-8">
               <p className="text-sm text-gray-600 mb-1">
                 {data.studentCoordinator || "Co-ordinator Name"}
@@ -19,7 +18,7 @@ const CertificateFooter = ({ data }: CertificateFooterProps) => {
               <p className="text-lg font-bold">Student Co-ordinator</p>
             </div>
           </div>
-          <div className="text-center flex-1 mx-8">
+          <div className="text-center flex-1 mx-12">
             <div className="border-t-2 border-black pt-2 mt-8">
               <p className="text-sm text-gray-600 mb-1">
                 Akbar Ansari
@@ -31,7 +30,7 @@ const CertificateFooter = ({ data }: CertificateFooterProps) => {
       </div>
 
       {/* Address and Contact Info at Bottom */}
-      <div className="text-center mt-1 mb-1">
+      <div className="text-center mt-4 mb-1">
         <p className="text-sm text-gray-700">
           1st Floor Mohsin Market, Yusufpur,Mohammadabad, Uttar Pradesh-India 233227
         </p>

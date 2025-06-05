@@ -1,4 +1,3 @@
-
 import { CertificateData } from "@/types/certificate";
 
 interface CertificateHeaderProps {
@@ -18,7 +17,7 @@ const CertificateHeader = ({ data }: CertificateHeaderProps) => {
         <img 
           src="/lovable-uploads/62c16412-d87b-42a8-9aa2-0daca4025461.png" 
           alt="Institute Logo" 
-          className="h-32 w-32 object-contain"
+          className="h-40 w-40 object-contain"
         />
       </div>
 

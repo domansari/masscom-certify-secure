@@ -1,4 +1,3 @@
-
 import { CertificateData } from "@/types/certificate";
 
 interface CertificateBodyProps {
@@ -62,27 +61,27 @@ const CertificateBody = ({ data }: CertificateBodyProps) => {
         has successfully completed the course of
       </p>
 
-      {/* Seal Image - Center aligned above course name */}
-      <div className="flex justify-center mb-3">
-        <img 
-          src="/lovable-uploads/dc9bc102-52f2-4cb0-ae96-01e99ea9fc4f.png" 
-          alt="Official Seal" 
-          className="h-60 w-60 object-contain"
-        />
-      </div>
-
       {/* Course Name */}
-      <div className="border-b-2 border-black pb-2 mx-20 mb-4">
+      <div className="border-b-2 border-black pb-2 mx-20 mb-8">
         <h4 className="text-2xl font-bold text-black text-center">
           {data.courseName || "Course Name"}
         </h4>
       </div>
 
+      {/* Seal Image - Center aligned above course name */}
+      <div className="flex justify-center mb-8">
+        <img 
+          src="/lovable-uploads/dc9bc102-52f2-4cb0-ae96-01e99ea9fc4f.png" 
+          alt="Official Seal" 
+          className="h-48 w-48 object-contain opacity-30"
+        />
+      </div>
+
       {/* Duration, Grade, and Date in one row */}
-      <div className="flex justify-center items-center gap-16 mb-4">
+      <div className="flex justify-center items-center gap-16 mb-12">
         <div className="text-center">
           <p className="text-lg text-gray-700 mb-2">Duration:</p>
-          <div className="border-b border-black pb-1">
+          <div className="border-b border-black pb-1 px-4">
             <p className="text-xl font-semibold">
               {data.duration ? `${data.duration}` : "Duration"}
             </p>
@@ -90,13 +89,13 @@ const CertificateBody = ({ data }: CertificateBodyProps) => {
         </div>
         <div className="text-center">
           <p className="text-lg text-gray-700 mb-2">Grade:</p>
-          <div className="border-b border-black pb-1">
+          <div className="border-b border-black pb-1 px-4">
             <p className="text-xl font-semibold">{data.grade || "Grade"}</p>
           </div>
         </div>
         <div className="text-center">
           <p className="text-lg text-gray-700 mb-2">Date of Issue:</p>
-          <div className="border-b border-black pb-1">
+          <div className="border-b border-black pb-1 px-4">
             <p className="text-xl font-semibold">
               {data.completionDate ? new Date(data.completionDate).toLocaleDateString() : "Date"}
             </p>
