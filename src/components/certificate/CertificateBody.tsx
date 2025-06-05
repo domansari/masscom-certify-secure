@@ -78,7 +78,7 @@ const CertificateBody = ({ data }: CertificateBodyProps) => {
       </div>
 
       {/* Duration, Grade, and Date in one row */}
-      <div className="flex justify-center items-center gap-55 mb-3">
+      <div className="flex justify-center items-center gap-60 mb-3">
         <div className="text-center">
           <p className="text-lg text-gray-700 mb-3">Duration:</p>
           <div className="border-b border-black pb-1 px-4">
