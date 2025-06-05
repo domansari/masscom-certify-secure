@@ -86,7 +86,7 @@ const CertificatePreview = ({ data, showPrintButton = false }: CertificatePrevie
         </div>
 
         {/* Main Content Container */}
-        <div className="flex flex-col h-full" style={{ padding: '5mm 5mm 5mm 5mm' }}>
+        <div className="flex flex-col h-full" style={{ padding: '5mm 5mm 0mm 5mm' }}>
           {/* Logo */}
           <div className="flex justify-center mb-4">
             <img 
