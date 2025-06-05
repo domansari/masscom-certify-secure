@@ -13,7 +13,7 @@ const CertificateFooter = ({ data }: CertificateFooterProps) => {
           <div className="text-center flex-1 mx-12">
             <div className="border-t-2 border-black pt-2 mt-4">
               <p className="text-sm text-black-600 mb-1">
-                {data.studentCoordinator || ("Co-ordinator Name")}
+                {data.studentCoordinator || "(Co-ordinator Name)"}
               </p>
               <p className="text-lg font-bold">Student Co-ordinator</p>
             </div>
