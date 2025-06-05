@@ -59,7 +59,7 @@ const CertificatePreview = ({ data, showPrintButton = false }: CertificatePrevie
       
       <div 
         id="certificate-element"
-        className="certificate-container relative bg-white mx-auto print:mx-0"
+        className="certificate-container relative bg-"abs.jpg" mx-auto print:mx-0"
         style={{
           width: '210mm',
           height: '297mm',
