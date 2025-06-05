@@ -111,7 +111,7 @@ const CertificatePreview = ({ data, showPrintButton = false }: CertificatePrevie
 
           {/* Certificate Title */}
           <div className="text-center mb-6">
-            <h2 className="text-4xl font-bold text-gold-700 italic tracking-widest">
+            <h2 className="text-4xl font-bold text-red-900 italic tracking-widest">
               Cerificate
             </h2>
             <p className="text-xl text-gray-700 mt-2">of Achievement</p>
@@ -137,7 +137,7 @@ const CertificatePreview = ({ data, showPrintButton = false }: CertificatePrevie
               
               </div>
     
-  <p className="text-xl text-gray-700 mt-2">...</p>
+  <p className="text-xl text-gray-700 mt-2"></p>
             <div className="grid grid-cols-2 gap-8 text-left max-w-2xl mx-auto">
                
               <div>
@@ -164,6 +164,8 @@ const CertificatePreview = ({ data, showPrintButton = false }: CertificatePrevie
               </div>
             </div>
 
+  <p className="text-xl text-gray-700 mt-2"></p>
+  <p className="text-xl text-gray-700 mt-2"></p>
             <p className="text-xl text-gray-800 text-center">
               has successfully completed the course of
             </p>
