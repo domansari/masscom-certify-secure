@@ -57,7 +57,7 @@ const CertificateBody = ({ data }: CertificateBodyProps) => {
         </div>
       </div>
 
-      <p className="text-5xl text-gray-800 text-center mb-2">
+      <p className="text-2xl text-gray-800 text-center mb-3">
         has successfully completed the course of
       </p>
 
