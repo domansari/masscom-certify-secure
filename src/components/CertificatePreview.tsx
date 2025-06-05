@@ -134,11 +134,12 @@ const CertificatePreview = ({ data, showPrintButton = false }: CertificatePrevie
                   width: `${Math.max(200, (data.studentName?.length || 12) * 18)}px`
                 }}
               >
+                <p className="text-xl text-gray-700 mt-2">...</p>
               </div>
     
 
             <div className="grid grid-cols-2 gap-8 text-left max-w-2xl mx-auto">
-               <p className="text-xl text-gray-700 mt-2">...</p>
+               
               <div>
                 <p className="text-lg text-gray-700 mb-1">S/O, D/O:</p>
                 <div 
