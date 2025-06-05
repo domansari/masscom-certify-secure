@@ -11,7 +11,7 @@ const CertificateFooter = ({ data }: CertificateFooterProps) => {
       <div className="mt-6 mb-1">
         <div className="flex justify-between items-end max-w-4xl mx-auto">
           <div className="text-center flex-1 mx-12">
-            <div className="border-t-2 border-black pt-2 mt-4">
+            <div className="border-t-2 border-black pt-3 mt-4">
               <p className="text-sm text-black-600 mb-1">
                 {data.studentCoordinator || "(Co-ordinator Name)"}
               </p>
@@ -19,7 +19,7 @@ const CertificateFooter = ({ data }: CertificateFooterProps) => {
             </div>
           </div>
           <div className="text-center flex-1 mx-12">
-            <div className="border-t-2 border-black pt-2 mt-8">
+            <div className="border-t-2 border-black pt-3 mt-8">
               <p className="text-sm text-black-600 mb-1">
                 (Akbar Ansari)
               </p>
