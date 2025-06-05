@@ -86,7 +86,7 @@ const Index = () => {
 
             {/* Search and Edit/Reissue */}
             <Link to="/generate">
-              <Card className="text-center hover:shadow-lg transition-shadow cursor-pointer h-48 flex flex-col justify-center bg-white/95 backdrop-blur-sm">
+              <Card className="text-center hover:shadow-lg transition-shadow cursor-pointer h-58 flex flex-col justify-center bg-white/95 backdrop-blur-sm">
                 <CardHeader>
                   <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Search className="h-8 w-8 text-white" />
