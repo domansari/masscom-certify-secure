@@ -62,14 +62,14 @@ const CertificateBody = ({ data }: CertificateBodyProps) => {
       </p>
 
       {/* Course Name */}
-      <div className="border-b-2 border-black pb-2 mx-20 mb-8">
+      <div className="border-b-2 border-black pb-2 mx-20 mb-3">
         <h4 className="text-3xl font-bold text-black text-center">
           {data.courseName || "Course Name"}
         </h4>
       </div>
 
       {/* Seal Image - Center aligned above course name */}
-      <div className="flex justify-center mb-3">
+      <div className="flex justify-center mb-1">
         <img 
           src="/lovable-uploads/ss.png" 
           alt="Official Seal" 
@@ -78,7 +78,7 @@ const CertificateBody = ({ data }: CertificateBodyProps) => {
       </div>
 
       {/* Duration, Grade, and Date in one row */}
-      <div className="flex justify-center items-center gap-60 mb-5">
+      <div className="flex justify-center items-center gap-50 mb-5">
         <div className="text-center">
           <p className="text-lg text-gray-700 mb-2">Duration:</p>
           <div className="border-b border-black pb-1 px-4">
