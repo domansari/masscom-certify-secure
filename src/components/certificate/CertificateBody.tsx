@@ -32,7 +32,7 @@ const CertificateBody = ({ data }: CertificateBodyProps) => {
       </div>
 
       {/* S/O, D/O and Roll No - Centered with equal gaps */}
-      <div className="flex justify-center items-center gap-70 mb-8">
+      <div className="flex justify-center items-center gap-60 mb-5">
         <div className="text-center">
           <p className="text-lg text-gray-700 mb-2">S/O, D/O:</p>
           <div 
@@ -73,12 +73,12 @@ const CertificateBody = ({ data }: CertificateBodyProps) => {
         <img 
           src="/lovable-uploads/ss.png" 
           alt="Official Seal" 
-          className="h-56 w-56 object-contain opacity-100"
+          className="h-52 w-52 object-contain opacity-100"
         />
       </div>
 
       {/* Duration, Grade, and Date in one row */}
-      <div className="flex justify-center items-center gap-70 mb-5">
+      <div className="flex justify-center items-center gap-60 mb-5">
         <div className="text-center">
           <p className="text-lg text-gray-700 mb-2">Duration:</p>
           <div className="border-b border-black pb-1 px-4">
