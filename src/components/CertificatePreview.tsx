@@ -112,7 +112,7 @@ const CertificatePreview = ({ data, showPrintButton = false }: CertificatePrevie
 
           {/* Certificate Title */}
           <div className="text-center mb-6">
-            <h2 className="text-6xl font-bold italic tracking-widest mb-2" style={{ color: '#FFD700' }}>
+            <h2 className="text-9xl font-bold italic tracking-widest mb-2" style={{ color: '#FFD700' }}>
               Certificate
             </h2>
             <p className="text-xl text-gray-700 mt-2">of Achievement</p>
@@ -134,10 +134,10 @@ const CertificatePreview = ({ data, showPrintButton = false }: CertificatePrevie
               </div>
             </div>
 
-            <p className="text-xl text-gray-700 mt-2"></p>
-            <div className="grid grid-cols-2 gap-8 text-left max-w-2xl mx-auto">
+            <p className="text-xl text-gray-700 mt-4 mb-4"></p>
+            <div className="grid grid-cols-2 gap-12 text-left max-w-2xl mx-auto mb-6">
               <div>
-                <p className="text-lg text-gray-700 mb-1">S/O, D/O:</p>
+                <p className="text-lg text-gray-700 mb-2">S/O, D/O:</p>
                 <div 
                   className="border-b border-black pb-1"
                   style={{ 
@@ -148,7 +148,7 @@ const CertificatePreview = ({ data, showPrintButton = false }: CertificatePrevie
                 </div>
               </div>
               <div>
-                <p className="text-lg text-gray-700 mb-1">Roll No:</p>
+                <p className="text-lg text-gray-700 mb-2">Roll No:</p>
                 <div 
                   className="border-b border-black pb-1"
                   style={{ 
@@ -156,34 +156,32 @@ const CertificatePreview = ({ data, showPrintButton = false }: CertificatePrevie
                   }}
                 >
                   <p className="text-xl font-semibold">{data.rollNo || "Roll Number"}</p>
-                  <p className="text-xl text-gray-700 mt-2"></p>
-                  <p className="text-xl text-gray-700 mt-2"></p>
                 </div>
               </div>
             </div>
 
-            <p className="text-xl text-gray-800 text-center">
+            <p className="text-xl text-gray-800 text-center mb-6">
               has successfully completed the course of
             </p>
 
             {/* Seal Image - Center aligned above course name */}
-            <div className="flex justify-center my-4">
+            <div className="flex justify-center mb-6">
               <img 
-                src="/lovable-uploads/945d2cdf-b885-4e7f-bc56-dc8153f8bc7d.png" 
+                src="/lovable-uploads/dc9bc102-52f2-4cb0-ae96-01e99ea9fc4f.png" 
                 alt="Official Seal" 
-                className="h-20 w-20 object-contain"
+                className="h-24 w-24 object-contain"
               />
             </div>
 
-            <div className="border-b-2 border-black pb-2 mx-20">
+            <div className="border-b-2 border-black pb-2 mx-20 mb-6">
               <h4 className="text-2xl font-bold text-black text-center">
                 {data.courseName || "Course Name"}
               </h4>
             </div>
 
-            <div className="grid grid-cols-2 gap-8 text-left max-w-2xl mx-auto">
+            <div className="grid grid-cols-2 gap-12 text-left max-w-2xl mx-auto mb-6">
               <div>
-                <p className="text-lg text-gray-700 mb-1">Duration:</p>
+                <p className="text-lg text-gray-700 mb-2">Duration:</p>
                 <div className="border-b border-black pb-1">
                   <p className="text-xl font-semibold">
                     {data.duration ? `${data.duration}` : "Duration"}
@@ -191,15 +189,15 @@ const CertificatePreview = ({ data, showPrintButton = false }: CertificatePrevie
                 </div>
               </div>
               <div>
-                <p className="text-lg text-gray-700 mb-1">Grade:</p>
+                <p className="text-lg text-gray-700 mb-2">Grade:</p>
                 <div className="border-b border-black pb-1">
                   <p className="text-xl font-semibold">{data.grade || "Grade"}</p>
                 </div>
               </div>
             </div>
 
-            <div className="text-center">
-              <p className="text-lg text-gray-700 mb-1">Date of Issue:</p>
+            <div className="text-center mb-8">
+              <p className="text-lg text-gray-700 mb-2">Date of Issue:</p>
               <div className="inline-block">
                 <p className="text-xl font-semibold mb-1">
                   {data.completionDate ? new Date(data.completionDate).toLocaleDateString() : "Date"}
@@ -215,7 +213,7 @@ const CertificatePreview = ({ data, showPrintButton = false }: CertificatePrevie
           </div>
 
           {/* Signatures Section */}
-          <div className="mt-2 mb-1">
+          <div className="mt-8 mb-1">
             <div className="flex justify-between items-end max-w-4xl mx-auto">
               <div className="text-center flex-1 mx-8">
                 <div className="border-t-2 border-black pt-2 mt-8">
