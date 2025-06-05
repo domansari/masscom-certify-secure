@@ -32,7 +32,7 @@ const CertificateBody = ({ data }: CertificateBodyProps) => {
       </div>
 
       {/* S/O, D/O and Roll No - Centered with equal gaps */}
-      <div className="flex justify-center items-center gap-35 mb-5">
+      <div className="flex justify-center items-center gap-45 mb-5">
         <div className="text-center">
           <p className="text-lg text-gray-700 mb-2">S/O, D/O:</p>
           <div 
