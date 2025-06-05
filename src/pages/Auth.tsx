@@ -52,7 +52,7 @@ const Auth = () => {
     <div 
       className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
       style={{
-        backgroundImage: `url('/lovable-uploads/3b58bcb9-fd05-4d05-81b0-30f76a01fd6a.png')`,
+        backgroundImage: `url('/lovable-uploads/f0d1378d-119b-4fea-80f3-ead49ffa08f1.png')`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'
