@@ -9,14 +9,14 @@ const CertificateBody = ({ data }: CertificateBodyProps) => {
     <>
       {/* Certificate Title */}
       <div className="text-center mb-1">
-        <h2 className="text-6xl font-bold italic tracking-widest mb-2" style={{ color: '#b48811' }}>
+        <h2 className="text-6xl font-bold italic tracking-widest mb-3" style={{ color: '#b48811' }}>
           Certificate
         </h2>
         <p className="text-2xl text-gray-800 mt-2">of Achievement, This is to certify that</p>
       </div>
 
       {/* Student Name */}
-      <div className="text-center mb-5">
+      <div className="text-center mb-6">
         <h3 className="text-3xl font-bold text-black uppercase mb-2">
           {data.studentName || "Student Name"}
         </h3>
@@ -34,7 +34,7 @@ const CertificateBody = ({ data }: CertificateBodyProps) => {
       {/* S/O, D/O and Roll No - Centered with equal gaps */}
       <div className="flex justify-center items-center gap-60 mb-5">
         <div className="text-center">
-          <p className="text-lg text-gray-700 mb-2">S/O, D/O:</p>
+          <p className="text-lg text-gray-700 mb-3">S/O, D/O:</p>
           <div 
             className="border-b border-black pb-1 mx-auto"
             style={{ 
@@ -45,7 +45,7 @@ const CertificateBody = ({ data }: CertificateBodyProps) => {
           </div>
         </div>
         <div className="text-center">
-          <p className="text-lg text-gray-700 mb-2">Roll No:</p>
+          <p className="text-lg text-gray-700 mb-3">Roll No:</p>
           <div 
             className="border-b border-black pb-1 mx-auto"
             style={{ 
@@ -62,7 +62,7 @@ const CertificateBody = ({ data }: CertificateBodyProps) => {
       </p>
 
       {/* Course Name */}
-      <div className="border-b-2 border-black pb-2 mx-20 mb-3">
+      <div className="border-b-2 border-black pb-2 mx-20 mb-4">
         <h4 className="text-3xl font-bold text-black text-center">
           {data.courseName || "Course Name"}
         </h4>
@@ -80,7 +80,7 @@ const CertificateBody = ({ data }: CertificateBodyProps) => {
       {/* Duration, Grade, and Date in one row */}
       <div className="flex justify-center items-center gap-55 mb-3">
         <div className="text-center">
-          <p className="text-lg text-gray-700 mb-2">Duration:</p>
+          <p className="text-lg text-gray-700 mb-3">Duration:</p>
           <div className="border-b border-black pb-1 px-4">
             <p className="text-xl font-semibold">
               {data.duration ? `${data.duration}` : "Duration"}
@@ -88,13 +88,13 @@ const CertificateBody = ({ data }: CertificateBodyProps) => {
           </div>
         </div>
         <div className="text-center">
-          <p className="text-lg text-gray-700 mb-2">Grade:</p>
+          <p className="text-lg text-gray-700 mb-3">Grade:</p>
           <div className="border-b border-black pb-1 px-4">
             <p className="text-xl font-semibold">{data.grade || "Grade"}</p>
           </div>
         </div>
         <div className="text-center">
-          <p className="text-lg text-gray-700 mb-2">Date of Issue:</p>
+          <p className="text-lg text-gray-700 mb-3">Date of Issue:</p>
           <div className="border-b border-black pb-1 px-4">
             <p className="text-xl font-semibold">
               {data.completionDate ? new Date(data.completionDate).toLocaleDateString() : "Date"}
