@@ -71,7 +71,7 @@ const Index = () => {
             
             {/* Generate New Certificate */}
             <Link to="/generate">
-              <Card className="text-center hover:shadow-lg transition-shadow cursor-pointer h-48 flex flex-col justify-center bg-white/95 backdrop-blur-sm">
+              <Card className="text-center hover:shadow-lg transition-shadow cursor-pointer h-58 flex flex-col justify-center bg-white/95 backdrop-blur-sm">
                 <CardHeader>
                   <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
                     <FileText className="h-8 w-8 text-white" />
@@ -101,7 +101,7 @@ const Index = () => {
 
             {/* Verify Certificate */}
             <Link to="/verify">
-              <Card className="text-center hover:shadow-lg transition-shadow cursor-pointer h-48 flex flex-col justify-center bg-white/95 backdrop-blur-sm">
+              <Card className="text-center hover:shadow-lg transition-shadow cursor-pointer h-58 flex flex-col justify-center bg-white/95 backdrop-blur-sm">
                 <CardHeader>
                   <div className="w-16 h-16 bg-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Shield className="h-8 w-8 text-white" />
