@@ -13,7 +13,7 @@ const Index = () => {
       <div 
         className="min-h-screen"
         style={{
-          backgroundImage: `url('/lovable-uploads/3b58bcb9-fd05-4d05-81b0-30f76a01fd6a.png')`,
+          backgroundImage: `url('/abs.jpg')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat'
@@ -47,7 +47,7 @@ const Index = () => {
     <div 
       className="min-h-screen"
       style={{
-        backgroundImage: `url('/lovable-uploads/3b58bcb9-fd05-4d05-81b0-30f76a01fd6a.png')`,
+        backgroundImage: `url('/abs.jpg')`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'
