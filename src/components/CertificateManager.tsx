@@ -91,19 +91,18 @@ const CertificateManager = ({ onEditCertificate }: CertificateManagerProps) => {
       }
 
       // If password is correct, proceed with permanent deletion
-      const { error } = await supabase
+      const { error: deleteError } = await supabase
         .from('certificates')
         .delete()
         .eq('id', certificateToDelete.id);
 
-      if (error) {
-        console.error('Delete error:', error);
-        throw error;
+      if (deleteError) {
+        console.error('Delete error:', deleteError);
+        throw deleteError;
       }
 
-      // Remove from local state immediately to prevent it from showing
-      const updatedCertificates = certificates.filter(cert => cert.id !== certificateToDelete.id);
-      setCertificates(updatedCertificates);
+      // Update local state immediately
+      setCertificates(prevCerts => prevCerts.filter(cert => cert.id !== certificateToDelete.id));
       
       // Clear the deletion state
       setCertificateToDelete(null);
@@ -112,19 +111,14 @@ const CertificateManager = ({ onEditCertificate }: CertificateManagerProps) => {
       
       toast({
         title: "Certificate Deleted",
-        description: `Certificate for ${certificateToDelete.student_name} has been permanently deleted from the database.`,
+        description: `Certificate for ${certificateToDelete.student_name} has been permanently deleted.`,
       });
-
-      // Force a fresh fetch from database to ensure consistency
-      setTimeout(() => {
-        fetchCertificates();
-      }, 500);
       
     } catch (error: any) {
-      console.error('Full delete error:', error);
+      console.error('Delete error:', error);
       toast({
         title: "Error",
-        description: error.message || "Failed to delete certificate permanently from database.",
+        description: error.message || "Failed to delete certificate.",
         variant: "destructive",
       });
     } finally {
@@ -215,7 +209,13 @@ const CertificateManager = ({ onEditCertificate }: CertificateManagerProps) => {
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
-                        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                        <Dialog open={dialogOpen && certificateToDelete?.id === certificate.id} onOpenChange={(open) => {
+                          setDialogOpen(open);
+                          if (!open) {
+                            setCertificateToDelete(null);
+                            setDeletePassword("");
+                          }
+                        }}>
                           <DialogTrigger asChild>
                             <Button
                               size="sm"
@@ -234,8 +234,7 @@ const CertificateManager = ({ onEditCertificate }: CertificateManagerProps) => {
                               <DialogTitle>Confirm Permanent Deletion</DialogTitle>
                               <DialogDescription>
                                 You are about to permanently delete the certificate for <strong>{certificate.student_name}</strong>. 
-                                This action cannot be undone and the record will be permanently removed from the database. 
-                                Please enter your admin password to confirm.
+                                This action cannot be undone. Please enter your admin password to confirm.
                               </DialogDescription>
                             </DialogHeader>
                             <div className="space-y-4 py-4">
@@ -269,7 +268,7 @@ const CertificateManager = ({ onEditCertificate }: CertificateManagerProps) => {
                                 {isDeleting ? (
                                   <>
                                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                                    Deleting Permanently...
+                                    Deleting...
                                   </>
                                 ) : (
                                   "Delete Permanently"

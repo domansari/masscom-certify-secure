@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileText, Search, Shield, Printer } from "lucide-react";
+import { FileText, Search, Shield } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -67,7 +67,7 @@ const Index = () => {
 
       <div className="relative z-10 py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             
             {/* Generate New Certificate */}
             <Link to="/generate">
@@ -110,21 +110,6 @@ const Index = () => {
                 </CardHeader>
                 <CardContent>
                   <p className="text-gray-600">Verify certificate authenticity</p>
-                </CardContent>
-              </Card>
-            </Link>
-
-            {/* Print Certificate */}
-            <Link to="/print">
-              <Card className="text-center hover:shadow-lg transition-shadow cursor-pointer h-48 flex flex-col justify-center bg-white/95 backdrop-blur-sm">
-                <CardHeader>
-                  <div className="w-16 h-16 bg-orange-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Printer className="h-8 w-8 text-white" />
-                  </div>
-                  <CardTitle className="text-xl">Print Certificate</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600">Search and print certificates</p>
                 </CardContent>
               </Card>
             </Link>
