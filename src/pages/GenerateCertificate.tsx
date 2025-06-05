@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -449,7 +448,7 @@ const GenerateCertificate = () => {
                   </CardHeader>
                   <CardContent>
                     <div ref={certificateRef}>
-                      <CertificatePreview data={formData} showPrintButton={true} />
+                      <CertificatePreview data={formData} />
                     </div>
                   </CardContent>
                 </Card>
