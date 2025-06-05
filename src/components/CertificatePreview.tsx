@@ -19,7 +19,7 @@ const CertificatePreview = ({ data }: CertificatePreviewProps) => {
           padding: '0',
           margin: '0',
           fontFamily: 'Times, serif',
-          backgroundImage: `url('/lovable-uploads/axa.png')`,
+          backgroundImage: `url('/lovable-uploads/axa.jpg')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
