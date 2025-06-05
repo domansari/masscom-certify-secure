@@ -65,7 +65,7 @@ const Index = () => {
         </div>
       </div>
 
-      <div className="relative z-10 py-20">
+      <div className="relative z-10 py-10">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             
