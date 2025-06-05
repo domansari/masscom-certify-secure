@@ -13,7 +13,7 @@ const CertificateHeader = ({ data }: CertificateHeaderProps) => {
       </div>
 
       {/* Logo and Institute Name - Reduced Gap */}
-      <div className="flex justify-center mb-10">
+      <div className="flex justify-center mb-1">
         <img 
           src="/lovable-uploads/62c16412-d87b-42a8-9aa2-0daca4025461.png" 
           alt="Institute Logo" 
@@ -22,7 +22,7 @@ const CertificateHeader = ({ data }: CertificateHeaderProps) => {
       </div>
 
       {/* Institute Name - Reduced margin */}
-      <div className="text-center mb-10">
+      <div className="text-center mb-1">
         <h1 className="text-3xl font-bold text-blue-700 uppercase tracking-wide">
           MASSCOM INFOTECH EDUCATION
         </h1>
