@@ -73,12 +73,12 @@ const CertificateBody = ({ data }: CertificateBodyProps) => {
         <img 
           src="/lovable-uploads/ss.png" 
           alt="Official Seal" 
-          className="h-55 w-55 object-contain opacity-100"
+          className="h-50 w-50 object-contain opacity-100"
         />
       </div>
 
       {/* Duration, Grade, and Date in one row */}
-      <div className="flex justify-center items-center gap-55 mb-5">
+      <div className="flex justify-center items-center gap-50 mb-5">
         <div className="text-center">
           <p className="text-lg text-gray-700 mb-2">Duration:</p>
           <div className="border-b border-black pb-1 px-4">
