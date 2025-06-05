@@ -23,7 +23,7 @@ const CertificateHeader = ({ data }: CertificateHeaderProps) => {
       </div>
 
       {/* Institute Name - Reduced margin */}
-      <div className="text-center mb-1">
+      <div className="text-center mb-0">
         <h1 className="text-3xl font-bold text-blue-700 uppercase tracking-wide">
           MASSCOM INFOTECH EDUCATION
         </h1>
