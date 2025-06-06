@@ -64,7 +64,13 @@ const CertificateBody = ({ data }: CertificateBodyProps) => {
 
       <p className="text-2xl text-gray-800 text-center mb-3">
         has successfully completed the course of
-      </p>
+      </p> <div className="text-center mb-5">
+              <p className="text-2xl text-gray-800 mt-2"></p>
+        <p className="text-2xl text-gray-800 mt-2"></p>
+      </div>   <div className="text-center mb-5">
+              <p className="text-2xl text-gray-800 mt-2"></p>
+        <p className="text-2xl text-gray-800 mt-2"></p>
+      </div>  
    <div className="text-center mb-5">
               <p className="text-2xl text-gray-800 mt-2"></p>
         <p className="text-2xl text-gray-800 mt-2"></p>
