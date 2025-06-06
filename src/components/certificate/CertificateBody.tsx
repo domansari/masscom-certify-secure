@@ -29,15 +29,15 @@ const CertificateBody = ({ data }: CertificateBodyProps) => {
       </div>
 
       {/* Student Name */}
-      <div className="text-center mb-6">
-        <h2 className="text-6xl font-bold italic tracking-widest mb-3" style={{ color: '#b48811' }}>
+      <div className="text-center mb-4">
+        <h2 className="text-5xl font-bold italic tracking-widest mb-3" style={{ color: '#b48811' }}>
           {data.studentName || "Student Name"}
         </h2>
     
       </div>
 
       {/* S/O, D/O and Roll No - Centered with equal gaps */}
-      <div className="flex justify-center items-center gap-50 mb-5">
+      <div className="flex justify-center items-center gap-60 mb-5">
         <div className="text-center">
           <p className="text-lg text-gray-700 mb-3">S/O, D/O:</p>
           <div 
@@ -65,7 +65,19 @@ const CertificateBody = ({ data }: CertificateBodyProps) => {
       <p className="text-2xl text-gray-800 text-center mb-3">
         has successfully completed the course of
       </p>
-
+   <div className="text-center mb-5">
+              <p className="text-2xl text-gray-800 mt-2"></p>
+        <p className="text-2xl text-gray-800 mt-2"></p>
+      </div>   <div className="text-center mb-5">
+              <p className="text-2xl text-gray-800 mt-2"></p>
+        <p className="text-2xl text-gray-800 mt-2"></p>
+      </div>   <div className="text-center mb-5">
+              <p className="text-2xl text-gray-800 mt-2"></p>
+        <p className="text-2xl text-gray-800 mt-2"></p>
+      </div>   <div className="text-center mb-5">
+              <p className="text-2xl text-gray-800 mt-2"></p>
+        <p className="text-2xl text-gray-800 mt-2"></p>
+      </div>
       {/* Course Name */}
       <div className="border-b-2 border-black pb-2 mx-20 mb-4">
         <h4 className="text-3xl font-bold text-black text-center">
