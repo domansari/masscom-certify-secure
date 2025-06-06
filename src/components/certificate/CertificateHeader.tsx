@@ -14,11 +14,7 @@ const CertificateHeader = ({ data }: CertificateHeaderProps) => {
 
       {/* Logo and Institute Name - Reduced Gap */}
       <div className="flex justify-center mb-0">
-        <img 
-          src="/lovable-uploads/62c16412-d87b-42a8-9aa2-0daca4025461.png" 
-          alt="Institute Logo" 
-          className="h-40 w-40 object-contain"
-        />
+       
       </div>
 
       {/* Institute Name - Reduced margin */}
