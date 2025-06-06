@@ -32,7 +32,7 @@ const CertificateFooter = ({ data }: CertificateFooterProps) => {
       {/* Address and Contact Info at Bottom */}
       <div className="text-center mt-4 mb-1">
         <p className="text-sm text-black-700">
-          1st Floor Mohsin Market, Yusufpur,Mohammadabad, Uttar Pradesh-India 233227
+          1st Floor Mohsin Market, Yusufpur,Mohammadabad, Uttar Pradesh-India 233227, info@masscom.co.in,+91-9628355656
         </p>
         <p className="text-sm text-black-700">
           info@masscom.co.in, +91-9628355656
