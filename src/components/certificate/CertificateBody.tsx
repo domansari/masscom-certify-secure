@@ -16,15 +16,12 @@ const CertificateBody = ({ data }: CertificateBodyProps) => {
         <p className="text-2xl text-gray-800 mt-2"></p>
       </div>
       
-      <div className="text-center mb-5">
-              <p className="text-2xl text-gray-800 mt-2"></p>
-        <p className="text-2xl text-gray-800 mt-2"></p>
-      </div>
-      
+     
 
       <div className="text-center mb-5">
       
-        <p className="text-2xl text-gray-800 mt-2">of Achievement, This is to certify that</p>
+        <p className="text-2xl text-gray-800 mt-2">of Achievement</p>
+      </div>  <p className="text-2xl text-gray-800 mt-2">This is to certify that</p>
       </div>
 
       {/* Student Name */}
@@ -44,7 +41,7 @@ const CertificateBody = ({ data }: CertificateBodyProps) => {
       </div>
 
       {/* S/O, D/O and Roll No - Centered with equal gaps */}
-      <div className="flex justify-center items-center gap-60 mb-5">
+      <div className="flex justify-center items-center gap-70 mb-5">
         <div className="text-center">
           <p className="text-lg text-gray-700 mb-3">S/O, D/O:</p>
           <div 
