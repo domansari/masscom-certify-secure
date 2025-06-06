@@ -21,7 +21,7 @@ const CertificateBody = ({ data }: CertificateBodyProps) => {
       <div className="text-center mb-5">
       
         <p className="text-2xl text-gray-800 mt-2">of Achievement</p>
-      </div>  <p className="text-2xl text-gray-800 mt-2">This is to certify that</p>
+      </div>    <div className="text-center mb-5"> <p className="text-2xl text-gray-800 mt-2">This is to certify that</p>
       </div>
 
       {/* Student Name */}
