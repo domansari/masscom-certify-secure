@@ -15,12 +15,16 @@ const CertificateHeader = ({ data }: CertificateHeaderProps) => {
 
       {/* Logo and Institute Name - Reduced Gap */}
       <div className="flex justify-center mb-4">
-        <p className="text-4xl font-bold text-black">INSTITUTE NAME</p>
+        <p className="text-4xl font-bold text-black">.</p>
+         <p className="text-4xl font-bold text-black">.</p>
+         <p className="text-4xl font-bold text-black">.</p>
+         <p className="text-4xl font-bold text-black">.</p>
+         <p className="text-4xl font-bold text-black">.</p>
       </div>
 
       {/* Subtitle */}
       <div className="text-center mb-5">
-        <p className="text-lg italic text-blue-600">
+        <p className="text-lg italic text-black-600">
           [An Autonomous Institution Registered Under The Public Trust Act.]
         </p>
       </div>
