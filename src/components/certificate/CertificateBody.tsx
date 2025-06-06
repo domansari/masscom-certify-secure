@@ -1,3 +1,4 @@
+
 import { CertificateData } from "@/types/certificate";
 
 interface CertificateBodyProps {
@@ -17,9 +18,9 @@ const CertificateBody = ({ data }: CertificateBodyProps) => {
 
       {/* Student Name */}
       <div className="text-center mb-6">
-        <h2 className="text-6xl font-bold italic tracking-widest mb-3" mb-3"style={{ color: '#b48811' }}>
+        <h2 className="text-6xl font-bold italic tracking-widest mb-3" style={{ color: '#b48811' }}>
           {data.studentName || "Student Name"}
-        </h3>
+        </h2>
         <div>
           <div 
             className="mx-auto border-b-2 border-black"
