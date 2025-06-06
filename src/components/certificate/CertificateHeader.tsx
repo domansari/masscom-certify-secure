@@ -1,3 +1,4 @@
+
 import { CertificateData } from "@/types/certificate";
 
 interface CertificateHeaderProps {
@@ -13,18 +14,13 @@ const CertificateHeader = ({ data }: CertificateHeaderProps) => {
       </div>
 
       {/* Logo and Institute Name - Reduced Gap */}
-      <div className="flex justify-center mb-0">
-       <p> <br>&nbsp;<br> </p>
-      </div>
-
-      {/* Institute Name - Reduced margin */}
-      <div className="text-center mb-0">
-       <p> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </p>
+      <div className="flex justify-center mb-4">
+        <p className="text-4xl font-bold text-black">INSTITUTE NAME</p>
       </div>
 
       {/* Subtitle */}
       <div className="text-center mb-5">
-        <p className="text-lg text-gray-700 italic">
+        <p className="text-lg italic text-blue-600">
           [An Autonomous Institution Registered Under The Public Trust Act.]
         </p>
       </div>
