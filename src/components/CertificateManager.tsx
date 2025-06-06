@@ -35,7 +35,6 @@ const CertificateManager = ({ onEditCertificate }: CertificateManagerProps) => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
-  const [deletePassword, setDeletePassword] = useState("");
   const [certificateToDelete, setCertificateToDelete] = useState<Certificate | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -54,10 +53,10 @@ const CertificateManager = ({ onEditCertificate }: CertificateManagerProps) => {
   });
 
   const confirmDelete = async () => {
-    if (!certificateToDelete || !deletePassword) {
+    if (!certificateToDelete) {
       toast({
         title: "Missing Information",
-        description: "Please enter your admin password to confirm deletion.",
+        description: "No certificate selected for deletion.",
         variant: "destructive",
       });
       return;
@@ -68,22 +67,15 @@ const CertificateManager = ({ onEditCertificate }: CertificateManagerProps) => {
     try {
       console.log('Attempting to delete certificate:', certificateToDelete.id);
       
-      // Use service role to delete the record directly
-      const { data, error: deleteError } = await supabase
+      // Delete the certificate record
+      const { error: deleteError } = await supabase
         .from('certificates')
         .delete()
-        .eq('id', certificateToDelete.id)
-        .select();
-
-      console.log('Delete response:', { data, error: deleteError });
+        .eq('id', certificateToDelete.id);
 
       if (deleteError) {
         console.error('Delete error details:', deleteError);
         throw deleteError;
-      }
-
-      if (!data || data.length === 0) {
-        throw new Error('No certificate was deleted. Certificate may not exist.');
       }
 
       // Invalidate and refetch the certificates query
@@ -91,7 +83,6 @@ const CertificateManager = ({ onEditCertificate }: CertificateManagerProps) => {
       
       // Clear the deletion state
       setCertificateToDelete(null);
-      setDeletePassword("");
       setDialogOpen(false);
       
       toast({
@@ -194,7 +185,6 @@ const CertificateManager = ({ onEditCertificate }: CertificateManagerProps) => {
                           setDialogOpen(open);
                           if (!open) {
                             setCertificateToDelete(null);
-                            setDeletePassword("");
                           }
                         }}>
                           <DialogTrigger asChild>
@@ -223,7 +213,6 @@ const CertificateManager = ({ onEditCertificate }: CertificateManagerProps) => {
                                 variant="outline"
                                 onClick={() => {
                                   setCertificateToDelete(null);
-                                  setDeletePassword("");
                                   setDialogOpen(false);
                                 }}
                               >

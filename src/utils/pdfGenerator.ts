@@ -30,7 +30,7 @@ export const generateCertificatePDF = async (certificateElement: HTMLElement, fi
     tempContainer.style.backgroundColor = 'white';
     tempContainer.style.overflow = 'hidden';
     
-    // Clone the certificate element
+    // Clone the certificate element and apply the background directly
     const clonedElement = actualCertificate.cloneNode(true) as HTMLElement;
     clonedElement.style.transform = 'scale(1)';
     clonedElement.style.width = '210mm';
@@ -38,6 +38,10 @@ export const generateCertificatePDF = async (certificateElement: HTMLElement, fi
     clonedElement.style.margin = '0';
     clonedElement.style.padding = '0';
     clonedElement.style.overflow = 'hidden';
+    clonedElement.style.backgroundImage = `url('/lovable-uploads/7ab347ae-d0be-4f64-ae7e-c4bfd0378ac4.png')`;
+    clonedElement.style.backgroundSize = 'cover';
+    clonedElement.style.backgroundPosition = 'center';
+    clonedElement.style.backgroundRepeat = 'no-repeat';
     
     // Ensure QR code is visible in the cloned element
     const originalQRCanvas = actualCertificate.querySelector('canvas');
@@ -54,7 +58,7 @@ export const generateCertificatePDF = async (certificateElement: HTMLElement, fi
     tempContainer.appendChild(clonedElement);
     document.body.appendChild(tempContainer);
     
-    // Wait for fonts and rendering
+    // Wait for images to load
     await new Promise(resolve => setTimeout(resolve, 2000));
     
     console.log('Creating canvas for PDF...');
@@ -68,7 +72,8 @@ export const generateCertificatePDF = async (certificateElement: HTMLElement, fi
       width: 794, // A4 width in pixels at 96 DPI
       height: 1123, // A4 height in pixels at 96 DPI
       logging: false,
-      removeContainer: false
+      removeContainer: false,
+      imageTimeout: 15000 // Increase timeout for image loading
     });
     
     // Remove the temporary container
