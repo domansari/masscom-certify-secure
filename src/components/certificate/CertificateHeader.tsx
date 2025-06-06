@@ -18,7 +18,19 @@ const CertificateHeader = ({ data }: CertificateHeaderProps) => {
         <p className="text-4xl font-bold text-black">.</p>
         
       </div>
-
+<div className="text-center mb-5">
+              <p className="text-2xl text-gray-800 mt-2"></p>
+        <p className="text-2xl text-gray-800 mt-2"></p>
+      </div>
+      
+<div className="text-center mb-5">
+              <p className="text-2xl text-gray-800 mt-2"></p>
+        <p className="text-2xl text-gray-800 mt-2"></p>
+      </div>
+       <div className="text-center mb-5">
+              <p className="text-2xl text-gray-800 mt-2"></p>
+        <p className="text-2xl text-gray-800 mt-2"></p>
+      </div>
       {/* Subtitle */}
       <div className="text-center mb-5">
         <p className="text-lg italic text-black-600">
