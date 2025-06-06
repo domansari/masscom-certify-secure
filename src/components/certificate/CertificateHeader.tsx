@@ -19,7 +19,7 @@ const CertificateHeader = ({ data }: CertificateHeaderProps) => {
 
       {/* Institute Name - Reduced margin */}
       <div className="text-center mb-0">
-       <p>  </p>
+       <p> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </p>
       </div>
 
       {/* Subtitle */}
