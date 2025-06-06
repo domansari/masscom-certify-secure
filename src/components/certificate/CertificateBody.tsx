@@ -15,24 +15,17 @@ const CertificateBody = ({ data }: CertificateBodyProps) => {
               <p className="text-2xl text-gray-800 mt-2"></p>
         <p className="text-2xl text-gray-800 mt-2"></p>
       </div>
-      
-            <div className="text-center mb-5">
-              <p className="text-2xl text-gray-800 mt-2"></p>
-        <p className="text-2xl text-gray-800 mt-2"></p>
-      </div>
-      
-
       <div className="text-center mb-5">
       
-        <p className="text-2xl text-gray-800 mt-2">of Achievement</p>
-     <p className="text-2xl text-gray-800 mt-2">This is to certify that</p>
+        <p className="text-2xl text-gray-800 mt-2">of Achievement,
+    This is to certify that</p>
       </div>
 
       {/* Student Name */}
       <div className="text-center mb-4">
-        <h2 className="text-5xl font-bold italic tracking-widest mb-3" style={{ color: '#b48811' }}>
+        <h3 className="text-4xl font-bold italic tracking-widest mb-3" style={{ color: '#b48811' }}>
           {data.studentName || "Student Name"}
-        </h2>
+        </h3>
     
       </div>
 
