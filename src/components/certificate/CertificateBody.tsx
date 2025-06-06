@@ -69,11 +69,7 @@ const CertificateBody = ({ data }: CertificateBodyProps) => {
 
       {/* Seal Image - Center aligned above course name */}
       <div className="flex justify-center mb-1">
-        <img 
-          src="/lovable-uploads/ss.png" 
-          alt="Official Seal" 
-          className="h-48 w-48 object-contain opacity-100"
-        />
+    
       </div>
 
       {/* Duration, Grade, and Date in one row */}
