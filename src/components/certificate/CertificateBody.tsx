@@ -16,12 +16,16 @@ const CertificateBody = ({ data }: CertificateBodyProps) => {
         <p className="text-2xl text-gray-800 mt-2"></p>
       </div>
       
-     
+            <div className="text-center mb-5">
+              <p className="text-2xl text-gray-800 mt-2"></p>
+        <p className="text-2xl text-gray-800 mt-2"></p>
+      </div>
+      
 
       <div className="text-center mb-5">
       
         <p className="text-2xl text-gray-800 mt-2">of Achievement</p>
-      </div>    <div className="text-center mb-5"> <p className="text-2xl text-gray-800 mt-2">This is to certify that</p>
+     <p className="text-5xl text-gray-800 mt-2">This is to certify that</p>
       </div>
 
       {/* Student Name */}
@@ -29,15 +33,7 @@ const CertificateBody = ({ data }: CertificateBodyProps) => {
         <h2 className="text-6xl font-bold italic tracking-widest mb-3" style={{ color: '#b48811' }}>
           {data.studentName || "Student Name"}
         </h2>
-        <div>
-          <div 
-            className="mx-auto border-b-2 border-black"
-            style={{ 
-              width: `${Math.max(200, (data.studentName?.length || 12) * 18)}px`
-            }}
-          >
-          </div>
-        </div>
+    
       </div>
 
       {/* S/O, D/O and Roll No - Centered with equal gaps */}
