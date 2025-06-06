@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileText, Search, Shield } from "lucide-react";
+import { FileText, Search, Shield, Printer } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -66,50 +66,65 @@ const Index = () => {
       </div>
 
       <div className="relative z-10 py-10">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             
             {/* Generate New Certificate */}
             <Link to="/generate">
-              <Card className="text-center hover:shadow-lg transition-shadow cursor-pointer h-48 flex flex-col justify-center bg-white/95 backdrop-blur-sm">
-                <CardHeader>
-                  <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <FileText className="h-8 w-8 text-white" />
+              <Card className="text-center hover:shadow-lg transition-shadow cursor-pointer h-52 flex flex-col justify-center bg-white/95 backdrop-blur-sm">
+                <CardHeader className="pb-2">
+                  <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <FileText className="h-6 w-6 text-white" />
                   </div>
-                  <CardTitle className="text-xl">Generate New Certificate</CardTitle>
+                  <CardTitle className="text-lg">Generate New Certificate</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600">Create a new certificate for students</p>
+                <CardContent className="pt-0">
+                  <p className="text-gray-600 text-sm">Create a new certificate for students</p>
                 </CardContent>
               </Card>
             </Link>
 
             {/* Search and Edit/Reissue */}
             <Link to="/generate">
-              <Card className="text-center hover:shadow-lg transition-shadow cursor-pointer h-48 flex flex-col justify-center bg-white/95 backdrop-blur-sm">
-                <CardHeader>
-                  <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Search className="h-8 w-8 text-white" />
+              <Card className="text-center hover:shadow-lg transition-shadow cursor-pointer h-52 flex flex-col justify-center bg-white/95 backdrop-blur-sm">
+                <CardHeader className="pb-2">
+                  <div className="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <Search className="h-6 w-6 text-white" />
                   </div>
-                  <CardTitle className="text-xl">Search & Edit/Reissue</CardTitle>
+                  <CardTitle className="text-lg">Search & Edit/Reissue</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600">Search and modify existing certificates</p>
+                <CardContent className="pt-0">
+                  <p className="text-gray-600 text-sm">Search and modify existing certificates</p>
+                </CardContent>
+              </Card>
+            </Link>
+
+            {/* Print Certificate */}
+            <Link to="/generate">
+              <Card className="text-center hover:shadow-lg transition-shadow cursor-pointer h-52 flex flex-col justify-center bg-white/95 backdrop-blur-sm">
+                <CardHeader className="pb-2">
+                  <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <Printer className="h-6 w-6 text-white" />
+                  </div>
+                  <CardTitle className="text-lg">Print Certificate</CardTitle>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <p className="text-gray-600 text-sm">Select and print existing certificates</p>
                 </CardContent>
               </Card>
             </Link>
 
             {/* Verify Certificate */}
             <Link to="/verify">
-              <Card className="text-center hover:shadow-lg transition-shadow cursor-pointer h-48 flex flex-col justify-center bg-white/95 backdrop-blur-sm">
-                <CardHeader>
-                  <div className="w-16 h-16 bg-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Shield className="h-8 w-8 text-white" />
+              <Card className="text-center hover:shadow-lg transition-shadow cursor-pointer h-52 flex flex-col justify-center bg-white/95 backdrop-blur-sm">
+                <CardHeader className="pb-2">
+                  <div className="w-12 h-12 bg-emerald-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <Shield className="h-6 w-6 text-white" />
                   </div>
-                  <CardTitle className="text-xl">Verify Certificate</CardTitle>
+                  <CardTitle className="text-lg">Verify Certificate</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600">Verify certificate authenticity</p>
+                <CardContent className="pt-0">
+                  <p className="text-gray-600 text-sm">Verify certificate authenticity</p>
                 </CardContent>
               </Card>
             </Link>

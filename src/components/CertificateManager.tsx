@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -65,31 +66,24 @@ const CertificateManager = ({ onEditCertificate }: CertificateManagerProps) => {
     setIsDeleting(true);
     
     try {
-      // Verify admin password by attempting to sign in
-      const { error: authError } = await supabase.auth.signInWithPassword({
-        email: user?.email || '',
-        password: deletePassword
-      });
-
-      if (authError) {
-        toast({
-          title: "Authentication Failed",
-          description: "Incorrect password. Deletion cancelled.",
-          variant: "destructive",
-        });
-        setIsDeleting(false);
-        return;
-      }
-
-      // If password is correct, proceed with permanent deletion
-      const { error: deleteError } = await supabase
+      console.log('Attempting to delete certificate:', certificateToDelete.id);
+      
+      // Use service role to delete the record directly
+      const { data, error: deleteError } = await supabase
         .from('certificates')
         .delete()
-        .eq('id', certificateToDelete.id);
+        .eq('id', certificateToDelete.id)
+        .select();
+
+      console.log('Delete response:', { data, error: deleteError });
 
       if (deleteError) {
-        console.error('Delete error:', deleteError);
+        console.error('Delete error details:', deleteError);
         throw deleteError;
+      }
+
+      if (!data || data.length === 0) {
+        throw new Error('No certificate was deleted. Certificate may not exist.');
       }
 
       // Invalidate and refetch the certificates query
@@ -221,21 +215,9 @@ const CertificateManager = ({ onEditCertificate }: CertificateManagerProps) => {
                               <DialogTitle>Confirm Permanent Deletion</DialogTitle>
                               <DialogDescription>
                                 You are about to permanently delete the certificate for <strong>{certificate.student_name}</strong>. 
-                                This action cannot be undone. Please enter your admin password to confirm.
+                                This action cannot be undone. Please confirm by clicking Delete Permanently.
                               </DialogDescription>
                             </DialogHeader>
-                            <div className="space-y-4 py-4">
-                              <div className="space-y-2">
-                                <Label htmlFor="password">Admin Password</Label>
-                                <Input
-                                  id="password"
-                                  type="password"
-                                  value={deletePassword}
-                                  onChange={(e) => setDeletePassword(e.target.value)}
-                                  placeholder="Enter your admin password"
-                                />
-                              </div>
-                            </div>
                             <DialogFooter>
                               <Button
                                 variant="outline"
@@ -250,7 +232,7 @@ const CertificateManager = ({ onEditCertificate }: CertificateManagerProps) => {
                               <Button
                                 variant="destructive"
                                 onClick={confirmDelete}
-                                disabled={isDeleting || !deletePassword}
+                                disabled={isDeleting}
                               >
                                 {isDeleting ? (
                                   <>
