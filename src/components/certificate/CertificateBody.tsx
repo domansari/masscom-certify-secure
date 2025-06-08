@@ -99,7 +99,7 @@ const CertificateBody = ({ data }: CertificateBodyProps) => {
  <div className="border-b border-black pb-1 px-4">
 
       
-      </div>
+      </div>      </div>
     </>
   );
 };
