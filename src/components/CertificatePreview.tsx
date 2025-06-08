@@ -75,7 +75,7 @@ const CertificatePreview = ({ data }: CertificatePreviewProps) => {
           <QRCodeSection certificateId={data.certificateId} />
           
           {/* Main Content Container */}
-          <div className="flex flex-col h-full" style={{ padding: '10mm 10mm 10mm 10mm' }}>
+          <div className="flex flex-col h-full" style={{ padding: '0mm 0mm 0mm 0mm' }}>
             <CertificateHeader data={data} />
             <CertificateBody data={data} />
             <CertificateFooter data={data} />
