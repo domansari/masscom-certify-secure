@@ -91,12 +91,12 @@ const CertificateBody = ({ data }: CertificateBodyProps) => {
 
       
       {/* Duration, Grade, and Date in one row */}
-      <div className="flex justify-center items-center mb-3">
+      <div className="flex justify-center items-center gap-15 mb-3">
         <div className="text-center">
           <p className="text-x1 font-semibold text-black-700 mb-3">Duration:
               {data.duration ? `${data.duration}` : "Duration"} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Grade:{data.grade || "Grade"} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Date of Issue:{data.completionDate ? new Date(data.completionDate).toLocaleDateString() : "Date"}
          </p>   
-</div>
+
 
       
       </div>      </div>
