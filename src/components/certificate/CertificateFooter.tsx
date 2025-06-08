@@ -19,7 +19,7 @@ const CertificateFooter = ({ data }: CertificateFooterProps) => {
             </div>
           </div>
           <div className="text-center flex-1 mx-12">
-            <div className="border-t-2 border-black pt-3 mt-8">
+            <div className="border-t-2 border-black pt-3 mt-6">
               <p className="text-sm text-black-800 mb-1">
                 Akbar Ansari
               </p>
@@ -31,7 +31,7 @@ const CertificateFooter = ({ data }: CertificateFooterProps) => {
       </div>
 
              {/* Address and Contact Info at Bottom */}
-      <div className="text-center mt-4 mb-1">
+      <div className="text-center mt-2 mb-1">
         <p className="text-sm text-black-700">
           1st Floor Mohsin Market, Yusufpur,Mohammadabad, Uttar Pradesh-India 233227, info@masscom.co.in,+91-9628355656
         </p>
