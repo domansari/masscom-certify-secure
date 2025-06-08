@@ -16,7 +16,7 @@ const CertificateBody = ({ data }: CertificateBodyProps) => {
       </div>
       <div className="text-center mb-5">
       
-        <p className="text-2xl text-gray-800 mt-2">of Achievement,
+        <p className="text-2xl text-gray-800 mt-3">of Achievement,
     This is to certify that</p>
       </div>
 
