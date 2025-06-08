@@ -94,7 +94,7 @@ const CertificateBody = ({ data }: CertificateBodyProps) => {
       <div className="flex justify-center items-center gap-25 mb-3">
         <div className="text-center">
           <p className="text-x1 font-semibold text-black-700 mb-3">Duration:
-              {data.duration ? `${data.duration}` : "Duration"}Grade:{data.grade || "Grade"}Date of Issue:{data.completionDate ? new Date(data.completionDate).toLocaleDateString() : "Date"}
+              {data.duration ? `${data.duration}` : "Duration"} &nbsp; Grade:{data.grade || "Grade"}Date of Issue:{data.completionDate ? new Date(data.completionDate).toLocaleDateString() : "Date"}
          </p>    <div className="border-b border-black pb-1 px-4">   </div>
 
 
