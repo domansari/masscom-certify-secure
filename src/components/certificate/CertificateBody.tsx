@@ -89,11 +89,7 @@ const CertificateBody = ({ data }: CertificateBodyProps) => {
         </h4>
       </div>
 
-      {/* Seal Image - Center aligned above course name */}
-      <div className="flex justify-center mb-1">
-    
-      </div>
-
+      
       {/* Duration, Grade, and Date in one row */}
       <div className="flex justify-center items-center gap-55 mb-3">
         <div className="text-center">
