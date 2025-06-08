@@ -9,7 +9,7 @@ const CertificateHeader = ({ data }: CertificateHeaderProps) => {
   return (
     <>
       {/* Certificate ID - Extreme Left Top Corner */}
-      <div className="absolute top-4 left-4 text-sm font-bold text-black z-10">
+      <div className="absolute top-2 left-4 text-sm font-bold text-black z-10">
         Certificate ID: {data.certificateId || "Generated ID"}
       </div>
 
