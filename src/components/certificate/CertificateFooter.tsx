@@ -33,7 +33,8 @@ const CertificateFooter = ({ data }: CertificateFooterProps) => {
              {/* Address and Contact Info at Bottom */}
       <div className="text-center mt-2 mb-1">
         <p className="text-sm text-black-700">
-          1st Floor Mohsin Market,Yusufpur,Mohammadabad,Ghazipur(U.P.)233227.info@masscom.co.in,Mobile:+91-9628355656
+          1st Floor Mohsin Market,Yusufpur,Mohammadabad,Ghazipur(U.P.)233227.</p> 
+        <p className="text-sm text-black-700">Email:info@masscom.co.in,Mobile:+91-9628355656,www.masscom.co.in
         </p>
       
       </div>
