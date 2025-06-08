@@ -104,17 +104,13 @@ const CertificateBody = ({ data }: CertificateBodyProps) => {
             {data.grade || "Grade"}
          </p>
           
+                <p className="text-x1 font-semibold text-black-700 mb-3">Date of Issue:
+        {data.completionDate ? new Date(data.completionDate).toLocaleDateString() : "Date"}
+         </p>
          </p>
  <div className="border-b border-black pb-1 px-4">
 
-        <div className="text-center">
-          <p className="text-lg text-gray-700 mb-3">Date of Issue:</p>
-          <div className="border-b border-black pb-1 px-4">
-            <p className="text-xl font-semibold">
-              {data.completionDate ? new Date(data.completionDate).toLocaleDateString() : "Date"}
-            </p>
-          </div>
-        </div>
+      
       </div>
     </>
   );
