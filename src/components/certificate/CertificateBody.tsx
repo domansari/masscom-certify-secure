@@ -96,7 +96,7 @@ const CertificateBody = ({ data }: CertificateBodyProps) => {
           <p className="text-x1 font-semibold text-black-700 mb-3">Duration:
               {data.duration ? `${data.duration}` : "Duration"} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Grade:{data.grade || "Grade"} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Date of Issue:{data.completionDate ? new Date(data.completionDate).toLocaleDateString() : "Date"}
          </p>   
-
+</div>
 
       
       </div>      </div>
