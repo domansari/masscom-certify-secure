@@ -1,4 +1,3 @@
-
 import { useState, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -57,6 +56,103 @@ const PrintCertificates = () => {
     }
   });
 
+  const createCertificateElement = (certificate: Certificate) => {
+    const certificateElement = document.createElement('div');
+    certificateElement.style.cssText = `
+      page-break-after: always;
+      width: 210mm;
+      height: 297mm;
+      position: relative;
+      font-family: Times, serif;
+      background-image: url('/lovable-uploads/7ab347ae-d0be-4f64-ae7e-c4bfd0378ac4.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box;
+    `;
+    
+    certificateElement.innerHTML = `
+      <div style="position: absolute; top: 4mm; left: 4mm; font-size: 14px; font-weight: bold; color: black; z-index: 10;">
+        Certificate ID: ${certificate.certificate_id}
+      </div>
+      
+      <div style="position: absolute; top: 4mm; right: 4mm; width: 20mm; height: 20mm; background: white; border: 1px solid #ccc; border-radius: 4px; display: flex; align-items: center; justify-content: center; z-index: 10;">
+        <canvas width="80" height="80" style="width: 100%; height: 100%;"></canvas>
+      </div>
+      
+      <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; text-align: center;">
+        <div style="margin-bottom: 40px;">
+          <p style="font-size: 18px; font-style: italic; color: #333; margin: 0;">
+            [An Autonomous Institution Registered Under The Public Trust Act.]
+          </p>
+        </div>
+        
+        <div style="margin-bottom: 30px;">
+          <h1 style="font-size: 48px; font-weight: bold; color: #d4af37; margin: 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
+            CERTIFICATE
+          </h1>
+          <p style="font-size: 20px; color: #333; margin: 5px 0 0 0;">OF COMPLETION</p>
+        </div>
+        
+        <div style="margin-bottom: 25px;">
+          <p style="font-size: 18px; color: #333; margin: 0;">This is to certify that</p>
+          <h2 style="font-size: 36px; font-weight: bold; color: #1a1a1a; margin: 10px 0; text-decoration: underline;">
+            ${certificate.student_name}
+          </h2>
+          ${certificate.father_name ? `<p style="font-size: 16px; color: #666; margin: 0;">S/O ${certificate.father_name}</p>` : ''}
+          ${certificate.roll_no ? `<p style="font-size: 16px; color: #666; margin: 5px 0 0 0;">Roll No: ${certificate.roll_no}</p>` : ''}
+        </div>
+        
+        <div style="margin-bottom: 25px;">
+          <p style="font-size: 18px; color: #333; margin: 0;">has successfully completed the course of</p>
+          <h3 style="font-size: 24px; font-weight: bold; color: #1a1a1a; margin: 10px 0;">
+            ${certificate.course_name}
+          </h3>
+          ${certificate.duration ? `<p style="font-size: 16px; color: #666; margin: 0;">Duration: ${certificate.duration}</p>` : ''}
+          ${certificate.grade ? `<p style="font-size: 16px; color: #666; margin: 5px 0 0 0;">Grade: ${certificate.grade}</p>` : ''}
+        </div>
+        
+        <div style="margin-bottom: 30px;">
+          <p style="font-size: 16px; color: #333; margin: 0;">
+            Date of Completion: ${new Date(certificate.completion_date).toLocaleDateString('en-GB')}
+          </p>
+        </div>
+      </div>
+      
+      <div style="position: absolute; bottom: 80mm; left: 0; right: 0; display: flex; justify-content: space-between; padding: 0 60mm;">
+        <div style="text-align: center; width: 200px;">
+          <div style="border-top: 2px solid black; padding-top: 12px; margin-top: 40px;">
+            <p style="font-size: 14px; color: #333; margin: 0 0 4px 0;">
+              ${certificate.student_coordinator || "Co-ordinator Name"}
+            </p>
+            <p style="font-size: 18px; font-weight: bold; margin: 0;">Student Co-ordinator</p>
+          </div>
+        </div>
+        <div style="text-align: center; width: 200px;">
+          <div style="border-top: 2px solid black; padding-top: 12px; margin-top: 40px;">
+            <p style="font-size: 14px; color: #333; margin: 0 0 4px 0;">
+              Akbar Ansari
+            </p>
+            <p style="font-size: 18px; font-weight: bold; margin: 0;">Principal/Director</p>
+          </div>
+        </div>
+      </div>
+      
+      <div style="position: absolute; bottom: 20mm; left: 0; right: 0; text-align: center;">
+        <p style="font-size: 14px; color: #333; margin: 0;">
+          1st Floor Mohsin Market,Yusufpur,Mohammadabad,Ghazipur(U.P.)233227.
+        </p>
+        <p style="font-size: 14px; color: #333; margin: 4px 0 0 0;">
+          Email:info@masscom.co.in,Mobile:+91-9628355656,www.masscom.co.in
+        </p>
+      </div>
+    `;
+    
+    return certificateElement;
+  };
+
   const handlePrintSelected = async () => {
     if (selectedCertificates.size === 0) {
       toast({
@@ -72,38 +168,29 @@ const PrintCertificates = () => {
     
     try {
       const container = document.createElement('div');
+      container.style.cssText = 'position: fixed; left: -9999px; top: 0; z-index: 9999;';
       
       for (const certificate of selectedCerts) {
-        const certificateData = {
-          studentName: certificate.student_name,
-          fatherName: certificate.father_name || "",
-          courseName: certificate.course_name,
-          duration: certificate.duration || "",
-          completionDate: certificate.completion_date,
-          grade: certificate.grade || "",
-          studentCoordinator: certificate.student_coordinator || "",
-          certificateId: certificate.certificate_id,
-          rollNo: certificate.roll_no || "",
-        };
-
-        const tempContainer = document.createElement('div');
-        tempContainer.innerHTML = `
-          <div style="page-break-after: always; width: 210mm; height: 297mm; position: relative; font-family: Times, serif; background-image: url('/lovable-uploads/7ab347ae-d0be-4f64-ae7e-c4bfd0378ac4.png'); background-size: cover; background-position: center; background-repeat: no-repeat;">
-            <!-- Certificate content would be rendered here -->
-          </div>
-        `;
-        
-        container.appendChild(tempContainer);
+        const certificateElement = createCertificateElement(certificate);
+        container.appendChild(certificateElement);
       }
+
+      document.body.appendChild(container);
+      
+      // Wait a moment for rendering
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
       const filename = `Selected_Certificates_${new Date().getTime()}`;
       await generateCertificatePDF(container, filename);
+      
+      document.body.removeChild(container);
       
       toast({
         title: "Download Complete",
         description: `Downloaded ${selectedCerts.length} selected certificates.`,
       });
     } catch (error) {
+      console.error('Error generating selected certificates PDF:', error);
       toast({
         title: "Download Failed",
         description: "Failed to generate PDF. Please try again.",
@@ -128,39 +215,30 @@ const PrintCertificates = () => {
     const batchCertificates = sortedAndFilteredCertificates.filter(cert => cert.batch_number === selectedBatch);
     
     try {
-      const batchContainer = document.createElement('div');
+      const container = document.createElement('div');
+      container.style.cssText = 'position: fixed; left: -9999px; top: 0; z-index: 9999;';
       
       for (const certificate of batchCertificates) {
-        const certificateData = {
-          studentName: certificate.student_name,
-          fatherName: certificate.father_name || "",
-          courseName: certificate.course_name,
-          duration: certificate.duration || "",
-          completionDate: certificate.completion_date,
-          grade: certificate.grade || "",
-          studentCoordinator: certificate.student_coordinator || "",
-          certificateId: certificate.certificate_id,
-          rollNo: certificate.roll_no || "",
-        };
-
-        const tempContainer = document.createElement('div');
-        tempContainer.innerHTML = `
-          <div style="page-break-after: always; width: 210mm; height: 297mm; position: relative; font-family: Times, serif; background-image: url('/lovable-uploads/7ab347ae-d0be-4f64-ae7e-c4bfd0378ac4.png'); background-size: cover; background-position: center; background-repeat: no-repeat;">
-            <!-- Certificate content would be rendered here -->
-          </div>
-        `;
-        
-        batchContainer.appendChild(tempContainer);
+        const certificateElement = createCertificateElement(certificate);
+        container.appendChild(certificateElement);
       }
 
+      document.body.appendChild(container);
+      
+      // Wait a moment for rendering
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
       const filename = `Batch_${selectedBatch}`;
-      await generateCertificatePDF(batchContainer, filename);
+      await generateCertificatePDF(container, filename);
+      
+      document.body.removeChild(container);
       
       toast({
         title: "Batch Download Complete",
         description: `Downloaded ${batchCertificates.length} certificates for batch ${selectedBatch}.`,
       });
     } catch (error) {
+      console.error('Error generating batch PDF:', error);
       toast({
         title: "Batch Download Failed",
         description: "Failed to generate batch PDF. Please try again.",
