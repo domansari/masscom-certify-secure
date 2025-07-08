@@ -1,134 +1,130 @@
 
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileText, Search, Shield, Printer } from "lucide-react";
+import { FileText, Search, Plus, Settings } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
-  const { isAdmin } = useAuth();
-
-  if (!isAdmin()) {
-    return (
-      <div 
-        className="min-h-screen"
-        style={{
-       backgroundImage: `url('/lovable-uploads/f0d1378d-119b-4fea-80f3-ead49ffa08f1.png')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat'
-        }}
-      >
-        <div className="absolute inset-0 bg-black bg-opacity-50"></div>
-        <div className="relative z-10 text-white py-20">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              Masscom Infotech Education
-            </h1>
-            <p className="text-xl md:text-2xl mb-8 text-blue-100">
-              Certificate Generation & Verification System
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/verify">
-                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-primary">
-                  <Shield className="mr-2 h-5 w-5" />
-                  Verify Certificate
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const { user, profile } = useAuth();
+  const isAdmin = profile?.role === 'admin';
 
   return (
-    <div 
-      className="min-h-screen"
-      style={{
-        backgroundImage: `url('/lovable-uploads/f0d1378d-119b-4fea-80f3-ead49ffa08f1.png')`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
-      }}
-    >
-      <div className="absolute inset-0 bg-black bg-opacity-50"></div>
-      <div className="relative z-10 text-white py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6">
-            Masscom Infotech Education
-          </h1>
-          <p className="text-xl md:text-2xl mb-8 text-blue-100">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="container mx-auto px-4 py-12">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
             Certificate Management System
+          </h1>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            Generate, manage, and verify digital certificates with ease. 
+            Secure, professional, and efficient certificate management for educational institutions.
           </p>
         </div>
-      </div>
 
-      <div className="relative z-10 py-10">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            
-            {/* Generate New Certificate */}
-            <Link to="/generate">
-              <Card className="text-center hover:shadow-lg transition-shadow cursor-pointer h-52 flex flex-col justify-center bg-white/95 backdrop-blur-sm">
-                <CardHeader className="pb-2">
-                  <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <FileText className="h-6 w-6 text-white" />
-                  </div>
-                  <CardTitle className="text-lg">Generate New Certificate</CardTitle>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <p className="text-gray-600 text-sm">Create a new certificate for students</p>
-                </CardContent>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          {isAdmin && (
+            <>
+              <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+                <Link to="/generate">
+                  <CardHeader className="text-center">
+                    <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                      <Plus className="h-8 w-8 text-green-600" />
+                    </div>
+                    <CardTitle className="text-xl">Generate Certificate</CardTitle>
+                    <CardDescription>
+                      Create new certificates for students with digital signatures and QR codes
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button className="w-full" size="lg">
+                      Start Creating
+                    </Button>
+                  </CardContent>
+                </Link>
               </Card>
-            </Link>
 
-            {/* Search and Edit/Reissue */}
-            <Link to="/generate">
-              <Card className="text-center hover:shadow-lg transition-shadow cursor-pointer h-52 flex flex-col justify-center bg-white/95 backdrop-blur-sm">
-                <CardHeader className="pb-2">
-                  <div className="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <Search className="h-6 w-6 text-white" />
-                  </div>
-                  <CardTitle className="text-lg">Search & Edit/Reissue</CardTitle>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <p className="text-gray-600 text-sm">Search and modify existing certificates</p>
-                </CardContent>
+              <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+                <Link to="/manage">
+                  <CardHeader className="text-center">
+                    <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                      <Settings className="h-8 w-8 text-blue-600" />
+                    </div>
+                    <CardTitle className="text-xl">Manage Certificates</CardTitle>
+                    <CardDescription>
+                      View, edit, delete, and print existing certificates with batch operations
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button variant="outline" className="w-full" size="lg">
+                      Manage Now
+                    </Button>
+                  </CardContent>
+                </Link>
               </Card>
-            </Link>
+            </>
+          )}
 
-            {/* Print Certificate */}
-            <Link to="/generate">
-              <Card className="text-center hover:shadow-lg transition-shadow cursor-pointer h-52 flex flex-col justify-center bg-white/95 backdrop-blur-sm">
-                <CardHeader className="pb-2">
-                  <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <Printer className="h-6 w-6 text-white" />
-                  </div>
-                  <CardTitle className="text-lg">Print Certificate</CardTitle>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <p className="text-gray-600 text-sm">Select and print existing certificates</p>
-                </CardContent>
-              </Card>
-            </Link>
-
-            {/* Verify Certificate */}
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
             <Link to="/verify">
-              <Card className="text-center hover:shadow-lg transition-shadow cursor-pointer h-52 flex flex-col justify-center bg-white/95 backdrop-blur-sm">
-                <CardHeader className="pb-2">
-                  <div className="w-12 h-12 bg-emerald-600 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <Shield className="h-6 w-6 text-white" />
-                  </div>
-                  <CardTitle className="text-lg">Verify Certificate</CardTitle>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <p className="text-gray-600 text-sm">Verify certificate authenticity</p>
-                </CardContent>
-              </Card>
+              <CardHeader className="text-center">
+                <div className="mx-auto w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-4">
+                  <Search className="h-8 w-8 text-purple-600" />
+                </div>
+                <CardTitle className="text-xl">Verify Certificate</CardTitle>
+                <CardDescription>
+                  Instantly verify the authenticity of any certificate using QR codes or certificate IDs
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button variant="outline" className="w-full" size="lg">
+                  Verify Now
+                </Button>
+              </CardContent>
             </Link>
+          </Card>
 
+          {!isAdmin && (
+            <Card className="md:col-span-2 lg:col-span-1">
+              <CardHeader className="text-center">
+                <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                  <FileText className="h-8 w-8 text-gray-600" />
+                </div>
+                <CardTitle className="text-xl">Welcome</CardTitle>
+                <CardDescription>
+                  You can verify certificates using the verification tool. Contact your administrator for certificate generation access.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          )}
+        </div>
+
+        <div className="text-center mt-16">
+          <div className="bg-white rounded-lg shadow-sm p-8 max-w-4xl mx-auto">
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">Features</h2>
+            <div className="grid md:grid-cols-3 gap-6">
+              <div className="text-center">
+                <div className="bg-green-50 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <FileText className="h-6 w-6 text-green-600" />
+                </div>
+                <h3 className="font-medium mb-2">Digital Certificates</h3>
+                <p className="text-sm text-gray-600">Professional certificate templates with institutional branding</p>
+              </div>
+              <div className="text-center">
+                <div className="bg-blue-50 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Search className="h-6 w-6 text-blue-600" />
+                </div>
+                <h3 className="font-medium mb-2">QR Verification</h3>
+                <p className="text-sm text-gray-600">Instant verification through QR codes and unique certificate IDs</p>
+              </div>
+              <div className="text-center">
+                <div className="bg-purple-50 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Settings className="h-6 w-6 text-purple-600" />
+                </div>
+                <h3 className="font-medium mb-2">Batch Operations</h3>
+                <p className="text-sm text-gray-600">Manage multiple certificates and print entire batches efficiently</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>

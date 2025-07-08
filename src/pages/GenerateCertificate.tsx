@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,7 +12,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import CertificatePreview from "@/components/CertificatePreview";
 import QRCodeGenerator from "@/components/QRCodeGenerator";
-import CertificateManager from "@/components/CertificateManager";
 import { generateCertificatePDF } from "@/utils/pdfGenerator";
 
 const GenerateCertificate = () => {
@@ -28,12 +28,12 @@ const GenerateCertificate = () => {
     studentCoordinator: "",
     certificateId: "",
     rollNo: "",
+    batchNumber: "",
   });
 
   const [showPreview, setShowPreview] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [editingCertificate, setEditingCertificate] = useState<any>(null);
 
   // Course duration mapping
   const courseDurations = {
@@ -78,67 +78,34 @@ const GenerateCertificate = () => {
     try {
       const verificationUrl = `${window.location.origin}/verify?id=${formData.certificateId}`;
       
-      if (editingCertificate) {
-        // Update existing certificate
-        const updateData: any = {
-          student_name: formData.studentName,
-          father_name: formData.fatherName,
-          course_name: formData.courseName,
-          duration: formData.duration || null,
-          completion_date: formData.completionDate,
-          grade: formData.grade || null,
-          student_coordinator: formData.studentCoordinator || null,
-          qr_code_data: verificationUrl,
-          updated_at: new Date().toISOString(),
-        };
+      const insertData: any = {
+        certificate_id: formData.certificateId,
+        student_name: formData.studentName,
+        father_name: formData.fatherName,
+        course_name: formData.courseName,
+        duration: formData.duration || null,
+        completion_date: formData.completionDate,
+        grade: formData.grade || null,
+        student_coordinator: formData.studentCoordinator || null,
+        qr_code_data: verificationUrl,
+        created_by: user?.id,
+        batch_number: formData.batchNumber || null,
+      };
 
-        // Only add roll_no if the field exists in the database
-        if (formData.rollNo) {
-          updateData.roll_no = formData.rollNo;
-        }
-
-        const { error } = await supabase
-          .from('certificates')
-          .update(updateData)
-          .eq('id', editingCertificate.id);
-
-        if (error) throw error;
-        
-        toast({
-          title: "Certificate Updated!",
-          description: "The certificate has been updated successfully.",
-        });
-      } else {
-        // Create new certificate
-        const insertData: any = {
-          certificate_id: formData.certificateId,
-          student_name: formData.studentName,
-          father_name: formData.fatherName,
-          course_name: formData.courseName,
-          duration: formData.duration || null,
-          completion_date: formData.completionDate,
-          grade: formData.grade || null,
-          student_coordinator: formData.studentCoordinator || null,
-          qr_code_data: verificationUrl,
-          created_by: user?.id,
-        };
-
-        // Only add roll_no if the field exists in the database
-        if (formData.rollNo) {
-          insertData.roll_no = formData.rollNo;
-        }
-
-        const { error } = await supabase
-          .from('certificates')
-          .insert(insertData);
-
-        if (error) throw error;
-        
-        toast({
-          title: "Certificate Generated!",
-          description: "Your certificate has been generated and saved successfully.",
-        });
+      if (formData.rollNo) {
+        insertData.roll_no = formData.rollNo;
       }
+
+      const { error } = await supabase
+        .from('certificates')
+        .insert(insertData);
+
+      if (error) throw error;
+      
+      toast({
+        title: "Certificate Generated!",
+        description: "Your certificate has been generated and saved successfully.",
+      });
 
       setShowPreview(true);
       setSaved(true);
@@ -191,43 +158,11 @@ const GenerateCertificate = () => {
       studentCoordinator: "",
       certificateId: "",
       rollNo: "",
+      batchNumber: "",
     });
     setShowPreview(false);
     setSaved(false);
-    setEditingCertificate(null);
   };
-
-  const handleEditCertificate = (certificate: any) => {
-    setFormData({
-      studentName: certificate.student_name,
-      fatherName: certificate.father_name || "",
-      courseName: certificate.course_name,
-      duration: certificate.duration || "",
-      completionDate: certificate.completion_date,
-      grade: certificate.grade || "",
-      studentCoordinator: certificate.student_coordinator || "",
-      certificateId: certificate.certificate_id,
-      rollNo: certificate.roll_no || "",
-    });
-    setEditingCertificate(certificate);
-    setShowPreview(true);
-    setSaved(false);
-  };
-
-  // Listen for QR download events
-  useState(() => {
-    const handleQRDownload = (event: any) => {
-      const { certificateId, studentName } = event.detail;
-      // Create QR code download
-      const verificationUrl = `${window.location.origin}/verify?id=${certificateId}`;
-      const qrGenerator = document.createElement('div');
-      qrGenerator.innerHTML = `<canvas></canvas>`;
-      // This would trigger the QR code generation and download
-    };
-
-    window.addEventListener('downloadQR', handleQRDownload);
-    return () => window.removeEventListener('downloadQR', handleQRDownload);
-  });
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -245,23 +180,13 @@ const GenerateCertificate = () => {
       </nav>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Certificate Management Section */}
-        <div className="mb-8">
-          <CertificateManager onEditCertificate={handleEditCertificate} />
-        </div>
-
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Form Section */}
           <Card>
             <CardHeader>
-              <CardTitle>
-                {editingCertificate ? "Edit Certificate" : "Certificate Details"}
-              </CardTitle>
+              <CardTitle>Certificate Details</CardTitle>
               <CardDescription>
-                {editingCertificate 
-                  ? "Update the certificate information"
-                  : "Fill in the student and course information to generate a certificate"
-                }
+                Fill in the student and course information to generate a certificate
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -274,7 +199,7 @@ const GenerateCertificate = () => {
                     onChange={(e) => setFormData({ ...formData, studentName: e.target.value })}
                     placeholder="Enter student's full name"
                     required
-                    disabled={saved && !editingCertificate}
+                    disabled={saved}
                   />
                 </div>
 
@@ -287,7 +212,7 @@ const GenerateCertificate = () => {
                       onChange={(e) => setFormData({ ...formData, fatherName: e.target.value })}
                       placeholder="Enter father's full name"
                       required
-                      disabled={saved && !editingCertificate}
+                      disabled={saved}
                     />
                   </div>
                   <div className="space-y-2">
@@ -297,7 +222,7 @@ const GenerateCertificate = () => {
                       value={formData.rollNo}
                       onChange={(e) => setFormData({ ...formData, rollNo: e.target.value })}
                       placeholder="Enter roll number"
-                      disabled={saved && !editingCertificate}
+                      disabled={saved}
                     />
                   </div>
                 </div>
@@ -307,7 +232,7 @@ const GenerateCertificate = () => {
                   <Select 
                     value={formData.courseName} 
                     onValueChange={(value) => setFormData({ ...formData, courseName: value })} 
-                    disabled={saved && !editingCertificate}
+                    disabled={saved}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select a course" />
@@ -329,7 +254,7 @@ const GenerateCertificate = () => {
                       value={formData.duration}
                       onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
                       placeholder="Auto-filled based on course"
-                      disabled={saved && !editingCertificate}
+                      disabled={saved}
                       readOnly
                     />
                   </div>
@@ -341,7 +266,7 @@ const GenerateCertificate = () => {
                       value={formData.completionDate}
                       onChange={(e) => setFormData({ ...formData, completionDate: e.target.value })}
                       required
-                      disabled={saved && !editingCertificate}
+                      disabled={saved}
                     />
                   </div>
                 </div>
@@ -351,7 +276,7 @@ const GenerateCertificate = () => {
                   <Select 
                     value={formData.grade}
                     onValueChange={(value) => setFormData({ ...formData, grade: value })} 
-                    disabled={saved && !editingCertificate}
+                    disabled={saved}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select grade" />
@@ -372,7 +297,18 @@ const GenerateCertificate = () => {
                     value={formData.studentCoordinator}
                     onChange={(e) => setFormData({ ...formData, studentCoordinator: e.target.value })}
                     placeholder="Enter student co-ordinator's name"
-                    disabled={saved && !editingCertificate}
+                    disabled={saved}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="batchNumber">Batch Number</Label>
+                  <Input
+                    id="batchNumber"
+                    value={formData.batchNumber}
+                    onChange={(e) => setFormData({ ...formData, batchNumber: e.target.value })}
+                    placeholder="Enter batch number"
+                    disabled={saved}
                   />
                 </div>
 
@@ -390,7 +326,7 @@ const GenerateCertificate = () => {
                       type="button" 
                       variant="outline" 
                       onClick={generateCertificateId} 
-                      disabled={(saved && !editingCertificate) || editingCertificate}
+                      disabled={saved}
                     >
                       Generate
                     </Button>
@@ -406,10 +342,8 @@ const GenerateCertificate = () => {
                     {saving ? (
                       <>
                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                        {editingCertificate ? "Updating..." : "Saving..."}
+                        Saving...
                       </>
-                    ) : editingCertificate ? (
-                      "Update Certificate"
                     ) : saved ? (
                       "Certificate Saved"
                     ) : (
@@ -419,7 +353,7 @@ const GenerateCertificate = () => {
                       </>
                     )}
                   </Button>
-                  {(saved || editingCertificate) && (
+                  {saved && (
                     <Button type="button" variant="outline" onClick={resetForm}>
                       New Certificate
                     </Button>

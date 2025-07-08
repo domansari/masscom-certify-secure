@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       certificates: {
         Row: {
+          batch_number: string | null
           certificate_id: string
           completion_date: string
           course_name: string
@@ -33,6 +34,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          batch_number?: string | null
           certificate_id: string
           completion_date: string
           course_name: string
@@ -50,6 +52,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          batch_number?: string | null
           certificate_id?: string
           completion_date?: string
           course_name?: string
