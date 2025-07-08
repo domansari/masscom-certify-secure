@@ -4,9 +4,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Search, Edit, Trash2 } from "lucide-react";
+import { Search, Edit, Trash2, ArrowUpDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
@@ -30,11 +31,16 @@ interface CertificateManagerProps {
   onEditCertificate: (certificate: Certificate) => void;
 }
 
+type SortField = 'completion_date' | 'course_name' | 'student_name' | 'created_at';
+type SortOrder = 'asc' | 'desc';
+
 const CertificateManager = ({ onEditCertificate }: CertificateManagerProps) => {
   const { toast } = useToast();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
+  const [sortField, setSortField] = useState<SortField>('created_at');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
   const [certificateToDelete, setCertificateToDelete] = useState<Certificate | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -102,12 +108,58 @@ const CertificateManager = ({ onEditCertificate }: CertificateManagerProps) => {
     }
   };
 
-  const filteredCertificates = certificates.filter(cert =>
-    cert.student_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    cert.certificate_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    cert.course_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (cert.roll_no && cert.roll_no.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  // Filter and sort certificates
+  const sortedAndFilteredCertificates = certificates
+    .filter(cert =>
+      cert.student_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      cert.certificate_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      cert.course_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (cert.roll_no && cert.roll_no.toLowerCase().includes(searchTerm.toLowerCase()))
+    )
+    .sort((a, b) => {
+      let aValue: string | Date;
+      let bValue: string | Date;
+
+      switch (sortField) {
+        case 'completion_date':
+          aValue = new Date(a.completion_date);
+          bValue = new Date(b.completion_date);
+          break;
+        case 'course_name':
+          aValue = a.course_name.toLowerCase();
+          bValue = b.course_name.toLowerCase();
+          break;
+        case 'student_name':
+          aValue = a.student_name.toLowerCase();
+          bValue = b.student_name.toLowerCase();
+          break;
+        case 'created_at':
+          aValue = new Date(a.created_at);
+          bValue = new Date(b.created_at);
+          break;
+        default:
+          aValue = a.created_at;
+          bValue = b.created_at;
+      }
+
+      if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
+      if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortOrder('asc');
+    }
+  };
+
+  const getSortIcon = (field: SortField) => {
+    if (sortField !== field) return <ArrowUpDown className="h-4 w-4 opacity-50" />;
+    return <ArrowUpDown className={`h-4 w-4 ${sortOrder === 'asc' ? 'rotate-180' : ''}`} />;
+  };
 
   if (isLoading) {
     return (
@@ -129,7 +181,7 @@ const CertificateManager = ({ onEditCertificate }: CertificateManagerProps) => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="mb-4">
+        <div className="mb-4 space-y-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
@@ -139,9 +191,36 @@ const CertificateManager = ({ onEditCertificate }: CertificateManagerProps) => {
               className="pl-10"
             />
           </div>
+
+          <div className="flex gap-4 items-center">
+            <Label htmlFor="sort-field" className="text-sm font-medium">
+              Sort by:
+            </Label>
+            <Select value={sortField} onValueChange={(value: SortField) => setSortField(value)}>
+              <SelectTrigger className="w-48">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="created_at">Date Added</SelectItem>
+                <SelectItem value="completion_date">Completion Date</SelectItem>
+                <SelectItem value="course_name">Course Name</SelectItem>
+                <SelectItem value="student_name">Student Name</SelectItem>
+              </SelectContent>
+            </Select>
+            
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+              className="flex items-center gap-2"
+            >
+              {sortOrder === 'asc' ? 'Ascending' : 'Descending'}
+              <ArrowUpDown className={`h-4 w-4 ${sortOrder === 'asc' ? 'rotate-180' : ''}`} />
+            </Button>
+          </div>
         </div>
 
-        {filteredCertificates.length === 0 ? (
+        {sortedAndFilteredCertificates.length === 0 ? (
           <div className="text-center text-gray-500 py-8">
             {searchTerm ? "No certificates found matching your search." : "No certificates found."}
           </div>
@@ -150,16 +229,46 @@ const CertificateManager = ({ onEditCertificate }: CertificateManagerProps) => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Student Name</TableHead>
+                  <TableHead>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleSort('student_name')}
+                      className="h-auto p-0 font-medium text-left justify-start hover:bg-transparent"
+                    >
+                      Student Name
+                      {getSortIcon('student_name')}
+                    </Button>
+                  </TableHead>
                   <TableHead>Roll No</TableHead>
-                  <TableHead>Course</TableHead>
+                  <TableHead>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleSort('course_name')}
+                      className="h-auto p-0 font-medium text-left justify-start hover:bg-transparent"
+                    >
+                      Course
+                      {getSortIcon('course_name')}
+                    </Button>
+                  </TableHead>
                   <TableHead>Certificate ID</TableHead>
-                  <TableHead>Date</TableHead>
+                  <TableHead>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleSort('completion_date')}
+                      className="h-auto p-0 font-medium text-left justify-start hover:bg-transparent"
+                    >
+                      Completion Date
+                      {getSortIcon('completion_date')}
+                    </Button>
+                  </TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredCertificates.map((certificate) => (
+                {sortedAndFilteredCertificates.map((certificate) => (
                   <TableRow key={certificate.id}>
                     <TableCell className="font-medium">
                       {certificate.student_name}
