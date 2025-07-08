@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import GenerateCertificate from "./pages/GenerateCertificate";
 import ManageCertificates from "./pages/ManageCertificates";
 import PrintCertificate from "./pages/PrintCertificate";
+import PrintCertificates from "./pages/PrintCertificates";
 import VerifyCertificate from "./pages/VerifyCertificate";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
@@ -49,6 +50,14 @@ const App = () => (
                 element={
                   <ProtectedRoute requireAdmin>
                     <ManageCertificates />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/print-certificates" 
+                element={
+                  <ProtectedRoute requireAdmin>
+                    <PrintCertificates />
                   </ProtectedRoute>
                 } 
               />

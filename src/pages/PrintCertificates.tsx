@@ -1,3 +1,4 @@
+
 import { useState, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -5,15 +6,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Search, Edit, Trash2, ArrowUpDown, Download, ArrowLeft, Printer } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Search, ArrowUpDown, Download, ArrowLeft, Printer } from "lucide-react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { generateCertificatePDF } from "@/utils/pdfGenerator";
 import CertificatePreview from "@/components/CertificatePreview";
-import EditCertificateForm from "@/components/EditCertificateForm";
 
 interface Certificate {
   id: string;
@@ -33,22 +33,16 @@ interface Certificate {
 type SortField = 'completion_date' | 'course_name' | 'student_name' | 'created_at' | 'batch_number';
 type SortOrder = 'asc' | 'desc';
 
-const ManageCertificates = () => {
+const PrintCertificates = () => {
   const { toast } = useToast();
-  const queryClient = useQueryClient();
   const certificateRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const [searchTerm, setSearchTerm] = useState("");
   const [sortField, setSortField] = useState<SortField>('created_at');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
-  const [certificateToDelete, setCertificateToDelete] = useState<Certificate | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedCertificates, setSelectedCertificates] = useState<Set<string>>(new Set());
   const [selectedBatch, setSelectedBatch] = useState<string>("");
   const [isPrintingBatch, setIsPrintingBatch] = useState(false);
-  const [editingCertificate, setEditingCertificate] = useState<Certificate | null>(null);
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [deletePassword, setDeletePassword] = useState("");
-  const [deletePasswordError, setDeletePasswordError] = useState("");
+  const [isPrintingSelected, setIsPrintingSelected] = useState(false);
 
   const { data: certificates = [], isLoading } = useQuery({
     queryKey: ['certificates'],
@@ -63,84 +57,60 @@ const ManageCertificates = () => {
     }
   });
 
-  const confirmDelete = async () => {
-    if (!certificateToDelete) {
+  const handlePrintSelected = async () => {
+    if (selectedCertificates.size === 0) {
       toast({
-        title: "Missing Information",
-        description: "No certificate selected for deletion.",
+        title: "No Certificates Selected",
+        description: "Please select at least one certificate to print.",
         variant: "destructive",
       });
       return;
     }
 
-    if (deletePassword !== "9565526767") {
-      setDeletePasswordError("Incorrect master password");
-      return;
-    }
-
-    setIsDeleting(true);
+    setIsPrintingSelected(true);
+    const selectedCerts = certificates.filter(cert => selectedCertificates.has(cert.id));
     
     try {
-      const { error: deleteError } = await supabase
-        .from('certificates')
-        .delete()
-        .eq('id', certificateToDelete.id);
-
-      if (deleteError) throw deleteError;
-
-      await queryClient.invalidateQueries({ queryKey: ['certificates'] });
+      const container = document.createElement('div');
       
-      setCertificateToDelete(null);
-      setDialogOpen(false);
-      setDeletePassword("");
-      setDeletePasswordError("");
+      for (const certificate of selectedCerts) {
+        const certificateData = {
+          studentName: certificate.student_name,
+          fatherName: certificate.father_name || "",
+          courseName: certificate.course_name,
+          duration: certificate.duration || "",
+          completionDate: certificate.completion_date,
+          grade: certificate.grade || "",
+          studentCoordinator: certificate.student_coordinator || "",
+          certificateId: certificate.certificate_id,
+          rollNo: certificate.roll_no || "",
+        };
+
+        const tempContainer = document.createElement('div');
+        tempContainer.innerHTML = `
+          <div style="page-break-after: always; width: 210mm; height: 297mm; position: relative; font-family: Times, serif; background-image: url('/lovable-uploads/7ab347ae-d0be-4f64-ae7e-c4bfd0378ac4.png'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+            <!-- Certificate content would be rendered here -->
+          </div>
+        `;
+        
+        container.appendChild(tempContainer);
+      }
+
+      const filename = `Selected_Certificates_${new Date().getTime()}`;
+      await generateCertificatePDF(container, filename);
       
       toast({
-        title: "Certificate Deleted",
-        description: `Certificate for ${certificateToDelete.student_name} has been permanently deleted.`,
+        title: "Download Complete",
+        description: `Downloaded ${selectedCerts.length} selected certificates.`,
       });
-      
-    } catch (error: any) {
+    } catch (error) {
       toast({
-        title: "Error",
-        description: error.message || "Failed to delete certificate.",
+        title: "Download Failed",
+        description: "Failed to generate PDF. Please try again.",
         variant: "destructive",
       });
     } finally {
-      setIsDeleting(false);
-    }
-  };
-
-  const handleEditCertificate = (certificate: Certificate) => {
-    setEditingCertificate(certificate);
-    setEditDialogOpen(true);
-  };
-
-  const handleUpdateCertificate = async (updatedData: any) => {
-    if (!editingCertificate) return;
-
-    try {
-      const { error } = await supabase
-        .from('certificates')
-        .update(updatedData)
-        .eq('id', editingCertificate.id);
-
-      if (error) throw error;
-
-      await queryClient.invalidateQueries({ queryKey: ['certificates'] });
-      setEditDialogOpen(false);
-      setEditingCertificate(null);
-
-      toast({
-        title: "Certificate Updated",
-        description: "Certificate has been successfully updated.",
-      });
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to update certificate.",
-        variant: "destructive",
-      });
+      setIsPrintingSelected(false);
     }
   };
 
@@ -183,7 +153,7 @@ const ManageCertificates = () => {
         batchContainer.appendChild(tempContainer);
       }
 
-      const filename = `Batch_${selectedBatch}_Certificates`;
+      const filename = `Batch_${selectedBatch}`;
       await generateCertificatePDF(batchContainer, filename);
       
       toast({
@@ -198,6 +168,24 @@ const ManageCertificates = () => {
       });
     } finally {
       setIsPrintingBatch(false);
+    }
+  };
+
+  const toggleCertificateSelection = (certificateId: string) => {
+    const newSelected = new Set(selectedCertificates);
+    if (newSelected.has(certificateId)) {
+      newSelected.delete(certificateId);
+    } else {
+      newSelected.add(certificateId);
+    }
+    setSelectedCertificates(newSelected);
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedCertificates.size === sortedAndFilteredCertificates.length) {
+      setSelectedCertificates(new Set());
+    } else {
+      setSelectedCertificates(new Set(sortedAndFilteredCertificates.map(cert => cert.id)));
     }
   };
 
@@ -272,7 +260,7 @@ const ManageCertificates = () => {
                 <ArrowLeft className="h-5 w-5" />
                 <span>Back to Home</span>
               </Link>
-              <h1 className="text-xl font-semibold">Manage Certificates</h1>
+              <h1 className="text-xl font-semibold">Print Certificates</h1>
               <div className="w-24"></div>
             </div>
           </div>
@@ -280,7 +268,7 @@ const ManageCertificates = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Card>
             <CardHeader>
-              <CardTitle>Manage Certificates</CardTitle>
+              <CardTitle>Print Certificates</CardTitle>
               <CardDescription>Loading certificates...</CardDescription>
             </CardHeader>
           </Card>
@@ -298,7 +286,7 @@ const ManageCertificates = () => {
               <ArrowLeft className="h-5 w-5" />
               <span>Back to Home</span>
             </Link>
-            <h1 className="text-xl font-semibold">Manage Certificates</h1>
+            <h1 className="text-xl font-semibold">Print Certificates</h1>
             <div className="w-24"></div>
           </div>
         </div>
@@ -307,9 +295,9 @@ const ManageCertificates = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Card>
           <CardHeader>
-            <CardTitle>Manage Certificates</CardTitle>
+            <CardTitle>Print Certificates</CardTitle>
             <CardDescription>
-              View, edit, and delete existing certificates
+              Select individual certificates or entire batches to print and download
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -350,6 +338,27 @@ const ManageCertificates = () => {
                   >
                     {sortOrder === 'asc' ? 'Ascending' : 'Descending'}
                     <ArrowUpDown className={`h-4 w-4 ${sortOrder === 'asc' ? 'rotate-180' : ''}`} />
+                  </Button>
+                </div>
+
+                <div className="flex gap-2 items-center">
+                  <Button
+                    onClick={handlePrintSelected}
+                    disabled={selectedCertificates.size === 0 || isPrintingSelected}
+                    size="sm"
+                    className="flex items-center gap-2"
+                  >
+                    {isPrintingSelected ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                        Printing...
+                      </>
+                    ) : (
+                      <>
+                        <Download className="h-4 w-4" />
+                        Print Selected ({selectedCertificates.size})
+                      </>
+                    )}
                   </Button>
                 </div>
 
@@ -400,6 +409,12 @@ const ManageCertificates = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead className="w-12">
+                        <Checkbox
+                          checked={selectedCertificates.size === sortedAndFilteredCertificates.length && sortedAndFilteredCertificates.length > 0}
+                          onCheckedChange={toggleSelectAll}
+                        />
+                      </TableHead>
                       <TableHead>
                         <Button
                           variant="ghost"
@@ -452,6 +467,12 @@ const ManageCertificates = () => {
                   <TableBody>
                     {sortedAndFilteredCertificates.map((certificate) => (
                       <TableRow key={certificate.id}>
+                        <TableCell>
+                          <Checkbox
+                            checked={selectedCertificates.has(certificate.id)}
+                            onCheckedChange={() => toggleCertificateSelection(certificate.id)}
+                          />
+                        </TableCell>
                         <TableCell className="font-medium">
                           {certificate.student_name}
                         </TableCell>
@@ -465,94 +486,11 @@ const ManageCertificates = () => {
                           {new Date(certificate.completion_date).toLocaleDateString()}
                         </TableCell>
                         <TableCell>
-                          <div className="flex space-x-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleEditCertificate(certificate)}
-                            >
-                              <Edit className="h-4 w-4" />
+                          <Link to={`/print/${certificate.id}`}>
+                            <Button size="sm" variant="outline">
+                              <Printer className="h-4 w-4" />
                             </Button>
-                            <Link to={`/print/${certificate.id}`}>
-                              <Button size="sm" variant="outline">
-                                <Printer className="h-4 w-4" />
-                              </Button>
-                            </Link>
-                            <Dialog open={dialogOpen && certificateToDelete?.id === certificate.id} onOpenChange={(open) => {
-                              setDialogOpen(open);
-                              if (!open) {
-                                setCertificateToDelete(null);
-                                setDeletePassword("");
-                                setDeletePasswordError("");
-                              }
-                            }}>
-                              <DialogTrigger asChild>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={() => {
-                                    setCertificateToDelete(certificate);
-                                    setDialogOpen(true);
-                                  }}
-                                  className="text-red-600 hover:text-red-700"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </DialogTrigger>
-                              <DialogContent className="bg-white border border-gray-200 shadow-lg">
-                                <DialogHeader>
-                                  <DialogTitle>Confirm Permanent Deletion</DialogTitle>
-                                  <DialogDescription>
-                                    You are about to permanently delete the certificate for <strong>{certificate.student_name}</strong>. 
-                                    This action cannot be undone. Please enter the master password to confirm.
-                                  </DialogDescription>
-                                </DialogHeader>
-                                <div className="space-y-2">
-                                  <Label htmlFor="delete-password">Master Password</Label>
-                                  <Input
-                                    id="delete-password"
-                                    type="password"
-                                    value={deletePassword}
-                                    onChange={(e) => {
-                                      setDeletePassword(e.target.value);
-                                      setDeletePasswordError("");
-                                    }}
-                                    placeholder="Enter master password"
-                                  />
-                                  {deletePasswordError && (
-                                    <p className="text-sm text-red-600">{deletePasswordError}</p>
-                                  )}
-                                </div>
-                                <DialogFooter>
-                                  <Button
-                                    variant="outline"
-                                    onClick={() => {
-                                      setCertificateToDelete(null);
-                                      setDialogOpen(false);
-                                      setDeletePassword("");
-                                      setDeletePasswordError("");
-                                    }}
-                                  >
-                                    Cancel
-                                  </Button>
-                                  <Button
-                                    variant="destructive"
-                                    onClick={confirmDelete}
-                                    disabled={isDeleting}
-                                  >
-                                    {isDeleting ? (
-                                      <>
-                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                                        Deleting...
-                                      </>
-                                    ) : (
-                                      "Delete Permanently"
-                                    )}
-                                  </Button>
-                                </DialogFooter>
-                              </DialogContent>
-                            </Dialog>
-                          </div>
+                          </Link>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -563,30 +501,8 @@ const ManageCertificates = () => {
           </CardContent>
         </Card>
       </div>
-
-      {/* Edit Certificate Dialog */}
-      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Edit Certificate</DialogTitle>
-            <DialogDescription>
-              Update the certificate information below.
-            </DialogDescription>
-          </DialogHeader>
-          {editingCertificate && (
-            <EditCertificateForm
-              certificate={editingCertificate}
-              onUpdate={handleUpdateCertificate}
-              onCancel={() => {
-                setEditDialogOpen(false);
-                setEditingCertificate(null);
-              }}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
 
-export default ManageCertificates;
+export default PrintCertificates;
