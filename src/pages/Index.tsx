@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileText, Search, Plus, Settings, Printer } from "lucide-react";
+import { FileText, Search, Plus, Settings } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -10,8 +10,14 @@ const Index = () => {
   const isAdmin = profile?.role === 'admin';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <div className="container mx-auto px-4 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden">
+      {/* Background decorative elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-100 to-indigo-200 rounded-full opacity-70 blur-3xl"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-purple-100 to-pink-200 rounded-full opacity-70 blur-3xl"></div>
+      </div>
+      
+      <div className="container mx-auto px-4 py-12 relative z-10">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
             Certificate Management System
@@ -25,7 +31,7 @@ const Index = () => {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {isAdmin && (
             <>
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+              <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white/80 backdrop-blur-sm border-white/20">
                 <Link to="/generate">
                   <CardHeader className="text-center">
                     <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
@@ -44,7 +50,7 @@ const Index = () => {
                 </Link>
               </Card>
 
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+              <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white/80 backdrop-blur-sm border-white/20">
                 <Link to="/manage">
                   <CardHeader className="text-center">
                     <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
@@ -62,29 +68,10 @@ const Index = () => {
                   </CardContent>
                 </Link>
               </Card>
-
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-                <Link to="/print-certificates">
-                  <CardHeader className="text-center">
-                    <div className="mx-auto w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mb-4">
-                      <Printer className="h-8 w-8 text-orange-600" />
-                    </div>
-                    <CardTitle className="text-xl">Print Certificates</CardTitle>
-                    <CardDescription>
-                      Select and print multiple certificates or entire batches for download
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Button variant="outline" className="w-full" size="lg">
-                      Print Now
-                    </Button>
-                  </CardContent>
-                </Link>
-              </Card>
             </>
           )}
 
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white/80 backdrop-blur-sm border-white/20">
             <Link to="/verify">
               <CardHeader className="text-center">
                 <div className="mx-auto w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-4">
@@ -104,7 +91,7 @@ const Index = () => {
           </Card>
 
           {!isAdmin && (
-            <Card className="md:col-span-2 lg:col-span-1">
+            <Card className="md:col-span-2 lg:col-span-1 bg-white/80 backdrop-blur-sm border-white/20">
               <CardHeader className="text-center">
                 <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
                   <FileText className="h-8 w-8 text-gray-600" />
@@ -119,9 +106,9 @@ const Index = () => {
         </div>
 
         <div className="text-center mt-16">
-          <div className="bg-white rounded-lg shadow-sm p-8 max-w-4xl mx-auto">
+          <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-sm p-8 max-w-4xl mx-auto border-white/20">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">Features</h2>
-            <div className="grid md:grid-cols-4 gap-6">
+            <div className="grid md:grid-cols-3 gap-6">
               <div className="text-center">
                 <div className="bg-green-50 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
                   <FileText className="h-6 w-6 text-green-600" />
@@ -135,13 +122,6 @@ const Index = () => {
                 </div>
                 <h3 className="font-medium mb-2">QR Verification</h3>
                 <p className="text-sm text-gray-600">Instant verification through QR codes and unique certificate IDs</p>
-              </div>
-              <div className="text-center">
-                <div className="bg-orange-50 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <Printer className="h-6 w-6 text-orange-600" />
-                </div>
-                <h3 className="font-medium mb-2">Batch Printing</h3>
-                <p className="text-sm text-gray-600">Print multiple certificates and entire batches efficiently</p>
               </div>
               <div className="text-center">
                 <div className="bg-purple-50 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
