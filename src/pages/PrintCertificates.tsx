@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { generateCertificatePDF } from "@/utils/pdfGenerator";
 import CertificatePreview from "@/components/CertificatePreview";
+import QRCode from 'qrcode';
 
 interface Certificate {
   id: string;
@@ -56,10 +57,10 @@ const PrintCertificates = () => {
     }
   });
 
-  const createCertificateElement = (certificate: Certificate) => {
+  const createCertificateElement = async (certificate: Certificate) => {
     const certificateElement = document.createElement('div');
+    certificateElement.className = 'certificate-container';
     certificateElement.style.cssText = `
-      page-break-after: always;
       width: 210mm;
       height: 297mm;
       position: relative;
@@ -71,84 +72,132 @@ const PrintCertificates = () => {
       padding: 0;
       margin: 0;
       box-sizing: border-box;
+      overflow: hidden;
     `;
+    
+    // Generate QR code canvas
+    const qrCanvas = document.createElement('canvas');
+    qrCanvas.width = 80;
+    qrCanvas.height = 80;
+    const verificationUrl = `${window.location.origin}/verify?id=${certificate.certificate_id}`;
+    try {
+      await QRCode.toCanvas(qrCanvas, verificationUrl, {
+        width: 80,
+        margin: 1,
+      });
+    } catch (error) {
+      console.error('Error generating QR code:', error);
+    }
     
     certificateElement.innerHTML = `
       <div style="position: absolute; top: 4mm; left: 4mm; font-size: 14px; font-weight: bold; color: black; z-index: 10;">
         Certificate ID: ${certificate.certificate_id}
       </div>
       
-      <div style="position: absolute; top: 4mm; right: 4mm; width: 20mm; height: 20mm; background: white; border: 1px solid #ccc; border-radius: 4px; display: flex; align-items: center; justify-content: center; z-index: 10;">
-        <canvas width="80" height="80" style="width: 100%; height: 100%;"></canvas>
+      <div style="position: absolute; top: 4mm; right: 4mm; width: 20mm; height: 20mm; background: white; border: 1px solid #ccc; border-radius: 4px; display: flex; align-items: center; justify-content: center; z-index: 10;" id="qr-container-${certificate.id}">
       </div>
       
-      <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; text-align: center;">
-        <div style="margin-bottom: 40px;">
+      <div style="display: flex; flex-direction: column; height: 100%; padding: 0mm 0mm 0mm 0mm;">
+        <!-- Header Section -->
+        <div style="text-align: center; margin-bottom: 20mm; margin-top: 100mm;">
           <p style="font-size: 18px; font-style: italic; color: #333; margin: 0;">
             [An Autonomous Institution Registered Under The Public Trust Act.]
           </p>
         </div>
         
-        <div style="margin-bottom: 30px;">
-          <h1 style="font-size: 48px; font-weight: bold; color: #d4af37; margin: 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
-            CERTIFICATE
-          </h1>
-          <p style="font-size: 20px; color: #333; margin: 5px 0 0 0;">OF COMPLETION</p>
+        <!-- Certificate Title -->
+        <div style="text-align: center; margin-bottom: 20mm;">
+          <p style="font-size: 24px; color: #333; margin: 0;">of Achievement,</p>
+          <p style="font-size: 24px; color: #333; margin: 5px 0 0 0;">This is to certify that</p>
         </div>
         
-        <div style="margin-bottom: 25px;">
-          <p style="font-size: 18px; color: #333; margin: 0;">This is to certify that</p>
-          <h2 style="font-size: 36px; font-weight: bold; color: #1a1a1a; margin: 10px 0; text-decoration: underline;">
+        <!-- Student Name -->
+        <div style="text-align: center; margin-bottom: 16mm;">
+          <h2 style="font-size: 48px; font-weight: bold; font-style: italic; letter-spacing: 4px; margin: 0; color: #b48811;">
             ${certificate.student_name}
           </h2>
-          ${certificate.father_name ? `<p style="font-size: 16px; color: #666; margin: 0;">S/O ${certificate.father_name}</p>` : ''}
-          ${certificate.roll_no ? `<p style="font-size: 16px; color: #666; margin: 5px 0 0 0;">Roll No: ${certificate.roll_no}</p>` : ''}
         </div>
         
-        <div style="margin-bottom: 25px;">
-          <p style="font-size: 18px; color: #333; margin: 0;">has successfully completed the course of</p>
-          <h3 style="font-size: 24px; font-weight: bold; color: #1a1a1a; margin: 10px 0;">
-            ${certificate.course_name}
-          </h3>
-          ${certificate.duration ? `<p style="font-size: 16px; color: #666; margin: 0;">Duration: ${certificate.duration}</p>` : ''}
-          ${certificate.grade ? `<p style="font-size: 16px; color: #666; margin: 5px 0 0 0;">Grade: ${certificate.grade}</p>` : ''}
+        <!-- Father Name and Roll No -->
+        <div style="display: flex; justify-content: center; align-items: center; gap: 240px; margin-bottom: 20mm;">
+          <div style="text-align: center;">
+            <p style="font-size: 18px; color: #333; margin: 0 0 12px 0;">S/O, D/O:</p>
+            <div style="border-bottom: 2px solid black; padding-bottom: 4px; min-width: 150px;">
+              <p style="font-size: 20px; font-weight: 600; margin: 0;">${certificate.father_name || "Father's Name"}</p>
+            </div>
+          </div>
+          <div style="text-align: center;">
+            <p style="font-size: 18px; color: #333; margin: 0 0 12px 0;">Roll No:</p>
+            <div style="border-bottom: 2px solid black; padding-bottom: 4px; min-width: 120px;">
+              <p style="font-size: 20px; font-weight: 600; margin: 0;">${certificate.roll_no || "Roll Number"}</p>
+            </div>
+          </div>
         </div>
         
-        <div style="margin-bottom: 30px;">
-          <p style="font-size: 16px; color: #333; margin: 0;">
-            Date of Completion: ${new Date(certificate.completion_date).toLocaleDateString('en-GB')}
+        <!-- Course completion text -->
+        <div style="text-align: center; margin-bottom: 20mm;">
+          <p style="font-size: 24px; color: #333; margin: 0;">has successfully completed the course of</p>
+        </div>
+        
+        <!-- Course Name -->
+        <div style="text-center; margin-bottom: 16mm; padding: 0 80mm;">
+          <div style="border-bottom: 2px solid black; padding-bottom: 8px;">
+            <h4 style="font-size: 32px; font-weight: bold; color: black; margin: 0; text-align: center;">
+              ${certificate.course_name}
+            </h4>
+          </div>
+        </div>
+        
+        <!-- Duration, Grade, and Date -->
+        <div style="text-align: center; margin-bottom: 20mm;">
+          <p style="font-size: 20px; font-weight: 600; color: #333; margin: 0;">
+            Duration: ${certificate.duration || "Duration"} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+            Grade: ${certificate.grade || "Grade"} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+            Date of Issue: ${new Date(certificate.completion_date).toLocaleDateString()}
+          </p>
+        </div>
+        
+        <!-- Signatures Section -->
+        <div style="margin-top: 24mm; margin-bottom: 4mm;">
+          <div style="display: flex; justify-content: space-between; align-items: end; max-width: 1200px; margin: 0 auto; padding: 0 240mm;">
+            <div style="text-align: center; flex: 1; margin: 0 48mm;">
+              <div style="border-top: 2px solid black; padding-top: 12px; margin-top: 16px;">
+                <p style="font-size: 14px; color: #333; margin: 0 0 4px 0;">
+                  ${certificate.student_coordinator || "Co-ordinator Name"}
+                </p>
+                <p style="font-size: 18px; font-weight: bold; margin: 0;">Student Co-ordinator</p>
+              </div>
+            </div>
+            <div style="text-align: center; flex: 1; margin: 0 48mm;">
+              <div style="border-top: 2px solid black; padding-top: 12px; margin-top: 32px;">
+                <p style="font-size: 14px; color: #333; margin: 0 0 4px 0;">
+                  Akbar Ansari
+                </p>
+                <p style="font-size: 18px; font-weight: bold; margin: 0;">Principal/Director</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Address and Contact Info -->
+        <div style="text-align: center; margin-top: 8mm; margin-bottom: 4mm;">
+          <p style="font-size: 14px; color: #333; margin: 0;">
+            1st Floor Mohsin Market,Yusufpur,Mohammadabad,Ghazipur(U.P.)233227.
+          </p>
+          <p style="font-size: 14px; color: #333; margin: 4px 0 0 0;">
+            Email:info@masscom.co.in,Mobile:+91-9628355656,www.masscom.co.in
           </p>
         </div>
       </div>
-      
-      <div style="position: absolute; bottom: 80mm; left: 0; right: 0; display: flex; justify-content: space-between; padding: 0 60mm;">
-        <div style="text-align: center; width: 200px;">
-          <div style="border-top: 2px solid black; padding-top: 12px; margin-top: 40px;">
-            <p style="font-size: 14px; color: #333; margin: 0 0 4px 0;">
-              ${certificate.student_coordinator || "Co-ordinator Name"}
-            </p>
-            <p style="font-size: 18px; font-weight: bold; margin: 0;">Student Co-ordinator</p>
-          </div>
-        </div>
-        <div style="text-align: center; width: 200px;">
-          <div style="border-top: 2px solid black; padding-top: 12px; margin-top: 40px;">
-            <p style="font-size: 14px; color: #333; margin: 0 0 4px 0;">
-              Akbar Ansari
-            </p>
-            <p style="font-size: 18px; font-weight: bold; margin: 0;">Principal/Director</p>
-          </div>
-        </div>
-      </div>
-      
-      <div style="position: absolute; bottom: 20mm; left: 0; right: 0; text-align: center;">
-        <p style="font-size: 14px; color: #333; margin: 0;">
-          1st Floor Mohsin Market,Yusufpur,Mohammadabad,Ghazipur(U.P.)233227.
-        </p>
-        <p style="font-size: 14px; color: #333; margin: 4px 0 0 0;">
-          Email:info@masscom.co.in,Mobile:+91-9628355656,www.masscom.co.in
-        </p>
-      </div>
     `;
+    
+    // Append QR code to the container
+    const qrContainer = certificateElement.querySelector(`#qr-container-${certificate.id}`);
+    if (qrContainer && qrCanvas) {
+      qrCanvas.style.width = '100%';
+      qrCanvas.style.height = '100%';
+      qrContainer.appendChild(qrCanvas);
+    }
     
     return certificateElement;
   };
@@ -171,14 +220,14 @@ const PrintCertificates = () => {
       container.style.cssText = 'position: fixed; left: -9999px; top: 0; z-index: 9999;';
       
       for (const certificate of selectedCerts) {
-        const certificateElement = createCertificateElement(certificate);
+        const certificateElement = await createCertificateElement(certificate);
         container.appendChild(certificateElement);
       }
 
       document.body.appendChild(container);
       
       // Wait a moment for rendering
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 2000));
 
       const filename = `Selected_Certificates_${new Date().getTime()}`;
       await generateCertificatePDF(container, filename);
@@ -219,14 +268,14 @@ const PrintCertificates = () => {
       container.style.cssText = 'position: fixed; left: -9999px; top: 0; z-index: 9999;';
       
       for (const certificate of batchCertificates) {
-        const certificateElement = createCertificateElement(certificate);
+        const certificateElement = await createCertificateElement(certificate);
         container.appendChild(certificateElement);
       }
 
       document.body.appendChild(container);
       
       // Wait a moment for rendering
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 2000));
 
       const filename = `Batch_${selectedBatch}`;
       await generateCertificatePDF(container, filename);
