@@ -3,11 +3,12 @@ import { useState, useRef, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Printer } from "lucide-react";
+import { ArrowLeft, Download, Printer } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import CertificatePreview from "@/components/CertificatePreview";
 import QRCodeGenerator from "@/components/QRCodeGenerator";
+import { generateCertificatePDF } from "@/utils/pdfGenerator";
 
 interface Certificate {
   id: string;
@@ -57,45 +58,35 @@ const PrintCertificate = () => {
     fetchCertificate();
   }, [id, toast]);
 
+  const handleDownload = async () => {
+    if (!certificateRef.current || !certificate) {
+      toast({
+        title: "Error",
+        description: "Certificate not available for download.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const filename = `${certificate.student_name.replace(/\s+/g, '_')}_${certificate.certificate_id}_Certificate`;
+      await generateCertificatePDF(certificateRef.current, filename);
+      
+      toast({
+        title: "Download Complete",
+        description: "Certificate PDF has been downloaded successfully.",
+      });
+    } catch (error) {
+      toast({
+        title: "Download Failed",
+        description: "Failed to generate PDF. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handlePrint = () => {
-    // Add print-specific styles
-    const printStyles = `
-      @media print {
-        body * {
-          visibility: hidden;
-        }
-        #certificate-container, #certificate-container * {
-          visibility: visible;
-        }
-        #certificate-container {
-          position: absolute;
-          left: 0;
-          top: 0;
-          width: 100%;
-          height: 100%;
-          transform: none !important;
-        }
-        .no-print {
-          display: none !important;
-        }
-        canvas {
-          -webkit-print-color-adjust: exact;
-          color-adjust: exact;
-        }
-      }
-    `;
-    
-    const styleSheet = document.createElement("style");
-    styleSheet.type = "text/css";
-    styleSheet.innerText = printStyles;
-    document.head.appendChild(styleSheet);
-    
     window.print();
-    
-    // Remove the style after printing
-    setTimeout(() => {
-      document.head.removeChild(styleSheet);
-    }, 1000);
   };
 
   if (loading) {
@@ -169,6 +160,10 @@ const PrintCertificate = () => {
                 <Printer className="mr-2 h-4 w-4" />
                 Print
               </Button>
+              <Button onClick={handleDownload}>
+                <Download className="mr-2 h-4 w-4" />
+                Download PDF
+              </Button>
             </div>
           </div>
         </div>
@@ -193,7 +188,7 @@ const PrintCertificate = () => {
             </Card>
           </div>
 
-          {/* QR Code and Details */}
+          {/* QR Code and Actions */}
           <div className="space-y-6 no-print">
             <Card>
               <CardHeader>
