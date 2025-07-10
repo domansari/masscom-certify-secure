@@ -17,6 +17,10 @@ const QRCodeSection = ({ certificateId }: QRCodeSectionProps) => {
           await QRCode.toCanvas(qrCanvasRef.current, verificationUrl, {
             width: 80,
             margin: 1,
+            color: {
+              dark: '#000000',
+              light: '#FFFFFF'
+            }
           });
         } catch (error) {
           console.error('Error generating QR code:', error);
@@ -28,8 +32,8 @@ const QRCodeSection = ({ certificateId }: QRCodeSectionProps) => {
   }, [certificateId]);
 
   return (
-    <div className="absolute top-4 right-4 w-20 h-20 bg-white border border-gray-300 rounded flex items-center justify-center z-10">
-      <canvas ref={qrCanvasRef} className="w-full h-full" />
+    <div className="absolute top-4 right-4 w-20 h-20 bg-white border border-gray-300 rounded flex items-center justify-center z-10 print:bg-white print:border-gray-300">
+      <canvas ref={qrCanvasRef} className="w-full h-full print:w-full print:h-full" />
     </div>
   );
 };
