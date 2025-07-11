@@ -39,8 +39,8 @@ const GenerateCertificate = () => {
   const courseDurations = {
     "Diploma in Computer Application": "8 Months",
     "Advance Diploma in Computer Application": "12 Months",
-    "Certificate Course in Accountancy(Tally ERP)": "4 Months",
-    "Certificate Course in Desktop Publishing": "4 Months"
+    "Computer Accountancy-Tally ERP+GST": "4 Months",
+    "Certificate Course in DTP": "4 Months"
   };
 
   // Auto-fill duration when course is selected
