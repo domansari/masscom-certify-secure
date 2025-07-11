@@ -240,8 +240,8 @@ const GenerateCertificate = () => {
                     <SelectContent>
                       <SelectItem value="Diploma in Computer Application">Diploma in Computer Application</SelectItem>
                       <SelectItem value="Advance Diploma in Computer Application">Advance Diploma in Computer Application</SelectItem>
-                      <SelectItem value="Certificate Course in Accountancy(Tally ERP)">Certificate Course in Accountancy(Tally ERP)</SelectItem>
-                      <SelectItem value="Certificate Course in Desktop Publishing">Certificate Course in Desktop Publishing</SelectItem>
+                      <SelectItem value="Computer Accountancy-Tally ERP+GST">Computer Accountancy-Tally ERP+GST</SelectItem>
+                      <SelectItem value="Certificate Course in DTP">Certificate Course in DTP</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
