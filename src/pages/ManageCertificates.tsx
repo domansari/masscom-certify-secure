@@ -1,4 +1,3 @@
-
 import { useState, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { Search, Edit, Trash2, ArrowUpDown, ArrowLeft, Printer } from "lucide-react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -33,6 +33,8 @@ interface Certificate {
 type SortField = 'completion_date' | 'course_name' | 'student_name' | 'created_at' | 'batch_number';
 type SortOrder = 'asc' | 'desc';
 
+const RECORDS_PER_PAGE = 20;
+
 const ManageCertificates = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -46,6 +48,7 @@ const ManageCertificates = () => {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deletePassword, setDeletePassword] = useState("");
   const [deletePasswordError, setDeletePasswordError] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const { data: certificates = [], isLoading } = useQuery({
     queryKey: ['certificates'],
@@ -185,6 +188,17 @@ const ManageCertificates = () => {
       return 0;
     });
 
+  // Pagination calculations
+  const totalPages = Math.ceil(sortedAndFilteredCertificates.length / RECORDS_PER_PAGE);
+  const startIndex = (currentPage - 1) * RECORDS_PER_PAGE;
+  const endIndex = startIndex + RECORDS_PER_PAGE;
+  const paginatedCertificates = sortedAndFilteredCertificates.slice(startIndex, endIndex);
+
+  // Reset to first page when search or filters change
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, sortField, sortOrder]);
+
   const handleSort = (field: SortField) => {
     if (sortField === field) {
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
@@ -197,6 +211,75 @@ const ManageCertificates = () => {
   const getSortIcon = (field: SortField) => {
     if (sortField !== field) return <ArrowUpDown className="h-4 w-4 opacity-50" />;
     return <ArrowUpDown className={`h-4 w-4 ${sortOrder === 'asc' ? 'rotate-180' : ''}`} />;
+  };
+
+  const renderPaginationItems = () => {
+    const items = [];
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    if (startPage > 1) {
+      items.push(
+        <PaginationItem key={1}>
+          <PaginationLink
+            onClick={() => setCurrentPage(1)}
+            isActive={currentPage === 1}
+            className="cursor-pointer"
+          >
+            1
+          </PaginationLink>
+        </PaginationItem>
+      );
+      if (startPage > 2) {
+        items.push(
+          <PaginationItem key="ellipsis1">
+            <PaginationEllipsis />
+          </PaginationItem>
+        );
+      }
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      items.push(
+        <PaginationItem key={i}>
+          <PaginationLink
+            onClick={() => setCurrentPage(i)}
+            isActive={currentPage === i}
+            className="cursor-pointer"
+          >
+            {i}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        items.push(
+          <PaginationItem key="ellipsis2">
+            <PaginationEllipsis />
+          </PaginationItem>
+        );
+      }
+      items.push(
+        <PaginationItem key={totalPages}>
+          <PaginationLink
+            onClick={() => setCurrentPage(totalPages)}
+            isActive={currentPage === totalPages}
+            className="cursor-pointer"
+          >
+            {totalPages}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+
+    return items;
   };
 
   if (isLoading) {
@@ -264,7 +347,7 @@ const ManageCertificates = () => {
           <CardHeader>
             <CardTitle className="text-white">Manage Certificates</CardTitle>
             <CardDescription className="text-gray-200">
-              View, edit, and delete existing certificates
+              View, edit, and delete existing certificates ({sortedAndFilteredCertificates.length} total)
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -307,6 +390,10 @@ const ManageCertificates = () => {
                     <ArrowUpDown className={`h-4 w-4 ${sortOrder === 'asc' ? 'rotate-180' : ''}`} />
                   </Button>
                 </div>
+                
+                <div className="text-sm text-gray-200">
+                  Showing {startIndex + 1}-{Math.min(endIndex, sortedAndFilteredCertificates.length)} of {sortedAndFilteredCertificates.length} certificates
+                </div>
               </div>
             </div>
 
@@ -315,170 +402,205 @@ const ManageCertificates = () => {
                 {searchTerm ? "No certificates found matching your search." : "No certificates found."}
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="border-white/20">
-                      <TableHead className="text-white">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleSort('student_name')}
-                          className="h-auto p-0 font-medium text-left justify-start hover:bg-transparent text-white"
-                        >
-                          Student Name
-                          {getSortIcon('student_name')}
-                        </Button>
-                      </TableHead>
-                      <TableHead className="text-white">Roll No</TableHead>
-                      <TableHead className="text-white">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleSort('course_name')}
-                          className="h-auto p-0 font-medium text-left justify-start hover:bg-transparent text-white"
-                        >
-                          Course
-                          {getSortIcon('course_name')}
-                        </Button>
-                      </TableHead>
-                      <TableHead className="text-white">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleSort('batch_number')}
-                          className="h-auto p-0 font-medium text-left justify-start hover:bg-transparent text-white"
-                        >
-                          Batch
-                          {getSortIcon('batch_number')}
-                        </Button>
-                      </TableHead>
-                      <TableHead className="text-white">Certificate ID</TableHead>
-                      <TableHead className="text-white">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleSort('completion_date')}
-                          className="h-auto p-0 font-medium text-left justify-start hover:bg-transparent text-white"
-                        >
-                          Completion Date
-                          {getSortIcon('completion_date')}
-                        </Button>
-                      </TableHead>
-                      <TableHead className="text-white">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {sortedAndFilteredCertificates.map((certificate) => (
-                      <TableRow key={certificate.id} className="border-white/20">
-                        <TableCell className="font-medium text-white">
-                          {certificate.student_name}
-                        </TableCell>
-                        <TableCell className="text-gray-200">{certificate.roll_no || "N/A"}</TableCell>
-                        <TableCell className="text-gray-200">{certificate.course_name}</TableCell>
-                        <TableCell className="text-gray-200">{certificate.batch_number || "N/A"}</TableCell>
-                        <TableCell className="font-mono text-xs text-gray-200">
-                          {certificate.certificate_id}
-                        </TableCell>
-                        <TableCell className="text-gray-200">
-                          {new Date(certificate.completion_date).toLocaleDateString()}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex space-x-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleEditCertificate(certificate)}
-                              className="border-white/30 text-white hover:bg-white/10"
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Link to={`/print/${certificate.id}`}>
-                              <Button size="sm" variant="outline" className="border-white/30 text-white hover:bg-white/10">
-                                <Printer className="h-4 w-4" />
+              <>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-white/20">
+                        <TableHead className="text-white">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleSort('student_name')}
+                            className="h-auto p-0 font-medium text-left justify-start hover:bg-transparent text-white"
+                          >
+                            Student Name
+                            {getSortIcon('student_name')}
+                          </Button>
+                        </TableHead>
+                        <TableHead className="text-white">Roll No</TableHead>
+                        <TableHead className="text-white">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleSort('course_name')}
+                            className="h-auto p-0 font-medium text-left justify-start hover:bg-transparent text-white"
+                          >
+                            Course
+                            {getSortIcon('course_name')}
+                          </Button>
+                        </TableHead>
+                        <TableHead className="text-white">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleSort('batch_number')}
+                            className="h-auto p-0 font-medium text-left justify-start hover:bg-transparent text-white"
+                          >
+                            Batch
+                            {getSortIcon('batch_number')}
+                          </Button>
+                        </TableHead>
+                        <TableHead className="text-white">Certificate ID</TableHead>
+                        <TableHead className="text-white">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleSort('completion_date')}
+                            className="h-auto p-0 font-medium text-left justify-start hover:bg-transparent text-white"
+                          >
+                            Completion Date
+                            {getSortIcon('completion_date')}
+                          </Button>
+                        </TableHead>
+                        <TableHead className="text-white">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {paginatedCertificates.map((certificate) => (
+                        <TableRow key={certificate.id} className="border-white/20">
+                          <TableCell className="font-medium text-white">
+                            {certificate.student_name}
+                          </TableCell>
+                          <TableCell className="text-gray-200">{certificate.roll_no || "N/A"}</TableCell>
+                          <TableCell className="text-gray-200">{certificate.course_name}</TableCell>
+                          <TableCell className="text-gray-200">{certificate.batch_number || "N/A"}</TableCell>
+                          <TableCell className="font-mono text-xs text-gray-200">
+                            {certificate.certificate_id}
+                          </TableCell>
+                          <TableCell className="text-gray-200">
+                            {new Date(certificate.completion_date).toLocaleDateString()}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex space-x-2">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleEditCertificate(certificate)}
+                                className="border-white/30 text-white hover:bg-white/10"
+                              >
+                                <Edit className="h-4 w-4" />
                               </Button>
-                            </Link>
-                            <Dialog open={dialogOpen && certificateToDelete?.id === certificate.id} onOpenChange={(open) => {
-                              setDialogOpen(open);
-                              if (!open) {
-                                setCertificateToDelete(null);
-                                setDeletePassword("");
-                                setDeletePasswordError("");
-                              }
-                            }}>
-                              <DialogTrigger asChild>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={() => {
-                                    setCertificateToDelete(certificate);
-                                    setDialogOpen(true);
-                                  }}
-                                  className="text-red-400 hover:text-red-300 border-red-400/50 hover:bg-red-400/10"
-                                >
-                                  <Trash2 className="h-4 w-4" />
+                              <Link to={`/print/${certificate.id}`}>
+                                <Button size="sm" variant="outline" className="border-white/30 text-white hover:bg-white/10">
+                                  <Printer className="h-4 w-4" />
                                 </Button>
-                              </DialogTrigger>
-                              <DialogContent className="bg-white border border-gray-200 shadow-lg">
-                                <DialogHeader>
-                                  <DialogTitle>Confirm Permanent Deletion</DialogTitle>
-                                  <DialogDescription>
-                                    You are about to permanently delete the certificate for <strong>{certificate.student_name}</strong>. 
-                                    This action cannot be undone. Please enter the master password to confirm.
-                                  </DialogDescription>
-                                </DialogHeader>
-                                <div className="space-y-2">
-                                  <Label htmlFor="delete-password">Master Password</Label>
-                                  <Input
-                                    id="delete-password"
-                                    type="password"
-                                    value={deletePassword}
-                                    onChange={(e) => {
-                                      setDeletePassword(e.target.value);
-                                      setDeletePasswordError("");
-                                    }}
-                                    placeholder="Enter master password"
-                                  />
-                                  {deletePasswordError && (
-                                    <p className="text-sm text-red-600">{deletePasswordError}</p>
-                                  )}
-                                </div>
-                                <DialogFooter>
+                              </Link>
+                              <Dialog open={dialogOpen && certificateToDelete?.id === certificate.id} onOpenChange={(open) => {
+                                setDialogOpen(open);
+                                if (!open) {
+                                  setCertificateToDelete(null);
+                                  setDeletePassword("");
+                                  setDeletePasswordError("");
+                                }
+                              }}>
+                                <DialogTrigger asChild>
                                   <Button
+                                    size="sm"
                                     variant="outline"
                                     onClick={() => {
-                                      setCertificateToDelete(null);
-                                      setDialogOpen(false);
-                                      setDeletePassword("");
-                                      setDeletePasswordError("");
+                                      setCertificateToDelete(certificate);
+                                      setDialogOpen(true);
                                     }}
+                                    className="text-red-400 hover:text-red-300 border-red-400/50 hover:bg-red-400/10"
                                   >
-                                    Cancel
+                                    <Trash2 className="h-4 w-4" />
                                   </Button>
-                                  <Button
-                                    variant="destructive"
-                                    onClick={confirmDelete}
-                                    disabled={isDeleting}
-                                  >
-                                    {isDeleting ? (
-                                      <>
-                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                                        Deleting...
-                                      </>
-                                    ) : (
-                                      "Delete Permanently"
+                                </DialogTrigger>
+                                <DialogContent className="bg-white border border-gray-200 shadow-lg">
+                                  <DialogHeader>
+                                    <DialogTitle>Confirm Permanent Deletion</DialogTitle>
+                                    <DialogDescription>
+                                      You are about to permanently delete the certificate for <strong>{certificate.student_name}</strong>. 
+                                      This action cannot be undone. Please enter the master password to confirm.
+                                    </DialogDescription>
+                                  </DialogHeader>
+                                  <div className="space-y-2">
+                                    <Label htmlFor="delete-password">Master Password</Label>
+                                    <Input
+                                      id="delete-password"
+                                      type="password"
+                                      value={deletePassword}
+                                      onChange={(e) => {
+                                        setDeletePassword(e.target.value);
+                                        setDeletePasswordError("");
+                                      }}
+                                      placeholder="Enter master password"
+                                    />
+                                    {deletePasswordError && (
+                                      <p className="text-sm text-red-600">{deletePasswordError}</p>
                                     )}
-                                  </Button>
-                                </DialogFooter>
-                              </DialogContent>
-                            </Dialog>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
+                                  </div>
+                                  <DialogFooter>
+                                    <Button
+                                      variant="outline"
+                                      onClick={() => {
+                                        setCertificateToDelete(null);
+                                        setDialogOpen(false);
+                                        setDeletePassword("");
+                                        setDeletePasswordError("");
+                                      }}
+                                    >
+                                      Cancel
+                                    </Button>
+                                    <Button
+                                      variant="destructive"
+                                      onClick={confirmDelete}
+                                      disabled={isDeleting}
+                                    >
+                                      {isDeleting ? (
+                                        <>
+                                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                                          Deleting...
+                                        </>
+                                      ) : (
+                                        "Delete Permanently"
+                                      )}
+                                    </Button>
+                                  </DialogFooter>
+                                </DialogContent>
+                              </Dialog>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="mt-6">
+                    <Pagination>
+                      <PaginationContent>
+                        <PaginationItem>
+                          <PaginationPrevious
+                            onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                            className={`cursor-pointer ${
+                              currentPage === 1 
+                                ? 'pointer-events-none opacity-50' 
+                                : 'text-white hover:bg-white/10'
+                            }`}
+                          />
+                        </PaginationItem>
+                        
+                        {renderPaginationItems()}
+                        
+                        <PaginationItem>
+                          <PaginationNext
+                            onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                            className={`cursor-pointer ${
+                              currentPage === totalPages 
+                                ? 'pointer-events-none opacity-50' 
+                                : 'text-white hover:bg-white/10'
+                            }`}
+                          />
+                        </PaginationItem>
+                      </PaginationContent>
+                    </Pagination>
+                  </div>
+                )}
+              </>
             )}
           </CardContent>
         </Card>
