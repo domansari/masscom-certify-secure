@@ -112,23 +112,23 @@ const VerifyCertificate = () => {
 
   return (
     <div 
-      className="min-h-screen"
+      className="min-h-screen relative overflow-hidden"
       style={{
-       backgroundImage: `url('/lovable-uploads/f0d1378d-119b-4fea-80f3-ead49ffa08f1.png')`,
+        backgroundImage: `url('/lovable-uploads/1c1f036d-97eb-4825-9766-e1ddb31b3f55.png')`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'
       }}
     >
-      <div className="absolute inset-0 bg-black bg-opacity-40"></div>
-      <nav className="relative z-10 bg-white/90 backdrop-blur-sm shadow-sm border-b">
+      <div className="absolute inset-0 bg-black/40"></div>
+      <nav className="relative z-10 bg-white/10 backdrop-blur-lg shadow-sm border-b border-white/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <Link to="/" className="flex items-center space-x-3 text-gray-900 hover:text-primary">
+            <Link to="/" className="flex items-center space-x-3 text-white hover:text-gray-200">
               <ArrowDown className="h-5 w-5" />
               <span>Back to Home</span>
             </Link>
-            <h1 className="text-xl font-semibold">Verify Certificate</h1>
+            <h1 className="text-xl font-semibold text-white">Verify Certificate</h1>
             <div className="w-24"></div>
           </div>
         </div>
@@ -137,32 +137,32 @@ const VerifyCertificate = () => {
       <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-8">
           {/* Verification Form */}
-          <Card className="bg-white/95 backdrop-blur-sm">
+          <Card className="bg-white/10 backdrop-blur-lg border-white/20">
             <CardHeader>
-              <CardTitle>Certificate Verification</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-white">Certificate Verification</CardTitle>
+              <CardDescription className="text-gray-200">
                 Enter the certificate ID or scan the QR code to verify authenticity
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
                 <div className="space-y-2">
-                  <Label htmlFor="certificateId">Certificate ID</Label>
+                  <Label htmlFor="certificateId" className="text-white">Certificate ID</Label>
                   <div className="flex space-x-2">
                     <Input
                       id="certificateId"
                       value={certificateId}
                       onChange={(e) => setCertificateId(e.target.value)}
                       placeholder="Enter certificate ID"
-                      className="flex-1"
+                      className="flex-1 bg-white/20 border-white/30 text-white placeholder:text-gray-300"
                     />
-                    <Button variant="outline" onClick={handleQRScan}>
+                    <Button variant="outline" onClick={handleQRScan} className="border-white/30 text-white hover:bg-white/10">
                       <Printer className="h-4 w-4" />
                     </Button>
                   </div>
                 </div>
 
-                <Button onClick={handleVerify} disabled={isVerifying} className="w-full">
+                <Button onClick={handleVerify} disabled={isVerifying} className="w-full bg-gradient-to-r from-green-500 to-green-700 hover:from-green-600 hover:to-green-800">
                   {isVerifying ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
@@ -181,19 +181,19 @@ const VerifyCertificate = () => {
 
           {/* Verification Result */}
           {verificationResult && (
-            <Card className={`${verificationResult.isValid ? "border-green-200 bg-green-50/95" : "border-red-200 bg-red-50/95"} backdrop-blur-sm`}>
+            <Card className={`${verificationResult.isValid ? "border-green-200 bg-green-50/10" : "border-red-200 bg-red-50/10"} backdrop-blur-lg`}>
               <CardHeader>
                 <div className="flex items-center space-x-3">
                   {verificationResult.isValid ? (
-                    <ArrowUp className="h-8 w-8 text-green-600" />
+                    <ArrowUp className="h-8 w-8 text-green-400" />
                   ) : (
-                    <ArrowDown className="h-8 w-8 text-red-600" />
+                    <ArrowDown className="h-8 w-8 text-red-400" />
                   )}
                   <div>
-                    <CardTitle className={verificationResult.isValid ? "text-green-900" : "text-red-900"}>
+                    <CardTitle className={verificationResult.isValid ? "text-green-100" : "text-red-100"}>
                       {verificationResult.isValid ? "Certificate Verified ✓" : "Verification Failed ✗"}
                     </CardTitle>
-                    <CardDescription className={verificationResult.isValid ? "text-green-700" : "text-red-700"}>
+                    <CardDescription className={verificationResult.isValid ? "text-green-200" : "text-red-200"}>
                       {verificationResult.isValid 
                         ? "This certificate is authentic and valid"
                         : verificationResult.error
@@ -206,64 +206,64 @@ const VerifyCertificate = () => {
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <h4 className="font-semibold text-gray-900 mb-2">Certificate Details</h4>
+                      <h4 className="font-semibold text-white mb-2">Certificate Details</h4>
                       <dl className="space-y-1">
                         <div className="flex justify-between">
-                          <dt className="text-sm text-gray-600">Student Name:</dt>
-                          <dd className="text-sm font-medium">{verificationResult.studentName}</dd>
+                          <dt className="text-sm text-gray-300">Student Name:</dt>
+                          <dd className="text-sm font-medium text-white">{verificationResult.studentName}</dd>
                         </div>
                         <div className="flex justify-between">
-                          <dt className="text-sm text-gray-600">Father's Name:</dt>
-                          <dd className="text-sm font-medium">{verificationResult.fatherName}</dd>
+                          <dt className="text-sm text-gray-300">Father's Name:</dt>
+                          <dd className="text-sm font-medium text-white">{verificationResult.fatherName}</dd>
                         </div>
                         {verificationResult.rollNo && (
                           <div className="flex justify-between">
-                            <dt className="text-sm text-gray-600">Roll No:</dt>
-                            <dd className="text-sm font-medium">{verificationResult.rollNo}</dd>
+                            <dt className="text-sm text-gray-300">Roll No:</dt>
+                            <dd className="text-sm font-medium text-white">{verificationResult.rollNo}</dd>
                           </div>
                         )}
                         <div className="flex justify-between">
-                          <dt className="text-sm text-gray-600">Course:</dt>
-                          <dd className="text-sm font-medium">{verificationResult.courseName}</dd>
+                          <dt className="text-sm text-gray-300">Course:</dt>
+                          <dd className="text-sm font-medium text-white">{verificationResult.courseName}</dd>
                         </div>
                         {verificationResult.duration && (
                           <div className="flex justify-between">
-                            <dt className="text-sm text-gray-600">Duration:</dt>
-                            <dd className="text-sm font-medium">{verificationResult.duration}</dd>
+                            <dt className="text-sm text-gray-300">Duration:</dt>
+                            <dd className="text-sm font-medium text-white">{verificationResult.duration}</dd>
                           </div>
                         )}
                         {verificationResult.grade && (
                           <div className="flex justify-between">
-                            <dt className="text-sm text-gray-600">Grade:</dt>
-                            <dd className="text-sm font-medium">{verificationResult.grade}</dd>
+                            <dt className="text-sm text-gray-300">Grade:</dt>
+                            <dd className="text-sm font-medium text-white">{verificationResult.grade}</dd>
                           </div>
                         )}
                       </dl>
                     </div>
                     <div>
-                      <h4 className="font-semibold text-gray-900 mb-2">Verification Info</h4>
+                      <h4 className="font-semibold text-white mb-2">Verification Info</h4>
                       <dl className="space-y-1">
                         <div className="flex justify-between">
-                          <dt className="text-sm text-gray-600">Certificate ID:</dt>
-                          <dd className="text-sm font-medium break-all">{verificationResult.certificateId}</dd>
+                          <dt className="text-sm text-gray-300">Certificate ID:</dt>
+                          <dd className="text-sm font-medium break-all text-white">{verificationResult.certificateId}</dd>
                         </div>
                         <div className="flex justify-between">
-                          <dt className="text-sm text-gray-600">Completion Date:</dt>
-                          <dd className="text-sm font-medium">{new Date(verificationResult.completionDate).toLocaleDateString()}</dd>
+                          <dt className="text-sm text-gray-300">Completion Date:</dt>
+                          <dd className="text-sm font-medium text-white">{new Date(verificationResult.completionDate).toLocaleDateString()}</dd>
                         </div>
                         {verificationResult.studentCoordinator && (
                           <div className="flex justify-between">
-                            <dt className="text-sm text-gray-600">Student Co-ordinator:</dt>
-                            <dd className="text-sm font-medium">{verificationResult.studentCoordinator}</dd>
+                            <dt className="text-sm text-gray-300">Student Co-ordinator:</dt>
+                            <dd className="text-sm font-medium text-white">{verificationResult.studentCoordinator}</dd>
                           </div>
                         )}
                         <div className="flex justify-between">
-                          <dt className="text-sm text-gray-600">Issue Date:</dt>
-                          <dd className="text-sm font-medium">{verificationResult.issueDate}</dd>
+                          <dt className="text-sm text-gray-300">Issue Date:</dt>
+                          <dd className="text-sm font-medium text-white">{verificationResult.issueDate}</dd>
                         </div>
                         <div className="flex justify-between">
-                          <dt className="text-sm text-gray-600">Verified At:</dt>
-                          <dd className="text-sm font-medium">
+                          <dt className="text-sm text-gray-300">Verified At:</dt>
+                          <dd className="text-sm font-medium text-white">
                             {new Date(verificationResult.verifiedAt).toLocaleString()}
                           </dd>
                         </div>
@@ -277,10 +277,10 @@ const VerifyCertificate = () => {
 
           {/* Certificate Preview */}
           {verificationResult && verificationResult.isValid && verificationResult.certificateData && (
-            <Card className="bg-white/95 backdrop-blur-sm">
+            <Card className="bg-white/10 backdrop-blur-lg border-white/20">
               <CardHeader>
-                <CardTitle>Certificate Preview</CardTitle>
-                <CardDescription>
+                <CardTitle className="text-white">Certificate Preview</CardTitle>
+                <CardDescription className="text-gray-200">
                   Preview of the verified certificate
                 </CardDescription>
               </CardHeader>

@@ -1,3 +1,4 @@
+
 import { useState, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,12 +7,11 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Search, Edit, Trash2, ArrowUpDown, Download, ArrowLeft, Printer } from "lucide-react";
+import { Search, Edit, Trash2, ArrowUpDown, ArrowLeft, Printer } from "lucide-react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { generateCertificatePDF } from "@/utils/pdfGenerator";
 import CertificatePreview from "@/components/CertificatePreview";
 import EditCertificateForm from "@/components/EditCertificateForm";
 
@@ -36,15 +36,12 @@ type SortOrder = 'asc' | 'desc';
 const ManageCertificates = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const certificateRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const [searchTerm, setSearchTerm] = useState("");
   const [sortField, setSortField] = useState<SortField>('created_at');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
   const [certificateToDelete, setCertificateToDelete] = useState<Certificate | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedBatch, setSelectedBatch] = useState<string>("");
-  const [isPrintingBatch, setIsPrintingBatch] = useState(false);
   const [editingCertificate, setEditingCertificate] = useState<Certificate | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deletePassword, setDeletePassword] = useState("");
@@ -144,66 +141,6 @@ const ManageCertificates = () => {
     }
   };
 
-  const handlePrintBatch = async () => {
-    if (!selectedBatch) {
-      toast({
-        title: "No Batch Selected",
-        description: "Please select a batch to print.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsPrintingBatch(true);
-    const batchCertificates = sortedAndFilteredCertificates.filter(cert => cert.batch_number === selectedBatch);
-    
-    try {
-      const batchContainer = document.createElement('div');
-      
-      for (const certificate of batchCertificates) {
-        const certificateData = {
-          studentName: certificate.student_name,
-          fatherName: certificate.father_name || "",
-          courseName: certificate.course_name,
-          duration: certificate.duration || "",
-          completionDate: certificate.completion_date,
-          grade: certificate.grade || "",
-          studentCoordinator: certificate.student_coordinator || "",
-          certificateId: certificate.certificate_id,
-          rollNo: certificate.roll_no || "",
-        };
-
-        const tempContainer = document.createElement('div');
-        tempContainer.innerHTML = `
-          <div style="page-break-after: always; width: 210mm; height: 297mm; position: relative; font-family: Times, serif; background-image: url('/lovable-uploads/7ab347ae-d0be-4f64-ae7e-c4bfd0378ac4.png'); background-size: cover; background-position: center; background-repeat: no-repeat;">
-            <!-- Certificate content would be rendered here -->
-          </div>
-        `;
-        
-        batchContainer.appendChild(tempContainer);
-      }
-
-      const filename = `Batch_${selectedBatch}_Certificates`;
-      await generateCertificatePDF(batchContainer, filename);
-      
-      toast({
-        title: "Batch Download Complete",
-        description: `Downloaded ${batchCertificates.length} certificates for batch ${selectedBatch}.`,
-      });
-    } catch (error) {
-      toast({
-        title: "Batch Download Failed",
-        description: "Failed to generate batch PDF. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsPrintingBatch(false);
-    }
-  };
-
-  // Get unique batch numbers
-  const uniqueBatches = Array.from(new Set(certificates.filter(cert => cert.batch_number).map(cert => cert.batch_number))).sort();
-
   // Filter and sort certificates
   const sortedAndFilteredCertificates = certificates
     .filter(cert =>
@@ -264,24 +201,33 @@ const ManageCertificates = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <nav className="bg-white shadow-sm border-b">
+      <div 
+        className="min-h-screen relative overflow-hidden"
+        style={{
+          backgroundImage: `url('/lovable-uploads/1c1f036d-97eb-4825-9766-e1ddb31b3f55.png')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      >
+        <div className="absolute inset-0 bg-black/40"></div>
+        <nav className="relative z-10 bg-white/10 backdrop-blur-lg shadow-sm border-b border-white/20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
-              <Link to="/" className="flex items-center space-x-3 text-gray-900 hover:text-primary">
+              <Link to="/" className="flex items-center space-x-3 text-white hover:text-gray-200">
                 <ArrowLeft className="h-5 w-5" />
                 <span>Back to Home</span>
               </Link>
-              <h1 className="text-xl font-semibold">Manage Certificates</h1>
+              <h1 className="text-xl font-semibold text-white">Manage Certificates</h1>
               <div className="w-24"></div>
             </div>
           </div>
         </nav>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <Card>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <Card className="bg-white/10 backdrop-blur-lg border-white/20">
             <CardHeader>
-              <CardTitle>Manage Certificates</CardTitle>
-              <CardDescription>Loading certificates...</CardDescription>
+              <CardTitle className="text-white">Manage Certificates</CardTitle>
+              <CardDescription className="text-gray-200">Loading certificates...</CardDescription>
             </CardHeader>
           </Card>
         </div>
@@ -290,25 +236,34 @@ const ManageCertificates = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm border-b">
+    <div 
+      className="min-h-screen relative overflow-hidden"
+      style={{
+        backgroundImage: `url('/lovable-uploads/1c1f036d-97eb-4825-9766-e1ddb31b3f55.png')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
+      <div className="absolute inset-0 bg-black/40"></div>
+      <nav className="relative z-10 bg-white/10 backdrop-blur-lg shadow-sm border-b border-white/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <Link to="/" className="flex items-center space-x-3 text-gray-900 hover:text-primary">
+            <Link to="/" className="flex items-center space-x-3 text-white hover:text-gray-200">
               <ArrowLeft className="h-5 w-5" />
               <span>Back to Home</span>
             </Link>
-            <h1 className="text-xl font-semibold">Manage Certificates</h1>
+            <h1 className="text-xl font-semibold text-white">Manage Certificates</h1>
             <div className="w-24"></div>
           </div>
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Card>
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <Card className="bg-white/10 backdrop-blur-lg border-white/20">
           <CardHeader>
-            <CardTitle>Manage Certificates</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-white">Manage Certificates</CardTitle>
+            <CardDescription className="text-gray-200">
               View, edit, and delete existing certificates
             </CardDescription>
           </CardHeader>
@@ -320,17 +275,17 @@ const ManageCertificates = () => {
                   placeholder="Search by student name, certificate ID, course, roll number, or batch..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 bg-white/20 border-white/30 text-white placeholder:text-gray-300"
                 />
               </div>
 
               <div className="flex gap-4 items-center flex-wrap">
                 <div className="flex gap-2 items-center">
-                  <Label htmlFor="sort-field" className="text-sm font-medium">
+                  <Label htmlFor="sort-field" className="text-sm font-medium text-white">
                     Sort by:
                   </Label>
                   <Select value={sortField} onValueChange={(value: SortField) => setSortField(value)}>
-                    <SelectTrigger className="w-48">
+                    <SelectTrigger className="w-48 bg-white/20 border-white/30 text-white">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -346,122 +301,86 @@ const ManageCertificates = () => {
                     variant="outline"
                     size="sm"
                     onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-2 border-white/30 text-white hover:bg-white/10"
                   >
                     {sortOrder === 'asc' ? 'Ascending' : 'Descending'}
                     <ArrowUpDown className={`h-4 w-4 ${sortOrder === 'asc' ? 'rotate-180' : ''}`} />
                   </Button>
                 </div>
-
-                {uniqueBatches.length > 0 && (
-                  <div className="flex gap-2 items-center">
-                    <Label className="text-sm font-medium">Batch Print:</Label>
-                    <Select value={selectedBatch} onValueChange={setSelectedBatch}>
-                      <SelectTrigger className="w-40">
-                        <SelectValue placeholder="Select batch" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {uniqueBatches.map((batch) => (
-                          <SelectItem key={batch} value={batch!}>
-                            {batch}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Button
-                      onClick={handlePrintBatch}
-                      disabled={!selectedBatch || isPrintingBatch}
-                      size="sm"
-                      className="flex items-center gap-2"
-                    >
-                      {isPrintingBatch ? (
-                        <>
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                          Printing...
-                        </>
-                      ) : (
-                        <>
-                          <Download className="h-4 w-4" />
-                          Print Batch
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                )}
               </div>
             </div>
 
             {sortedAndFilteredCertificates.length === 0 ? (
-              <div className="text-center text-gray-500 py-8">
+              <div className="text-center text-gray-200 py-8">
                 {searchTerm ? "No certificates found matching your search." : "No certificates found."}
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
-                    <TableRow>
-                      <TableHead>
+                    <TableRow className="border-white/20">
+                      <TableHead className="text-white">
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => handleSort('student_name')}
-                          className="h-auto p-0 font-medium text-left justify-start hover:bg-transparent"
+                          className="h-auto p-0 font-medium text-left justify-start hover:bg-transparent text-white"
                         >
                           Student Name
                           {getSortIcon('student_name')}
                         </Button>
                       </TableHead>
-                      <TableHead>Roll No</TableHead>
-                      <TableHead>
+                      <TableHead className="text-white">Roll No</TableHead>
+                      <TableHead className="text-white">
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => handleSort('course_name')}
-                          className="h-auto p-0 font-medium text-left justify-start hover:bg-transparent"
+                          className="h-auto p-0 font-medium text-left justify-start hover:bg-transparent text-white"
                         >
                           Course
                           {getSortIcon('course_name')}
                         </Button>
                       </TableHead>
-                      <TableHead>
+                      <TableHead className="text-white">
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => handleSort('batch_number')}
-                          className="h-auto p-0 font-medium text-left justify-start hover:bg-transparent"
+                          className="h-auto p-0 font-medium text-left justify-start hover:bg-transparent text-white"
                         >
                           Batch
                           {getSortIcon('batch_number')}
                         </Button>
                       </TableHead>
-                      <TableHead>Certificate ID</TableHead>
-                      <TableHead>
+                      <TableHead className="text-white">Certificate ID</TableHead>
+                      <TableHead className="text-white">
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => handleSort('completion_date')}
-                          className="h-auto p-0 font-medium text-left justify-start hover:bg-transparent"
+                          className="h-auto p-0 font-medium text-left justify-start hover:bg-transparent text-white"
                         >
                           Completion Date
                           {getSortIcon('completion_date')}
                         </Button>
                       </TableHead>
-                      <TableHead>Actions</TableHead>
+                      <TableHead className="text-white">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {sortedAndFilteredCertificates.map((certificate) => (
-                      <TableRow key={certificate.id}>
-                        <TableCell className="font-medium">
+                      <TableRow key={certificate.id} className="border-white/20">
+                        <TableCell className="font-medium text-white">
                           {certificate.student_name}
                         </TableCell>
-                        <TableCell>{certificate.roll_no || "N/A"}</TableCell>
-                        <TableCell>{certificate.course_name}</TableCell>
-                        <TableCell>{certificate.batch_number || "N/A"}</TableCell>
-                        <TableCell className="font-mono text-xs">
+                        <TableCell className="text-gray-200">{certificate.roll_no || "N/A"}</TableCell>
+                        <TableCell className="text-gray-200">{certificate.course_name}</TableCell>
+                        <TableCell className="text-gray-200">{certificate.batch_number || "N/A"}</TableCell>
+                        <TableCell className="font-mono text-xs text-gray-200">
                           {certificate.certificate_id}
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="text-gray-200">
                           {new Date(certificate.completion_date).toLocaleDateString()}
                         </TableCell>
                         <TableCell>
@@ -470,11 +389,12 @@ const ManageCertificates = () => {
                               size="sm"
                               variant="outline"
                               onClick={() => handleEditCertificate(certificate)}
+                              className="border-white/30 text-white hover:bg-white/10"
                             >
                               <Edit className="h-4 w-4" />
                             </Button>
                             <Link to={`/print/${certificate.id}`}>
-                              <Button size="sm" variant="outline">
+                              <Button size="sm" variant="outline" className="border-white/30 text-white hover:bg-white/10">
                                 <Printer className="h-4 w-4" />
                               </Button>
                             </Link>
@@ -494,7 +414,7 @@ const ManageCertificates = () => {
                                     setCertificateToDelete(certificate);
                                     setDialogOpen(true);
                                   }}
-                                  className="text-red-600 hover:text-red-700"
+                                  className="text-red-400 hover:text-red-300 border-red-400/50 hover:bg-red-400/10"
                                 >
                                   <Trash2 className="h-4 w-4" />
                                 </Button>

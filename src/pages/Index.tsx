@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FileText, Search, Plus, Settings, Shield, Cpu, Database } from "lucide-react";
@@ -31,7 +30,7 @@ const Index = () => {
               <Card className="hover:shadow-xl transition-all duration-300 cursor-pointer bg-white/10 backdrop-blur-lg border-white/20 hover:bg-white/15">
                 <Link to="/generate">
                   <CardHeader className="text-center">
-                    <div className="mx-auto w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center mb-4 shadow-lg">
+                    <div className="mx-auto w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-700 rounded-full flex items-center justify-center mb-4 shadow-lg">
                       <Plus className="h-8 w-8 text-white" />
                     </div>
                     <CardTitle className="text-xl text-white">Generate Certificate</CardTitle>
@@ -50,8 +49,8 @@ const Index = () => {
               <Card className="hover:shadow-xl transition-all duration-300 cursor-pointer bg-white/10 backdrop-blur-lg border-white/20 hover:bg-white/15">
                 <Link to="/manage">
                   <CardHeader className="text-center">
-                    <div className="mx-auto w-16 h-16 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center mb-4 shadow-lg">
-                      <Database className="h-8 w-8 text-white" />
+                    <div className="mx-auto w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-700 rounded-full flex items-center justify-center mb-4 shadow-lg">
+                      <Settings className="h-8 w-8 text-white" />
                     </div>
                     <CardTitle className="text-xl text-white">Manage Certificates</CardTitle>
                     <CardDescription className="text-gray-300">
@@ -59,7 +58,7 @@ const Index = () => {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <Button variant="outline" className="w-full border-white/30 text-white hover:bg-white/10" size="lg">
+                    <Button className="w-full bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800" size="lg">
                       Manage Now
                     </Button>
                   </CardContent>
@@ -71,7 +70,7 @@ const Index = () => {
           <Card className="hover:shadow-xl transition-all duration-300 cursor-pointer bg-white/10 backdrop-blur-lg border-white/20 hover:bg-white/15">
             <Link to="/verify">
               <CardHeader className="text-center">
-                <div className="mx-auto w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mb-4 shadow-lg">
+                <div className="mx-auto w-16 h-16 bg-gradient-to-br from-green-500 to-green-700 rounded-full flex items-center justify-center mb-4 shadow-lg">
                   <Shield className="h-8 w-8 text-white" />
                 </div>
                 <CardTitle className="text-xl text-white">Verify Certificate</CardTitle>
@@ -80,7 +79,7 @@ const Index = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button variant="outline" className="w-full border-white/30 text-white hover:bg-white/10" size="lg">
+                <Button className="w-full bg-gradient-to-r from-green-500 to-green-700 hover:from-green-600 hover:to-green-800" size="lg">
                   Verify Now
                 </Button>
               </CardContent>
