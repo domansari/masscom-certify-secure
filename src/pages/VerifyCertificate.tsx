@@ -9,6 +9,7 @@ import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import CertificatePreview from "@/components/CertificatePreview";
+import { CertificateData } from "@/types/certificate";
 
 interface Certificate {
   id: string;
@@ -83,6 +84,21 @@ const VerifyCertificate = () => {
     }
   };
 
+  // Convert database Certificate to CertificateData format
+  const convertToCertificateData = (cert: Certificate): CertificateData => {
+    return {
+      studentName: cert.student_name,
+      fatherName: cert.father_name || '',
+      courseName: cert.course_name,
+      duration: cert.duration || '',
+      completionDate: cert.completion_date,
+      grade: cert.grade || '',
+      studentCoordinator: cert.student_coordinator || '',
+      certificateId: cert.certificate_id,
+      rollNo: cert.roll_no,
+    };
+  };
+
   return (
     <div 
       className="min-h-screen relative overflow-hidden"
@@ -97,7 +113,7 @@ const VerifyCertificate = () => {
       <nav className="relative z-10 bg-white/10 backdrop-blur-lg shadow-sm border-b border-white/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <Link to="/" className="flex items-center space-x-3 text-white hover:text-gray-200 transition-colors">
+            <Link to="/" className="flex items-center space-x-3 text-white hover:text-gray-200 transition-colors duration-200">
               <ArrowLeft className="h-5 w-5" />
               <span>Back to Home</span>
             </Link>
@@ -132,7 +148,7 @@ const VerifyCertificate = () => {
               <Button 
                 onClick={handleVerify} 
                 disabled={isLoading}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white transition-colors"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white transition-colors duration-200"
               >
                 {isLoading ? (
                   <>
@@ -205,7 +221,7 @@ const VerifyCertificate = () => {
                     <CardTitle>Certificate Preview</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <CertificatePreview certificate={certificate} />
+                    <CertificatePreview data={convertToCertificateData(certificate)} />
                   </CardContent>
                 </Card>
               </div>
