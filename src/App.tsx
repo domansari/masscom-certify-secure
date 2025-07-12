@@ -24,10 +24,11 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          <div className="min-h-screen bg-gray-50">
+          <div className="min-h-screen">
             <Header />
             <Routes>
               <Route path="/auth" element={<Auth />} />
+              <Route path="/verify" element={<VerifyCertificate />} />
               <Route 
                 path="/" 
                 element={
@@ -60,7 +61,6 @@ const App = () => (
                   </ProtectedRoute>
                 } 
               />
-              <Route path="/verify" element={<VerifyCertificate />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </div>

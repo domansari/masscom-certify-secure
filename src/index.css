@@ -68,6 +68,11 @@
   body {
     @apply bg-background text-foreground;
     font-family: 'Inter', sans-serif;
+    background-image: url('/lovable-uploads/1c1f036d-97eb-4825-9766-e1ddb31b3f55.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
   }
 }
 
@@ -82,6 +87,8 @@
     padding: 0 !important;
     -webkit-print-color-adjust: exact !important;
     color-adjust: exact !important;
+    background: white !important;
+    background-image: none !important;
   }
   
   .no-print {
