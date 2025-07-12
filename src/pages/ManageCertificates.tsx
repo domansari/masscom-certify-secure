@@ -1,19 +1,17 @@
-import React, { useState, useRef } from "react";
+
+import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
-import { Search, Edit, Trash2, ArrowUpDown, ArrowLeft, Printer } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import CertificatePreview from "@/components/CertificatePreview";
 import EditCertificateForm from "@/components/EditCertificateForm";
+import { CertificateFilters } from "@/components/manage-certificates/CertificateFilters";
+import { CertificateTable } from "@/components/manage-certificates/CertificateTable";
+import { DeleteCertificateDialog } from "@/components/manage-certificates/DeleteCertificateDialog";
+import { CertificatePagination } from "@/components/manage-certificates/CertificatePagination";
 
 interface Certificate {
   id: string;
@@ -144,6 +142,18 @@ const ManageCertificates = () => {
     }
   };
 
+  const handleDeleteCertificate = (certificate: Certificate) => {
+    setCertificateToDelete(certificate);
+    setDialogOpen(true);
+  };
+
+  const handleCloseDeleteDialog = () => {
+    setDialogOpen(false);
+    setCertificateToDelete(null);
+    setDeletePassword("");
+    setDeletePasswordError("");
+  };
+
   // Filter and sort certificates
   const sortedAndFilteredCertificates = certificates
     .filter(cert =>
@@ -208,80 +218,6 @@ const ManageCertificates = () => {
     }
   };
 
-  const getSortIcon = (field: SortField) => {
-    if (sortField !== field) return <ArrowUpDown className="h-4 w-4 opacity-50" />;
-    return <ArrowUpDown className={`h-4 w-4 ${sortOrder === 'asc' ? 'rotate-180' : ''}`} />;
-  };
-
-  const renderPaginationItems = () => {
-    const items = [];
-    const maxVisiblePages = 5;
-    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-
-    if (endPage - startPage + 1 < maxVisiblePages) {
-      startPage = Math.max(1, endPage - maxVisiblePages + 1);
-    }
-
-    if (startPage > 1) {
-      items.push(
-        <PaginationItem key={1}>
-          <PaginationLink
-            onClick={() => setCurrentPage(1)}
-            isActive={currentPage === 1}
-            className="cursor-pointer"
-          >
-            1
-          </PaginationLink>
-        </PaginationItem>
-      );
-      if (startPage > 2) {
-        items.push(
-          <PaginationItem key="ellipsis1">
-            <PaginationEllipsis />
-          </PaginationItem>
-        );
-      }
-    }
-
-    for (let i = startPage; i <= endPage; i++) {
-      items.push(
-        <PaginationItem key={i}>
-          <PaginationLink
-            onClick={() => setCurrentPage(i)}
-            isActive={currentPage === i}
-            className="cursor-pointer"
-          >
-            {i}
-          </PaginationLink>
-        </PaginationItem>
-      );
-    }
-
-    if (endPage < totalPages) {
-      if (endPage < totalPages - 1) {
-        items.push(
-          <PaginationItem key="ellipsis2">
-            <PaginationEllipsis />
-          </PaginationItem>
-        );
-      }
-      items.push(
-        <PaginationItem key={totalPages}>
-          <PaginationLink
-            onClick={() => setCurrentPage(totalPages)}
-            isActive={currentPage === totalPages}
-            className="cursor-pointer"
-          >
-            {totalPages}
-          </PaginationLink>
-        </PaginationItem>
-      );
-    }
-
-    return items;
-  };
-
   if (isLoading) {
     return (
       <div 
@@ -297,7 +233,7 @@ const ManageCertificates = () => {
         <nav className="relative z-10 bg-white/10 backdrop-blur-lg shadow-sm border-b border-white/20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
-              <Link to="/" className="flex items-center space-x-3 text-white hover:text-gray-200">
+              <Link to="/" className="flex items-center space-x-3 text-white hover:text-gray-200 transition-colors">
                 <ArrowLeft className="h-5 w-5" />
                 <span>Back to Home</span>
               </Link>
@@ -332,7 +268,7 @@ const ManageCertificates = () => {
       <nav className="relative z-10 bg-white/10 backdrop-blur-lg shadow-sm border-b border-white/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <Link to="/" className="flex items-center space-x-3 text-white hover:text-gray-200">
+            <Link to="/" className="flex items-center space-x-3 text-white hover:text-gray-200 transition-colors">
               <ArrowLeft className="h-5 w-5" />
               <span>Back to Home</span>
             </Link>
@@ -351,51 +287,17 @@ const ManageCertificates = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="mb-4 space-y-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input
-                  placeholder="Search by student name, certificate ID, course, roll number, or batch..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 bg-white/20 border-white/30 text-white placeholder:text-gray-300"
-                />
-              </div>
-
-              <div className="flex gap-4 items-center flex-wrap">
-                <div className="flex gap-2 items-center">
-                  <Label htmlFor="sort-field" className="text-sm font-medium text-white">
-                    Sort by:
-                  </Label>
-                  <Select value={sortField} onValueChange={(value: SortField) => setSortField(value)}>
-                    <SelectTrigger className="w-48 bg-white/20 border-white/30 text-white">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="created_at">Date Added</SelectItem>
-                      <SelectItem value="completion_date">Completion Date</SelectItem>
-                      <SelectItem value="course_name">Course Name</SelectItem>
-                      <SelectItem value="student_name">Student Name</SelectItem>
-                      <SelectItem value="batch_number">Batch Number</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-                    className="flex items-center gap-2 border-white/30 text-white hover:bg-white/10"
-                  >
-                    {sortOrder === 'asc' ? 'Ascending' : 'Descending'}
-                    <ArrowUpDown className={`h-4 w-4 ${sortOrder === 'asc' ? 'rotate-180' : ''}`} />
-                  </Button>
-                </div>
-                
-                <div className="text-sm text-gray-200">
-                  Showing {startIndex + 1}-{Math.min(endIndex, sortedAndFilteredCertificates.length)} of {sortedAndFilteredCertificates.length} certificates
-                </div>
-              </div>
-            </div>
+            <CertificateFilters
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              sortField={sortField}
+              setSortField={setSortField}
+              sortOrder={sortOrder}
+              setSortOrder={setSortOrder}
+              totalRecords={sortedAndFilteredCertificates.length}
+              startIndex={startIndex}
+              endIndex={endIndex}
+            />
 
             {sortedAndFilteredCertificates.length === 0 ? (
               <div className="text-center text-gray-200 py-8">
@@ -403,208 +305,37 @@ const ManageCertificates = () => {
               </div>
             ) : (
               <>
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="border-white/20">
-                        <TableHead className="text-white">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleSort('student_name')}
-                            className="h-auto p-0 font-medium text-left justify-start hover:bg-transparent text-white"
-                          >
-                            Student Name
-                            {getSortIcon('student_name')}
-                          </Button>
-                        </TableHead>
-                        <TableHead className="text-white">Roll No</TableHead>
-                        <TableHead className="text-white">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleSort('course_name')}
-                            className="h-auto p-0 font-medium text-left justify-start hover:bg-transparent text-white"
-                          >
-                            Course
-                            {getSortIcon('course_name')}
-                          </Button>
-                        </TableHead>
-                        <TableHead className="text-white">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleSort('batch_number')}
-                            className="h-auto p-0 font-medium text-left justify-start hover:bg-transparent text-white"
-                          >
-                            Batch
-                            {getSortIcon('batch_number')}
-                          </Button>
-                        </TableHead>
-                        <TableHead className="text-white">Certificate ID</TableHead>
-                        <TableHead className="text-white">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleSort('completion_date')}
-                            className="h-auto p-0 font-medium text-left justify-start hover:bg-transparent text-white"
-                          >
-                            Completion Date
-                            {getSortIcon('completion_date')}
-                          </Button>
-                        </TableHead>
-                        <TableHead className="text-white">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {paginatedCertificates.map((certificate) => (
-                        <TableRow key={certificate.id} className="border-white/20">
-                          <TableCell className="font-medium text-white">
-                            {certificate.student_name}
-                          </TableCell>
-                          <TableCell className="text-gray-200">{certificate.roll_no || "N/A"}</TableCell>
-                          <TableCell className="text-gray-200">{certificate.course_name}</TableCell>
-                          <TableCell className="text-gray-200">{certificate.batch_number || "N/A"}</TableCell>
-                          <TableCell className="font-mono text-xs text-gray-200">
-                            {certificate.certificate_id}
-                          </TableCell>
-                          <TableCell className="text-gray-200">
-                            {new Date(certificate.completion_date).toLocaleDateString()}
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex space-x-2">
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleEditCertificate(certificate)}
-                                className="border-white/30 text-white hover:bg-white/10"
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              <Link to={`/print/${certificate.id}`}>
-                                <Button size="sm" variant="outline" className="border-white/30 text-white hover:bg-white/10">
-                                  <Printer className="h-4 w-4" />
-                                </Button>
-                              </Link>
-                              <Dialog open={dialogOpen && certificateToDelete?.id === certificate.id} onOpenChange={(open) => {
-                                setDialogOpen(open);
-                                if (!open) {
-                                  setCertificateToDelete(null);
-                                  setDeletePassword("");
-                                  setDeletePasswordError("");
-                                }
-                              }}>
-                                <DialogTrigger asChild>
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => {
-                                      setCertificateToDelete(certificate);
-                                      setDialogOpen(true);
-                                    }}
-                                    className="text-red-400 hover:text-red-300 border-red-400/50 hover:bg-red-400/10"
-                                  >
-                                    <Trash2 className="h-4 w-4" />
-                                  </Button>
-                                </DialogTrigger>
-                                <DialogContent className="bg-white border border-gray-200 shadow-lg">
-                                  <DialogHeader>
-                                    <DialogTitle>Confirm Permanent Deletion</DialogTitle>
-                                    <DialogDescription>
-                                      You are about to permanently delete the certificate for <strong>{certificate.student_name}</strong>. 
-                                      This action cannot be undone. Please enter the master password to confirm.
-                                    </DialogDescription>
-                                  </DialogHeader>
-                                  <div className="space-y-2">
-                                    <Label htmlFor="delete-password">Master Password</Label>
-                                    <Input
-                                      id="delete-password"
-                                      type="password"
-                                      value={deletePassword}
-                                      onChange={(e) => {
-                                        setDeletePassword(e.target.value);
-                                        setDeletePasswordError("");
-                                      }}
-                                      placeholder="Enter master password"
-                                    />
-                                    {deletePasswordError && (
-                                      <p className="text-sm text-red-600">{deletePasswordError}</p>
-                                    )}
-                                  </div>
-                                  <DialogFooter>
-                                    <Button
-                                      variant="outline"
-                                      onClick={() => {
-                                        setCertificateToDelete(null);
-                                        setDialogOpen(false);
-                                        setDeletePassword("");
-                                        setDeletePasswordError("");
-                                      }}
-                                    >
-                                      Cancel
-                                    </Button>
-                                    <Button
-                                      variant="destructive"
-                                      onClick={confirmDelete}
-                                      disabled={isDeleting}
-                                    >
-                                      {isDeleting ? (
-                                        <>
-                                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                                          Deleting...
-                                        </>
-                                      ) : (
-                                        "Delete Permanently"
-                                      )}
-                                    </Button>
-                                  </DialogFooter>
-                                </DialogContent>
-                              </Dialog>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
+                <CertificateTable
+                  certificates={paginatedCertificates}
+                  onEdit={handleEditCertificate}
+                  onDelete={handleDeleteCertificate}
+                  sortField={sortField}
+                  sortOrder={sortOrder}
+                  onSort={handleSort}
+                />
 
-                {/* Pagination */}
-                {totalPages > 1 && (
-                  <div className="mt-6">
-                    <Pagination>
-                      <PaginationContent>
-                        <PaginationItem>
-                          <PaginationPrevious
-                            onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                            className={`cursor-pointer ${
-                              currentPage === 1 
-                                ? 'pointer-events-none opacity-50' 
-                                : 'text-white hover:bg-white/10'
-                            }`}
-                          />
-                        </PaginationItem>
-                        
-                        {renderPaginationItems()}
-                        
-                        <PaginationItem>
-                          <PaginationNext
-                            onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                            className={`cursor-pointer ${
-                              currentPage === totalPages 
-                                ? 'pointer-events-none opacity-50' 
-                                : 'text-white hover:bg-white/10'
-                            }`}
-                          />
-                        </PaginationItem>
-                      </PaginationContent>
-                    </Pagination>
-                  </div>
-                )}
+                <CertificatePagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={setCurrentPage}
+                />
               </>
             )}
           </CardContent>
         </Card>
       </div>
+
+      <DeleteCertificateDialog
+        isOpen={dialogOpen}
+        onClose={handleCloseDeleteDialog}
+        certificate={certificateToDelete}
+        onConfirm={confirmDelete}
+        isDeleting={isDeleting}
+        password={deletePassword}
+        setPassword={setDeletePassword}
+        passwordError={deletePasswordError}
+        setPasswordError={setDeletePasswordError}
+      />
 
       {/* Edit Certificate Dialog */}
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>

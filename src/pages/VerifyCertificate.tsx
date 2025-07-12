@@ -1,113 +1,86 @@
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowDown, ArrowUp, Printer } from "lucide-react";
-import { Link, useSearchParams } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
+import { ArrowLeft, Search, Loader2 } from "lucide-react";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
 import CertificatePreview from "@/components/CertificatePreview";
+
+interface Certificate {
+  id: string;
+  certificate_id: string;
+  student_name: string;
+  father_name: string;
+  course_name: string;
+  duration: string;
+  completion_date: string;
+  grade: string;
+  student_coordinator: string;
+  roll_no?: string;
+  batch_number?: string;
+  qr_code_data: string;
+}
 
 const VerifyCertificate = () => {
   const { toast } = useToast();
-  const [searchParams] = useSearchParams();
-  const [certificateId, setCertificateId] = useState(searchParams.get('id') || "");
-  const [verificationResult, setVerificationResult] = useState<any>(null);
-  const [isVerifying, setIsVerifying] = useState(false);
-
-  useEffect(() => {
-    if (searchParams.get('id')) {
-      handleVerify();
-    }
-  }, []);
+  const [certificateId, setCertificateId] = useState("");
+  const [certificate, setCertificate] = useState<Certificate | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
 
   const handleVerify = async () => {
     if (!certificateId.trim()) {
       toast({
-        title: "Missing Certificate ID",
-        description: "Please enter a certificate ID to verify.",
+        title: "Invalid Input",
+        description: "Please enter a certificate ID.",
         variant: "destructive",
       });
       return;
     }
 
-    setIsVerifying(true);
-
+    setIsLoading(true);
+    setHasSearched(true);
+    
     try {
       const { data, error } = await supabase
         .from('certificates')
         .select('*')
         .eq('certificate_id', certificateId.trim())
-        .maybeSingle();
+        .single();
 
       if (error) {
-        throw error;
-      }
-
-      if (data) {
-        setVerificationResult({
-          isValid: true,
-          certificateId: data.certificate_id,
-          studentName: data.student_name,
-          fatherName: data.father_name,
-          courseName: data.course_name,
-          duration: data.duration,
-          completionDate: data.completion_date,
-          grade: data.grade,
-          studentCoordinator: data.student_coordinator,
-          rollNo: data.roll_no || "",
-          issueDate: new Date(data.created_at).toLocaleDateString(),
-          verifiedAt: new Date().toISOString(),
-          certificateData: {
-            studentName: data.student_name,
-            fatherName: data.father_name || "",
-            courseName: data.course_name,
-            duration: data.duration || "",
-            completionDate: data.completion_date,
-            grade: data.grade || "",
-            studentCoordinator: data.student_coordinator || "",
-            certificateId: data.certificate_id,
-            rollNo: data.roll_no || "",
-          }
-        });
-        toast({
-          title: "Certificate Verified!",
-          description: "This certificate is authentic and valid.",
-        });
+        if (error.code === 'PGRST116') {
+          setCertificate(null);
+          toast({
+            title: "Certificate Not Found",
+            description: "No certificate found with the provided ID.",
+            variant: "destructive",
+          });
+        } else {
+          throw error;
+        }
       } else {
-        setVerificationResult({
-          isValid: false,
-          error: "Certificate not found or invalid",
-        });
+        setCertificate(data);
         toast({
-          title: "Verification Failed",
-          description: "This certificate could not be verified.",
-          variant: "destructive",
+          title: "Certificate Found",
+          description: "Certificate has been successfully verified.",
         });
       }
     } catch (error: any) {
-      setVerificationResult({
-        isValid: false,
-        error: "Error verifying certificate",
-      });
+      console.error('Verification error:', error);
+      setCertificate(null);
       toast({
-        title: "Verification Error",
-        description: error.message || "An error occurred while verifying the certificate.",
+        title: "Error",
+        description: error.message || "Failed to verify certificate.",
         variant: "destructive",
       });
     } finally {
-      setIsVerifying(false);
+      setIsLoading(false);
     }
-  };
-
-  const handleQRScan = () => {
-    toast({
-      title: "QR Scanner",
-      description: "QR scanner would open here in a real implementation.",
-    });
   };
 
   return (
@@ -124,8 +97,8 @@ const VerifyCertificate = () => {
       <nav className="relative z-10 bg-white/10 backdrop-blur-lg shadow-sm border-b border-white/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <Link to="/" className="flex items-center space-x-3 text-white hover:text-gray-200">
-              <ArrowDown className="h-5 w-5" />
+            <Link to="/" className="flex items-center space-x-3 text-white hover:text-gray-200 transition-colors">
+              <ArrowLeft className="h-5 w-5" />
               <span>Back to Home</span>
             </Link>
             <h1 className="text-xl font-semibold text-white">Verify Certificate</h1>
@@ -135,161 +108,128 @@ const VerifyCertificate = () => {
       </nav>
 
       <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="space-y-8">
-          {/* Verification Form */}
-          <Card className="bg-white/10 backdrop-blur-lg border-white/20">
-            <CardHeader>
-              <CardTitle className="text-white">Certificate Verification</CardTitle>
-              <CardDescription className="text-gray-200">
-                Enter the certificate ID or scan the QR code to verify authenticity
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                <div className="space-y-2">
-                  <Label htmlFor="certificateId" className="text-white">Certificate ID</Label>
-                  <div className="flex space-x-2">
-                    <Input
-                      id="certificateId"
-                      value={certificateId}
-                      onChange={(e) => setCertificateId(e.target.value)}
-                      placeholder="Enter certificate ID"
-                      className="flex-1 bg-white/20 border-white/30 text-white placeholder:text-gray-300"
-                    />
-                    <Button variant="outline" onClick={handleQRScan} className="border-white/30 text-white hover:bg-white/10">
-                      <Printer className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-
-                <Button onClick={handleVerify} disabled={isVerifying} className="w-full bg-gradient-to-r from-green-500 to-green-700 hover:from-green-600 hover:to-green-800">
-                  {isVerifying ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      Verifying...
-                    </>
-                  ) : (
-                    <>
-                      <ArrowUp className="mr-2 h-4 w-4" />
-                      Verify Certificate
-                    </>
-                  )}
-                </Button>
+        <Card className="bg-white/10 backdrop-blur-lg border-white/20 mb-8">
+          <CardHeader>
+            <CardTitle className="text-white">Verify Certificate</CardTitle>
+            <CardDescription className="text-gray-200">
+              Enter a certificate ID to verify its authenticity
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="certificate-id" className="text-white">Certificate ID</Label>
+                <Input
+                  id="certificate-id"
+                  type="text"
+                  placeholder="Enter certificate ID (e.g., CERT-2024-001)"
+                  value={certificateId}
+                  onChange={(e) => setCertificateId(e.target.value)}
+                  className="bg-white/20 border-white/30 text-white placeholder:text-gray-300"
+                  onKeyPress={(e) => e.key === 'Enter' && handleVerify()}
+                />
               </div>
-            </CardContent>
-          </Card>
+              <Button 
+                onClick={handleVerify} 
+                disabled={isLoading}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white transition-colors"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Verifying...
+                  </>
+                ) : (
+                  <>
+                    <Search className="mr-2 h-4 w-4" />
+                    Verify Certificate
+                  </>
+                )}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
-          {/* Verification Result */}
-          {verificationResult && (
-            <Card className={`${verificationResult.isValid ? "border-green-200 bg-green-50/10" : "border-red-200 bg-red-50/10"} backdrop-blur-lg`}>
-              <CardHeader>
-                <div className="flex items-center space-x-3">
-                  {verificationResult.isValid ? (
-                    <ArrowUp className="h-8 w-8 text-green-400" />
-                  ) : (
-                    <ArrowDown className="h-8 w-8 text-red-400" />
-                  )}
-                  <div>
-                    <CardTitle className={verificationResult.isValid ? "text-green-100" : "text-red-100"}>
-                      {verificationResult.isValid ? "Certificate Verified ✓" : "Verification Failed ✗"}
+        {hasSearched && (
+          <>
+            {certificate ? (
+              <div className="space-y-6">
+                <Card className="bg-green-50/90 backdrop-blur-lg border-green-200">
+                  <CardHeader>
+                    <CardTitle className="text-green-800 flex items-center">
+                      <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+                      Certificate Verified ✓
                     </CardTitle>
-                    <CardDescription className={verificationResult.isValid ? "text-green-200" : "text-red-200"}>
-                      {verificationResult.isValid 
-                        ? "This certificate is authentic and valid"
-                        : verificationResult.error
-                      }
+                    <CardDescription className="text-green-700">
+                      This certificate is authentic and was issued by our institution.
                     </CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              {verificationResult.isValid && (
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <h4 className="font-semibold text-white mb-2">Certificate Details</h4>
-                      <dl className="space-y-1">
-                        <div className="flex justify-between">
-                          <dt className="text-sm text-gray-300">Student Name:</dt>
-                          <dd className="text-sm font-medium text-white">{verificationResult.studentName}</dd>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <span className="font-medium text-green-800">Student Name:</span>
+                        <p className="text-green-700">{certificate.student_name}</p>
+                      </div>
+                      <div>
+                        <span className="font-medium text-green-800">Course:</span>
+                        <p className="text-green-700">{certificate.course_name}</p>
+                      </div>
+                      <div>
+                        <span className="font-medium text-green-800">Completion Date:</span>
+                        <p className="text-green-700">
+                          {new Date(certificate.completion_date).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <div>
+                        <span className="font-medium text-green-800">Grade:</span>
+                        <p className="text-green-700">{certificate.grade}</p>
+                      </div>
+                      {certificate.roll_no && (
+                        <div>
+                          <span className="font-medium text-green-800">Roll Number:</span>
+                          <p className="text-green-700">{certificate.roll_no}</p>
                         </div>
-                        <div className="flex justify-between">
-                          <dt className="text-sm text-gray-300">Father's Name:</dt>
-                          <dd className="text-sm font-medium text-white">{verificationResult.fatherName}</dd>
+                      )}
+                      {certificate.batch_number && (
+                        <div>
+                          <span className="font-medium text-green-800">Batch:</span>
+                          <p className="text-green-700">{certificate.batch_number}</p>
                         </div>
-                        {verificationResult.rollNo && (
-                          <div className="flex justify-between">
-                            <dt className="text-sm text-gray-300">Roll No:</dt>
-                            <dd className="text-sm font-medium text-white">{verificationResult.rollNo}</dd>
-                          </div>
-                        )}
-                        <div className="flex justify-between">
-                          <dt className="text-sm text-gray-300">Course:</dt>
-                          <dd className="text-sm font-medium text-white">{verificationResult.courseName}</dd>
-                        </div>
-                        {verificationResult.duration && (
-                          <div className="flex justify-between">
-                            <dt className="text-sm text-gray-300">Duration:</dt>
-                            <dd className="text-sm font-medium text-white">{verificationResult.duration}</dd>
-                          </div>
-                        )}
-                        {verificationResult.grade && (
-                          <div className="flex justify-between">
-                            <dt className="text-sm text-gray-300">Grade:</dt>
-                            <dd className="text-sm font-medium text-white">{verificationResult.grade}</dd>
-                          </div>
-                        )}
-                      </dl>
+                      )}
                     </div>
-                    <div>
-                      <h4 className="font-semibold text-white mb-2">Verification Info</h4>
-                      <dl className="space-y-1">
-                        <div className="flex justify-between">
-                          <dt className="text-sm text-gray-300">Certificate ID:</dt>
-                          <dd className="text-sm font-medium break-all text-white">{verificationResult.certificateId}</dd>
-                        </div>
-                        <div className="flex justify-between">
-                          <dt className="text-sm text-gray-300">Completion Date:</dt>
-                          <dd className="text-sm font-medium text-white">{new Date(verificationResult.completionDate).toLocaleDateString()}</dd>
-                        </div>
-                        {verificationResult.studentCoordinator && (
-                          <div className="flex justify-between">
-                            <dt className="text-sm text-gray-300">Student Co-ordinator:</dt>
-                            <dd className="text-sm font-medium text-white">{verificationResult.studentCoordinator}</dd>
-                          </div>
-                        )}
-                        <div className="flex justify-between">
-                          <dt className="text-sm text-gray-300">Issue Date:</dt>
-                          <dd className="text-sm font-medium text-white">{verificationResult.issueDate}</dd>
-                        </div>
-                        <div className="flex justify-between">
-                          <dt className="text-sm text-gray-300">Verified At:</dt>
-                          <dd className="text-sm font-medium text-white">
-                            {new Date(verificationResult.verifiedAt).toLocaleString()}
-                          </dd>
-                        </div>
-                      </dl>
-                    </div>
-                  </div>
-                </CardContent>
-              )}
-            </Card>
-          )}
+                  </CardContent>
+                </Card>
 
-          {/* Certificate Preview */}
-          {verificationResult && verificationResult.isValid && verificationResult.certificateData && (
-            <Card className="bg-white/10 backdrop-blur-lg border-white/20">
-              <CardHeader>
-                <CardTitle className="text-white">Certificate Preview</CardTitle>
-                <CardDescription className="text-gray-200">
-                  Preview of the verified certificate
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <CertificatePreview data={verificationResult.certificateData} />
-              </CardContent>
-            </Card>
-          )}
-        </div>
+                <Card className="bg-white/90 backdrop-blur-lg border-gray-200">
+                  <CardHeader>
+                    <CardTitle>Certificate Preview</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <CertificatePreview certificate={certificate} />
+                  </CardContent>
+                </Card>
+              </div>
+            ) : (
+              <Card className="bg-red-50/90 backdrop-blur-lg border-red-200">
+                <CardHeader>
+                  <CardTitle className="text-red-800 flex items-center">
+                    <div className="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
+                    Certificate Not Found ✗
+                  </CardTitle>
+                  <CardDescription className="text-red-700">
+                    No certificate found with ID: <strong>{certificateId}</strong>
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-red-700 text-sm">
+                    Please check the certificate ID and try again. If you believe this is an error, 
+                    contact our support team.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+          </>
+        )}
       </div>
     </div>
   );
