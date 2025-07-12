@@ -118,7 +118,7 @@ const Auth = () => {
                 <Shield className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-green mb-2">Verify Certificate</h3>
+                <h3 className="text-lg font-semibold text-white mb-2">Verify Certificate</h3>
                 <p className="text-sm text-gray-300 mb-4">
                   Verify the authenticity of any certificate without logging in
                 </p>
