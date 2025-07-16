@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, FileText, Save } from "lucide-react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,14 +27,46 @@ const GenerateCertificate = () => {
     certificateId: "",
     rollNo: "",
   });
+  const [batchNumber, setBatchNumber] = useState("");
   const [qrCodeData, setQrCodeData] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  // Course options
+  const courseOptions = [
+    "Web Development",
+    "Mobile App Development", 
+    "Data Science",
+    "Digital Marketing",
+    "Graphic Design",
+    "UI/UX Design",
+    "Python Programming",
+    "Java Programming",
+    "Machine Learning",
+    "Cyber Security"
+  ];
+
+  // Duration options
+  const durationOptions = [
+    "1 Month",
+    "2 Months", 
+    "3 Months",
+    "6 Months",
+    "1 Year",
+    "2 Years"
+  ];
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
     setFormData(prevData => ({
       ...prevData,
       [id]: value
+    }));
+  };
+
+  const handleSelectChange = (field: string, value: string) => {
+    setFormData(prevData => ({
+      ...prevData,
+      [field]: value
     }));
   };
 
@@ -78,6 +111,7 @@ const GenerateCertificate = () => {
             student_coordinator: formData.studentCoordinator,
             roll_no: formData.rollNo,
             certificate_id: certificateId,
+            batch_number: batchNumber,
             qr_code_data: qrCodeData,
             created_by: user.id
           }
@@ -172,26 +206,33 @@ const GenerateCertificate = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="courseName" className="text-white">Course Name</Label>
-                  <Input
-                    type="text"
-                    id="courseName"
-                    placeholder="Enter course name"
-                    value={formData.courseName}
-                    onChange={handleChange}
-                    className="bg-white/20 border-white/30 text-white placeholder:text-gray-300"
-                    required
-                  />
+                  <Select onValueChange={(value) => handleSelectChange('courseName', value)}>
+                    <SelectTrigger className="bg-white/20 border-white/30 text-white">
+                      <SelectValue placeholder="Select course" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {courseOptions.map((course) => (
+                        <SelectItem key={course} value={course}>
+                          {course}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <Label htmlFor="duration" className="text-white">Duration</Label>
-                  <Input
-                    type="text"
-                    id="duration"
-                    placeholder="Enter duration (e.g., 6 months)"
-                    value={formData.duration}
-                    onChange={handleChange}
-                    className="bg-white/20 border-white/30 text-white placeholder:text-gray-300"
-                  />
+                  <Select onValueChange={(value) => handleSelectChange('duration', value)}>
+                    <SelectTrigger className="bg-white/20 border-white/30 text-white">
+                      <SelectValue placeholder="Select duration" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {durationOptions.map((duration) => (
+                        <SelectItem key={duration} value={duration}>
+                          {duration}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 
@@ -233,7 +274,7 @@ const GenerateCertificate = () => {
                     required
                   />
                 </div>
-                 <div>
+                <div>
                   <Label htmlFor="rollNo" className="text-white">Roll Number</Label>
                   <Input
                     type="text"
@@ -246,18 +287,31 @@ const GenerateCertificate = () => {
                 </div>
               </div>
 
-              {formData.certificateId && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="certificateId" className="text-white">Certificate ID</Label>
+                  <Label htmlFor="batchNumber" className="text-white">Batch Number</Label>
                   <Input
                     type="text"
-                    id="certificateId"
-                    value={formData.certificateId}
-                    readOnly
-                    className="bg-white/10 border-white/30 text-white"
+                    id="batchNumber"
+                    placeholder="Enter batch number"
+                    value={batchNumber}
+                    onChange={(e) => setBatchNumber(e.target.value)}
+                    className="bg-white/20 border-white/30 text-white placeholder:text-gray-300"
                   />
                 </div>
-              )}
+                {formData.certificateId && (
+                  <div>
+                    <Label htmlFor="certificateId" className="text-white">Certificate ID</Label>
+                    <Input
+                      type="text"
+                      id="certificateId"
+                      value={formData.certificateId}
+                      readOnly
+                      className="bg-white/10 border-white/30 text-white"
+                    />
+                  </div>
+                )}
+              </div>
 
               <div>
                 <Label htmlFor="additionalInfo" className="text-white">Additional Information</Label>
