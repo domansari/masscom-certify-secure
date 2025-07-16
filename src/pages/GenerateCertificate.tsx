@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -58,28 +57,13 @@ const GenerateCertificate = () => {
     });
 
     try {
-      // Get current user for created_by field
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-      
-      if (userError || !user) {
-        throw new Error("User not authenticated");
-      }
-
       const { data, error } = await supabase
         .from('certificates')
         .insert([
           {
-            student_name: formData.studentName,
-            father_name: formData.fatherName,
-            course_name: formData.courseName,
-            duration: formData.duration,
-            completion_date: formData.completionDate,
-            grade: formData.grade,
-            student_coordinator: formData.studentCoordinator,
-            roll_no: formData.rollNo,
+            ...formData,
             certificate_id: certificateId,
-            qr_code_data: qrCodeData,
-            created_by: user.id
+            qr_code_data: qrCodeData
           }
         ]);
 
