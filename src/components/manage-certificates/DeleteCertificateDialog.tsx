@@ -1,9 +1,12 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useOTP } from '@/hooks/useOTP';
+import OTPInput from '@/components/OTPInput';
+import { Smartphone } from 'lucide-react';
 
 interface Certificate {
   id: string;
@@ -33,6 +36,32 @@ export const DeleteCertificateDialog: React.FC<DeleteCertificateDialogProps> = (
   passwordError,
   setPasswordError
 }) => {
+  const [verificationMethod, setVerificationMethod] = useState<'password' | 'otp'>('password');
+  const [otpValue, setOtpValue] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
+  const { sendOTP, verifyOTP, isLoading: otpLoading, timeLeft, canResend } = useOTP();
+
+  const handleSendOTP = async () => {
+    const success = await sendOTP('delete');
+    if (success) {
+      setOtpSent(true);
+    }
+  };
+
+  const handleOTPConfirm = () => {
+    if (verifyOTP(otpValue)) {
+      onConfirm();
+    } else {
+      setPasswordError("Invalid OTP. Please try again.");
+    }
+  };
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="bg-white border border-gray-200 shadow-lg">
@@ -40,25 +69,117 @@ export const DeleteCertificateDialog: React.FC<DeleteCertificateDialogProps> = (
           <DialogTitle>Confirm Permanent Deletion</DialogTitle>
           <DialogDescription>
             You are about to permanently delete the certificate for <strong>{certificate?.student_name}</strong>. 
-            This action cannot be undone. Please enter the master password to confirm.
+            This action cannot be undone. Please verify your identity to confirm.
           </DialogDescription>
         </DialogHeader>
-        <div className="space-y-2">
-          <Label htmlFor="delete-password">Master Password</Label>
-          <Input
-            id="delete-password"
-            type="password"
-            value={password}
-            onChange={(e) => {
-              setPassword(e.target.value);
-              setPasswordError("");
-            }}
-            placeholder="Enter master password"
-          />
-          {passwordError && (
-            <p className="text-sm text-red-600">{passwordError}</p>
+        
+        <div className="space-y-4">
+          <div className="flex space-x-2">
+            <Button
+              variant={verificationMethod === 'password' ? 'default' : 'outline'}
+              onClick={() => setVerificationMethod('password')}
+              className="flex-1"
+              size="sm"
+            >
+              Password
+            </Button>
+            <Button
+              variant={verificationMethod === 'otp' ? 'default' : 'outline'}
+              onClick={() => setVerificationMethod('otp')}
+              className="flex-1"
+              size="sm"
+            >
+              <Smartphone className="mr-2 h-4 w-4" />
+              OTP
+            </Button>
+          </div>
+
+          {verificationMethod === 'password' ? (
+            <div className="space-y-2">
+              <Label htmlFor="delete-password">Master Password</Label>
+              <Input
+                id="delete-password"
+                type="password"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setPasswordError("");
+                }}
+                placeholder="Enter master password"
+              />
+              {passwordError && (
+                <p className="text-sm text-red-600">{passwordError}</p>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {!otpSent ? (
+                <div className="text-center space-y-2">
+                  <p className="text-sm text-gray-600">
+                    An OTP will be sent to +919565526767
+                  </p>
+                  <Button
+                    onClick={handleSendOTP}
+                    disabled={otpLoading}
+                    className="w-full"
+                    variant="outline"
+                  >
+                    {otpLoading ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2"></div>
+                        Sending OTP...
+                      </>
+                    ) : (
+                      <>
+                        <Smartphone className="mr-2 h-4 w-4" />
+                        Send OTP
+                      </>
+                    )}
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <div className="text-center">
+                    <Label>Enter 6-digit OTP</Label>
+                    <p className="text-sm text-gray-600 mt-1">
+                      Sent to +919565526767
+                    </p>
+                  </div>
+                  
+                  <div className="flex justify-center">
+                    <OTPInput
+                      value={otpValue}
+                      onChange={setOtpValue}
+                    />
+                  </div>
+
+                  {timeLeft > 0 && (
+                    <p className="text-center text-sm text-gray-600">
+                      Time remaining: {formatTime(timeLeft)}
+                    </p>
+                  )}
+
+                  {canResend && (
+                    <Button
+                      onClick={handleSendOTP}
+                      variant="outline"
+                      disabled={otpLoading}
+                      className="w-full"
+                      size="sm"
+                    >
+                      Resend OTP
+                    </Button>
+                  )}
+
+                  {passwordError && (
+                    <p className="text-sm text-red-600 text-center">{passwordError}</p>
+                  )}
+                </div>
+              )}
+            </div>
           )}
         </div>
+
         <DialogFooter>
           <Button
             variant="outline"
@@ -69,8 +190,12 @@ export const DeleteCertificateDialog: React.FC<DeleteCertificateDialogProps> = (
           </Button>
           <Button
             variant="destructive"
-            onClick={onConfirm}
-            disabled={isDeleting}
+            onClick={verificationMethod === 'password' ? onConfirm : handleOTPConfirm}
+            disabled={
+              isDeleting || 
+              (verificationMethod === 'password' && !password) ||
+              (verificationMethod === 'otp' && (!otpSent || otpValue.length !== 6))
+            }
             className="hover:bg-red-600 transition-colors"
           >
             {isDeleting ? (

@@ -7,17 +7,24 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowDown, Shield } from "lucide-react";
+import { ArrowDown, Shield, Smartphone } from "lucide-react";
+import { useOTP } from "@/hooks/useOTP";
+import OTPInput from "@/components/OTPInput";
 
 const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [authMode, setAuthMode] = useState<'email' | 'otp'>('email');
+  const [otpValue, setOtpValue] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
+  
   const { signIn } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { sendOTP, verifyOTP, isLoading: otpLoading, timeLeft, canResend } = useOTP();
 
-  const handleSignIn = async (e: React.FormEvent) => {
+  const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
@@ -48,9 +55,57 @@ const Auth = () => {
     }
   };
 
+  const handleSendOTP = async () => {
+    const success = await sendOTP('login');
+    if (success) {
+      setOtpSent(true);
+    }
+  };
+
+  const handleVerifyOTP = async () => {
+    if (verifyOTP(otpValue)) {
+      // For demo purposes, we'll sign in with a default admin account
+      // In production, you'd have a proper OTP verification system
+      try {
+        const { error } = await signIn("admin@masscom.com", "admin123");
+        
+        if (error) {
+          toast({
+            title: "OTP Verification Failed",
+            description: "Unable to complete OTP login",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "OTP Verified!",
+            description: "You have been signed in successfully.",
+          });
+          navigate("/");
+        }
+      } catch (error: any) {
+        toast({
+          title: "OTP Verification Failed",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
+    } else {
+      toast({
+        title: "Invalid OTP",
+        description: "Please check the OTP and try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative">
-      {/* Dark overlay for better readability */}
       <div className="absolute inset-0 bg-black/50"></div>
       
       <div className="w-full max-w-md relative z-10 space-y-6">
@@ -62,51 +117,143 @@ const Auth = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSignIn} className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-white">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
-                  required
-                />
+            <div className="space-y-4 mb-6">
+              <div className="flex space-x-2">
+                <Button
+                  variant={authMode === 'email' ? 'default' : 'outline'}
+                  onClick={() => setAuthMode('email')}
+                  className="flex-1"
+                >
+                  Email Login
+                </Button>
+                <Button
+                  variant={authMode === 'otp' ? 'default' : 'outline'}
+                  onClick={() => setAuthMode('otp')}
+                  className="flex-1"
+                >
+                  <Smartphone className="mr-2 h-4 w-4" />
+                  OTP Login
+                </Button>
               </div>
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-white">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
-                  className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
-                  required
-                />
-              </div>
+            {authMode === 'email' ? (
+              <form onSubmit={handleEmailSignIn} className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-white">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter your email"
+                    className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
+                    required
+                  />
+                </div>
 
-              <Button
-                type="submit"
-                className="w-full bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800"
-                disabled={loading}
-              >
-                {loading ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Signing in...
-                  </>
+                <div className="space-y-2">
+                  <Label htmlFor="password" className="text-white">Password</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Enter your password"
+                    className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
+                    required
+                  />
+                </div>
+
+                <Button
+                  type="submit"
+                  className="w-full bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800"
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Signing in...
+                    </>
+                  ) : (
+                    <>
+                      <ArrowDown className="mr-2 h-4 w-4" />
+                      Sign In
+                    </>
+                  )}
+                </Button>
+              </form>
+            ) : (
+              <div className="space-y-6">
+                {!otpSent ? (
+                  <div className="text-center space-y-4">
+                    <p className="text-white text-sm">
+                      An OTP will be sent to +919565526767
+                    </p>
+                    <Button
+                      onClick={handleSendOTP}
+                      disabled={otpLoading}
+                      className="w-full bg-gradient-to-r from-green-500 to-green-700 hover:from-green-600 hover:to-green-800"
+                    >
+                      {otpLoading ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                          Sending OTP...
+                        </>
+                      ) : (
+                        <>
+                          <Smartphone className="mr-2 h-4 w-4" />
+                          Send OTP
+                        </>
+                      )}
+                    </Button>
+                  </div>
                 ) : (
-                  <>
-                    <ArrowDown className="mr-2 h-4 w-4" />
-                    Sign In
-                  </>
+                  <div className="space-y-4">
+                    <div className="text-center">
+                      <Label className="text-white">Enter 6-digit OTP</Label>
+                      <p className="text-sm text-gray-300 mt-1">
+                        Sent to +919565526767
+                      </p>
+                    </div>
+                    
+                    <div className="flex justify-center">
+                      <OTPInput
+                        value={otpValue}
+                        onChange={setOtpValue}
+                      />
+                    </div>
+
+                    {timeLeft > 0 && (
+                      <p className="text-center text-sm text-gray-300">
+                        Time remaining: {formatTime(timeLeft)}
+                      </p>
+                    )}
+
+                    <div className="space-y-2">
+                      <Button
+                        onClick={handleVerifyOTP}
+                        disabled={otpValue.length !== 6}
+                        className="w-full bg-gradient-to-r from-green-500 to-green-700 hover:from-green-600 hover:to-green-800"
+                      >
+                        Verify OTP
+                      </Button>
+                      
+                      {canResend && (
+                        <Button
+                          onClick={handleSendOTP}
+                          variant="outline"
+                          disabled={otpLoading}
+                          className="w-full"
+                        >
+                          Resend OTP
+                        </Button>
+                      )}
+                    </div>
+                  </div>
                 )}
-              </Button>
-            </form>
+              </div>
+            )}
           </CardContent>
         </Card>
 
