@@ -123,9 +123,8 @@ const Auth = () => {
                   Verify the authenticity of any certificate without logging in
                 </p>
                 <Link to="/verify">
-                  <Button className="w-full bg-gradient-to-r from-green-500 to-green-700 hover:from-green-600 hover:to-green-800 text-white shadow-lg transition-all duration-300 hover:scale-105">
-                    <Shield className="mr-2 h-4 w-4" />
-                    Verify Now
+                  <Button variant="outline" className="w-full border-white/30 text-white hover:bg-white/10">
+                    Verify Certificate
                   </Button>
                 </Link>
               </div>

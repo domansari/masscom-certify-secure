@@ -55,7 +55,7 @@ export const CertificateTable: React.FC<CertificateTableProps> = ({
                 variant="ghost"
                 size="sm"
                 onClick={() => onSort('student_name')}
-                className="h-auto p-0 font-medium text-left justify-start hover:bg-gradient-to-r hover:from-blue-500/20 hover:to-purple-500/20 hover:text-white text-white transition-all duration-200 hover:shadow-lg"
+                className="h-auto p-0 font-medium text-left justify-start hover:bg-white/10 hover:text-white text-white transition-colors duration-200"
               >
                 Student Name
                 {getSortIcon('student_name')}
@@ -67,7 +67,7 @@ export const CertificateTable: React.FC<CertificateTableProps> = ({
                 variant="ghost"
                 size="sm"
                 onClick={() => onSort('course_name')}
-                className="h-auto p-0 font-medium text-left justify-start hover:bg-gradient-to-r hover:from-blue-500/20 hover:to-purple-500/20 hover:text-white text-white transition-all duration-200 hover:shadow-lg"
+                className="h-auto p-0 font-medium text-left justify-start hover:bg-white/10 hover:text-white text-white transition-colors duration-200"
               >
                 Course
                 {getSortIcon('course_name')}
@@ -78,7 +78,7 @@ export const CertificateTable: React.FC<CertificateTableProps> = ({
                 variant="ghost"
                 size="sm"
                 onClick={() => onSort('batch_number')}
-                className="h-auto p-0 font-medium text-left justify-start hover:bg-gradient-to-r hover:from-blue-500/20 hover:to-purple-500/20 hover:text-white text-white transition-all duration-200 hover:shadow-lg"
+                className="h-auto p-0 font-medium text-left justify-start hover:bg-white/10 hover:text-white text-white transition-colors duration-200"
               >
                 Batch
                 {getSortIcon('batch_number')}
@@ -90,7 +90,7 @@ export const CertificateTable: React.FC<CertificateTableProps> = ({
                 variant="ghost"
                 size="sm"
                 onClick={() => onSort('completion_date')}
-                className="h-auto p-0 font-medium text-left justify-start hover:bg-gradient-to-r hover:from-blue-500/20 hover:to-purple-500/20 hover:text-white text-white transition-all duration-200 hover:shadow-lg"
+                className="h-auto p-0 font-medium text-left justify-start hover:bg-white/10 hover:text-white text-white transition-colors duration-200"
               >
                 Completion Date
                 {getSortIcon('completion_date')}
@@ -118,23 +118,26 @@ export const CertificateTable: React.FC<CertificateTableProps> = ({
                 <div className="flex space-x-2">
                   <Button
                     size="sm"
+                    variant="outline"
                     onClick={() => onEdit(certificate)}
-                    className="bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white shadow-lg transition-all duration-300 hover:scale-105"
+                    className="border-white/30 text-white hover:bg-white/10 hover:text-white hover:border-white/50 transition-all duration-200"
                   >
                     <Edit className="h-4 w-4" />
                   </Button>
                   <Link to={`/print/${certificate.id}`}>
                     <Button 
                       size="sm" 
-                      className="bg-gradient-to-r from-green-500 to-green-700 hover:from-green-600 hover:to-green-800 text-white shadow-lg transition-all duration-300 hover:scale-105"
+                      variant="outline" 
+                      className="border-white/30 text-white hover:bg-white/10 hover:text-white hover:border-white/50 transition-all duration-200"
                     >
                       <Printer className="h-4 w-4" />
                     </Button>
                   </Link>
                   <Button
                     size="sm"
+                    variant="outline"
                     onClick={() => onDelete(certificate)}
-                    className="bg-gradient-to-r from-red-500 to-red-700 hover:from-red-600 hover:to-red-800 text-white shadow-lg transition-all duration-300 hover:scale-105"
+                    className="text-red-400 hover:text-red-300 border-red-400/50 hover:bg-red-400/10 hover:border-red-400/70 transition-all duration-200"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>

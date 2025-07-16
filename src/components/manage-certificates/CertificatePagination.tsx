@@ -47,7 +47,7 @@ export const CertificatePagination: React.FC<CertificatePaginationProps> = ({
         size="sm"
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white border-0 shadow-lg transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+        className="border-white/30 text-white hover:bg-white/10 hover:text-white hover:border-white/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
       >
         <ChevronLeft className="h-4 w-4" />
         Previous
@@ -56,12 +56,13 @@ export const CertificatePagination: React.FC<CertificatePaginationProps> = ({
       {getPageNumbers().map((page) => (
         <Button
           key={page}
+          variant={currentPage === page ? "secondary" : "outline"}
           size="sm"
           onClick={() => onPageChange(page)}
           className={
             currentPage === page
-              ? "bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 text-white shadow-lg transition-all duration-300 hover:scale-105"
-              : "bg-gradient-to-r from-gray-500 to-gray-700 hover:from-gray-600 hover:to-gray-800 text-white shadow-lg transition-all duration-300 hover:scale-105"
+              ? "bg-white/20 text-white border-white/50 hover:bg-white/30 transition-all duration-200"
+              : "border-white/30 text-white hover:bg-white/10 hover:text-white hover:border-white/50 transition-all duration-200"
           }
         >
           {page}
@@ -73,7 +74,7 @@ export const CertificatePagination: React.FC<CertificatePaginationProps> = ({
         size="sm"
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white border-0 shadow-lg transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+        className="border-white/30 text-white hover:bg-white/10 hover:text-white hover:border-white/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
       >
         Next
         <ChevronRight className="h-4 w-4" />
