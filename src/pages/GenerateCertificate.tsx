@@ -1,24 +1,20 @@
-
-import { useState, useRef, useEffect } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Download, QrCode } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { ArrowLeft, FileText, Save } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
-import CertificatePreview from "@/components/CertificatePreview";
+import { useToast } from "@/hooks/use-toast";
 import QRCodeGenerator from "@/components/QRCodeGenerator";
-import { generateCertificatePDF } from "@/utils/pdfGenerator";
+import CertificatePreview from "@/components/CertificatePreview";
+import { CertificateData } from "@/types/certificate";
 
 const GenerateCertificate = () => {
   const { toast } = useToast();
-  const { user } = useAuth();
-  const certificateRef = useRef<HTMLDivElement>(null);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<CertificateData>({
     studentName: "",
     fatherName: "",
     courseName: "",
@@ -28,392 +24,253 @@ const GenerateCertificate = () => {
     studentCoordinator: "",
     certificateId: "",
     rollNo: "",
-    batchNumber: "",
   });
+  const [qrCodeData, setQrCodeData] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const [showPreview, setShowPreview] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
-
-  // Course duration mapping
-  const courseDurations = {
-    "Diploma in Computer Application": "8 Months",
-    "Advance Diploma in Computer Application": "12 Months",
-    "Computer Accountancy-Tally ERP+GST": "4 Months",
-    "Certificate Course in DTP": "4 Months"
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { id, value } = e.target;
+    setFormData(prevData => ({
+      ...prevData,
+      [id]: value
+    }));
   };
 
-  // Auto-fill duration when course is selected
-  useEffect(() => {
-    if (formData.courseName && courseDurations[formData.courseName as keyof typeof courseDurations]) {
-      setFormData(prev => ({
-        ...prev,
-        duration: courseDurations[formData.courseName as keyof typeof courseDurations]
-      }));
-    }
-  }, [formData.courseName]);
-
   const generateCertificateId = () => {
-    const id = `MIE-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`.toUpperCase();
-    setFormData({ ...formData, certificateId: id });
+    const prefix = "CERT";
+    const currentDate = new Date();
+    const year = currentDate.getFullYear();
+    const random = Math.random().toString(36).substring(2, 7).toUpperCase();
+    return `${prefix}-${year}-${random}`;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.studentName || !formData.courseName || !formData.completionDate) {
-      toast({
-        title: "Missing Information",
-        description: "Please fill in all required fields.",
-        variant: "destructive",
-      });
-      return;
-    }
+    setIsLoading(true);
 
-    if (!formData.certificateId) {
-      generateCertificateId();
-    }
-
-    setSaving(true);
+    const certificateId = generateCertificateId();
+    const qrCodeData = JSON.stringify({
+      studentName: formData.studentName,
+      courseName: formData.courseName,
+      completionDate: formData.completionDate,
+      certificateId: certificateId
+    });
 
     try {
-      const verificationUrl = `${window.location.origin}/verify?id=${formData.certificateId}`;
-      
-      const insertData: any = {
-        certificate_id: formData.certificateId,
-        student_name: formData.studentName,
-        father_name: formData.fatherName,
-        course_name: formData.courseName,
-        duration: formData.duration || null,
-        completion_date: formData.completionDate,
-        grade: formData.grade || null,
-        student_coordinator: formData.studentCoordinator || null,
-        qr_code_data: verificationUrl,
-        created_by: user?.id,
-        batch_number: formData.batchNumber || null,
-      };
+      const { data, error } = await supabase
+        .from('certificates')
+        .insert([
+          {
+            ...formData,
+            certificate_id: certificateId,
+            qr_code_data: qrCodeData
+          }
+        ]);
 
-      if (formData.rollNo) {
-        insertData.roll_no = formData.rollNo;
+      if (error) {
+        throw error;
       }
 
-      const { error } = await supabase
-        .from('certificates')
-        .insert(insertData);
-
-      if (error) throw error;
-      
+      setQrCodeData(qrCodeData);
       toast({
-        title: "Certificate Generated!",
-        description: "Your certificate has been generated and saved successfully.",
+        title: "Certificate Generated",
+        description: "Certificate has been successfully generated.",
       });
-
-      setShowPreview(true);
-      setSaved(true);
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error.message || "Failed to save certificate.",
+        description: error.message || "Failed to generate certificate.",
         variant: "destructive",
       });
     } finally {
-      setSaving(false);
+      setIsLoading(false);
     }
-  };
-
-  const handleDownload = async () => {
-    if (!certificateRef.current) {
-      toast({
-        title: "Error",
-        description: "Certificate preview not available for download.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      const filename = `${formData.studentName.replace(/\s+/g, '_')}_${formData.certificateId}_Certificate`;
-      await generateCertificatePDF(certificateRef.current, filename);
-      
-      toast({
-        title: "Download Complete",
-        description: "Your certificate PDF has been downloaded successfully.",
-      });
-    } catch (error) {
-      toast({
-        title: "Download Failed",
-        description: "Failed to generate PDF. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const resetForm = () => {
-    setFormData({
-      studentName: "",
-      fatherName: "",
-      courseName: "",
-      duration: "",
-      completionDate: "",
-      grade: "",
-      studentCoordinator: "",
-      certificateId: "",
-      rollNo: "",
-      batchNumber: "",
-    });
-    setShowPreview(false);
-    setSaved(false);
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm border-b">
+    <div 
+      className="min-h-screen relative overflow-hidden"
+      style={{
+        backgroundImage: `url('/lovable-uploads/1c1f036d-97eb-4825-9766-e1ddb31b3f55.png')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
+      <div className="absolute inset-0 bg-black/40"></div>
+      <nav className="relative z-10 bg-white/10 backdrop-blur-lg shadow-sm border-b border-white/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <Link to="/" className="flex items-center space-x-3 text-gray-900 hover:text-primary">
+            <Link to="/" className="flex items-center space-x-3 text-white hover:text-gray-200 transition-colors">
               <ArrowLeft className="h-5 w-5" />
               <span>Back to Home</span>
             </Link>
-            <h1 className="text-xl font-semibold">Generate Certificate</h1>
+            <h1 className="text-xl font-semibold text-white">Generate Certificate</h1>
             <div className="w-24"></div>
           </div>
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid lg:grid-cols-2 gap-8">
-          {/* Form Section */}
-          <Card>
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <Card className="bg-white/10 backdrop-blur-lg border-white/20">
+          <CardHeader>
+            <CardTitle className="text-white">Generate Certificate</CardTitle>
+            <CardDescription className="text-gray-200">
+              Fill out the form below to generate a new certificate
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="studentName" className="text-white">Student Name</Label>
+                  <Input
+                    type="text"
+                    id="studentName"
+                    placeholder="Enter student name"
+                    value={formData.studentName}
+                    onChange={handleChange}
+                    className="bg-white/20 border-white/30 text-white placeholder:text-gray-300"
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="fatherName" className="text-white">Father's Name</Label>
+                  <Input
+                    type="text"
+                    id="fatherName"
+                    placeholder="Enter father's name"
+                    value={formData.fatherName}
+                    onChange={handleChange}
+                    className="bg-white/20 border-white/30 text-white placeholder:text-gray-300"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="courseName" className="text-white">Course Name</Label>
+                  <Input
+                    type="text"
+                    id="courseName"
+                    placeholder="Enter course name"
+                    value={formData.courseName}
+                    onChange={handleChange}
+                    className="bg-white/20 border-white/30 text-white placeholder:text-gray-300"
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="duration" className="text-white">Duration</Label>
+                  <Input
+                    type="text"
+                    id="duration"
+                    placeholder="Enter duration (e.g., 6 months)"
+                    value={formData.duration}
+                    onChange={handleChange}
+                    className="bg-white/20 border-white/30 text-white placeholder:text-gray-300"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="completionDate" className="text-white">Completion Date</Label>
+                  <Input
+                    type="date"
+                    id="completionDate"
+                    value={formData.completionDate}
+                    onChange={handleChange}
+                    className="bg-white/20 border-white/30 text-white placeholder:text-gray-300"
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="grade" className="text-white">Grade</Label>
+                  <Input
+                    type="text"
+                    id="grade"
+                    placeholder="Enter grade (e.g., A+)"
+                    value={formData.grade}
+                    onChange={handleChange}
+                    className="bg-white/20 border-white/30 text-white placeholder:text-gray-300"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="studentCoordinator" className="text-white">Student Coordinator</Label>
+                  <Input
+                    type="text"
+                    id="studentCoordinator"
+                    placeholder="Enter student coordinator name"
+                    value={formData.studentCoordinator}
+                    onChange={handleChange}
+                    className="bg-white/20 border-white/30 text-white placeholder:text-gray-300"
+                    required
+                  />
+                </div>
+                 <div>
+                  <Label htmlFor="rollNo" className="text-white">Roll Number</Label>
+                  <Input
+                    type="text"
+                    id="rollNo"
+                    placeholder="Enter Roll Number"
+                    value={formData.rollNo}
+                    onChange={handleChange}
+                    className="bg-white/20 border-white/30 text-white placeholder:text-gray-300"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="additionalInfo" className="text-white">Additional Information</Label>
+                <Textarea
+                  id="additionalInfo"
+                  placeholder="Enter any additional information"
+                  className="bg-white/20 border-white/30 text-white placeholder:text-gray-300 resize-none"
+                />
+              </div>
+
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white transition-colors duration-200"
+              >
+                {isLoading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <FileText className="mr-2 h-4 w-4" />
+                    Generate Certificate
+                  </>
+                )}
+              </Button>
+            </form>
+
+            {qrCodeData && (
+              <div className="mt-6 p-4 border border-white/30 rounded-md">
+                <h3 className="text-lg font-semibold text-white mb-4">QR Code Preview</h3>
+                <QRCodeGenerator data={qrCodeData} />
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {formData.studentName && formData.courseName && formData.completionDate && formData.studentCoordinator && (
+          <Card className="bg-white/10 backdrop-blur-lg border-white/20">
             <CardHeader>
-              <CardTitle>Certificate Details</CardTitle>
-              <CardDescription>
-                Fill in the student and course information to generate a certificate
-              </CardDescription>
+              <CardTitle className="text-white">Certificate Preview</CardTitle>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="space-y-2">
-                  <Label htmlFor="studentName">Student Name *</Label>
-                  <Input
-                    id="studentName"
-                    value={formData.studentName}
-                    onChange={(e) => setFormData({ ...formData, studentName: e.target.value })}
-                    placeholder="Enter student's full name"
-                    required
-                    disabled={saved}
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="fatherName">Father's Name *</Label>
-                    <Input
-                      id="fatherName"
-                      value={formData.fatherName}
-                      onChange={(e) => setFormData({ ...formData, fatherName: e.target.value })}
-                      placeholder="Enter father's full name"
-                      required
-                      disabled={saved}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="rollNo">Roll No.</Label>
-                    <Input
-                      id="rollNo"
-                      value={formData.rollNo}
-                      onChange={(e) => setFormData({ ...formData, rollNo: e.target.value })}
-                      placeholder="Enter roll number"
-                      disabled={saved}
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="courseName">Course Name *</Label>
-                  <Select 
-                    value={formData.courseName} 
-                    onValueChange={(value) => setFormData({ ...formData, courseName: value })} 
-                    disabled={saved}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a course" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Diploma in Computer Application">Diploma in Computer Application</SelectItem>
-                      <SelectItem value="Advance Diploma in Computer Application">Advance Diploma in Computer Application</SelectItem>
-                      <SelectItem value="Computer Accountancy-Tally ERP+GST">Computer Accountancy-Tally ERP+GST</SelectItem>
-                      <SelectItem value="Certificate Course in DTP">Certificate Course in DTP</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="duration">Course Duration</Label>
-                    <Input
-                      id="duration"
-                      value={formData.duration}
-                      onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-                      placeholder="Auto-filled based on course"
-                      disabled={saved}
-                      readOnly
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="completionDate">Completion Date *</Label>
-                    <Input
-                      id="completionDate"
-                      type="date"
-                      value={formData.completionDate}
-                      onChange={(e) => setFormData({ ...formData, completionDate: e.target.value })}
-                      required
-                      disabled={saved}
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="grade">Grade/Performance</Label>
-                  <Select 
-                    value={formData.grade}
-                    onValueChange={(value) => setFormData({ ...formData, grade: value })} 
-                    disabled={saved}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select grade" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Excellent">Excellent</SelectItem>
-                      <SelectItem value="Very Good">Very Good</SelectItem>
-                      <SelectItem value="Good">Good</SelectItem>
-                      <SelectItem value="Satisfactory">Satisfactory</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="studentCoordinator">Student Co-ordinator</Label>
-                  <Input
-                    id="studentCoordinator"
-                    value={formData.studentCoordinator}
-                    onChange={(e) => setFormData({ ...formData, studentCoordinator: e.target.value })}
-                    placeholder="Enter student co-ordinator's name"
-                    disabled={saved}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="batchNumber">Batch Number</Label>
-                  <Input
-                    id="batchNumber"
-                    value={formData.batchNumber}
-                    onChange={(e) => setFormData({ ...formData, batchNumber: e.target.value })}
-                    placeholder="Enter batch number"
-                    disabled={saved}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="certificateId">Certificate ID</Label>
-                  <div className="flex space-x-2">
-                    <Input
-                      id="certificateId"
-                      value={formData.certificateId}
-                      onChange={(e) => setFormData({ ...formData, certificateId: e.target.value })}
-                      placeholder="Auto-generated ID"
-                      readOnly
-                    />
-                    <Button 
-                      type="button" 
-                      variant="outline" 
-                      onClick={generateCertificateId} 
-                      disabled={saved}
-                    >
-                      Generate
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="flex space-x-2">
-                  <Button 
-                    type="submit" 
-                    className="flex-1" 
-                    disabled={saving}
-                  >
-                    {saving ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                        Saving...
-                      </>
-                    ) : saved ? (
-                      "Certificate Saved"
-                    ) : (
-                      <>
-                        <QrCode className="mr-2 h-4 w-4" />
-                        Generate Certificate
-                      </>
-                    )}
-                  </Button>
-                  {saved && (
-                    <Button type="button" variant="outline" onClick={resetForm}>
-                      New Certificate
-                    </Button>
-                  )}
-                </div>
-              </form>
+              <CertificatePreview data={formData} />
             </CardContent>
           </Card>
-
-          {/* Preview Section */}
-          <div className="space-y-6">
-            {showPreview ? (
-              <>
-                <Card>
-                  <CardHeader>
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <CardTitle>Certificate Preview</CardTitle>
-                        <CardDescription>A4 Portrait certificate with logo</CardDescription>
-                      </div>
-                      <Button onClick={handleDownload}>
-                        <Download className="mr-2 h-4 w-4" />
-                        Download PDF
-                      </Button>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div ref={certificateRef}>
-                      <CertificatePreview data={formData} />
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle>QR Code</CardTitle>
-                    <CardDescription>
-                      QR code for certificate verification
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="flex justify-center">
-                    <QRCodeGenerator
-                      data={`${window.location.origin}/verify?id=${formData.certificateId}`}
-                      filename={`${formData.studentName.replace(/\s+/g, '_')}_${formData.certificateId}`}
-                      size={200}
-                    />
-                  </CardContent>
-                </Card>
-              </>
-            ) : (
-              <Card className="h-64 flex items-center justify-center border-dashed">
-                <div className="text-center text-gray-500">
-                  <QrCode className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>Certificate preview will appear here</p>
-                  <p className="text-sm">Fill the form and click "Generate Certificate"</p>
-                </div>
-              </Card>
-            )}
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );
