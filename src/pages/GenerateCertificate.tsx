@@ -87,6 +87,12 @@ const GenerateCertificate = () => {
         throw error;
       }
 
+      // Update form data with generated certificate ID
+      setFormData(prevData => ({
+        ...prevData,
+        certificateId: certificateId
+      }));
+
       setQrCodeData(qrCodeData);
       toast({
         title: "Certificate Generated",
@@ -240,6 +246,19 @@ const GenerateCertificate = () => {
                 </div>
               </div>
 
+              {formData.certificateId && (
+                <div>
+                  <Label htmlFor="certificateId" className="text-white">Certificate ID</Label>
+                  <Input
+                    type="text"
+                    id="certificateId"
+                    value={formData.certificateId}
+                    readOnly
+                    className="bg-white/10 border-white/30 text-white"
+                  />
+                </div>
+              )}
+
               <div>
                 <Label htmlFor="additionalInfo" className="text-white">Additional Information</Label>
                 <Textarea
@@ -278,7 +297,7 @@ const GenerateCertificate = () => {
         </Card>
 
         {formData.studentName && formData.courseName && formData.completionDate && formData.studentCoordinator && (
-          <Card className="bg-white/10 backdrop-blur-lg border-white/20">
+          <Card className="bg-white/10 backdrop-blur-lg border-white/20 mt-6">
             <CardHeader>
               <CardTitle className="text-white">Certificate Preview</CardTitle>
             </CardHeader>
