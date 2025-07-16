@@ -64,10 +64,9 @@ export const CertificateFilters: React.FC<CertificateFiltersProps> = ({
           </Select>
           
           <Button
-            variant="outline"
             size="sm"
             onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-            className="flex items-center gap-2 border-white/30 text-white hover:bg-white/10 hover:text-white transition-colors"
+            className="flex items-center gap-2 bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 text-white shadow-lg transition-all duration-300 hover:scale-105"
           >
             {sortOrder === 'asc' ? 'Ascending' : 'Descending'}
             <ArrowUpDown className={`h-4 w-4 ${sortOrder === 'asc' ? 'rotate-180' : ''}`} />
