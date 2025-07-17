@@ -1,12 +1,11 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, FileText, Save } from "lucide-react";
+import { ArrowLeft, FileText } from "lucide-react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -31,31 +30,49 @@ const GenerateCertificate = () => {
   const [qrCodeData, setQrCodeData] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  // Course options
+  // Course options with updated list
   const courseOptions = [
-    "Web Development",
-    "Mobile App Development", 
-    "Data Science",
-    "Digital Marketing",
-    "Graphic Design",
-    "UI/UX Design",
-    "Python Programming",
-    "Java Programming",
-    "Machine Learning",
-    "Cyber Security"
+    "Diploma in Computer Application",
+    "Advance Diploma in Computer Application",
+    "Computer Accountancy Tally & GST",
+    "Diploma in DTP"
   ];
 
-  // Duration options
-  const durationOptions = [
-    "1 Month",
-    "2 Months", 
-    "3 Months",
-    "6 Months",
-    "1 Year",
-    "2 Years"
+  // Grade options updated
+  const gradeOptions = [
+    "Excellent",
+    "Very Good", 
+    "Good",
+    "Satisfactory"
   ];
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  // Auto-select duration based on course
+  useEffect(() => {
+    let duration = "";
+    switch (formData.courseName) {
+      case "Computer Accountancy Tally & GST":
+      case "Diploma in DTP":
+        duration = "4 Months";
+        break;
+      case "Advance Diploma in Computer Application":
+        duration = "1 Year";
+        break;
+      case "Diploma in Computer Application":
+        duration = "8 Months";
+        break;
+      default:
+        duration = "";
+    }
+    
+    if (duration && duration !== formData.duration) {
+      setFormData(prevData => ({
+        ...prevData,
+        duration: duration
+      }));
+    }
+  }, [formData.courseName]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     setFormData(prevData => ({
       ...prevData,
@@ -221,18 +238,14 @@ const GenerateCertificate = () => {
                 </div>
                 <div>
                   <Label htmlFor="duration" className="text-white">Duration</Label>
-                  <Select onValueChange={(value) => handleSelectChange('duration', value)}>
-                    <SelectTrigger className="bg-white/20 border-white/30 text-white">
-                      <SelectValue placeholder="Select duration" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {durationOptions.map((duration) => (
-                        <SelectItem key={duration} value={duration}>
-                          {duration}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Input
+                    type="text"
+                    id="duration"
+                    value={formData.duration}
+                    readOnly
+                    className="bg-white/10 border-white/30 text-white"
+                    placeholder="Auto-selected based on course"
+                  />
                 </div>
               </div>
 
@@ -250,14 +263,18 @@ const GenerateCertificate = () => {
                 </div>
                 <div>
                   <Label htmlFor="grade" className="text-white">Grade</Label>
-                  <Input
-                    type="text"
-                    id="grade"
-                    placeholder="Enter grade (e.g., A+)"
-                    value={formData.grade}
-                    onChange={handleChange}
-                    className="bg-white/20 border-white/30 text-white placeholder:text-gray-300"
-                  />
+                  <Select onValueChange={(value) => handleSelectChange('grade', value)}>
+                    <SelectTrigger className="bg-white/20 border-white/30 text-white">
+                      <SelectValue placeholder="Select grade" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {gradeOptions.map((grade) => (
+                        <SelectItem key={grade} value={grade}>
+                          {grade}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 
@@ -299,27 +316,16 @@ const GenerateCertificate = () => {
                     className="bg-white/20 border-white/30 text-white placeholder:text-gray-300"
                   />
                 </div>
-                {formData.certificateId && (
-                  <div>
-                    <Label htmlFor="certificateId" className="text-white">Certificate ID</Label>
-                    <Input
-                      type="text"
-                      id="certificateId"
-                      value={formData.certificateId}
-                      readOnly
-                      className="bg-white/10 border-white/30 text-white"
-                    />
-                  </div>
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="additionalInfo" className="text-white">Additional Information</Label>
-                <Textarea
-                  id="additionalInfo"
-                  placeholder="Enter any additional information"
-                  className="bg-white/20 border-white/30 text-white placeholder:text-gray-300 resize-none"
-                />
+                <div>
+                  <Label htmlFor="certificateId" className="text-white">Certificate ID</Label>
+                  <Input
+                    type="text"
+                    id="certificateId"
+                    value={formData.certificateId || "Will be generated automatically"}
+                    readOnly
+                    className="bg-white/10 border-white/30 text-white"
+                  />
+                </div>
               </div>
 
               <Button
