@@ -29,7 +29,7 @@ export const useOTP = (): UseOTPReturn => {
     try {
       const { data, error } = await supabase.functions.invoke('send-otp', {
         body: {
-          phoneNumber: '+919565526767',
+          phoneNumber: '+917007017256',
           otp: generatedOTP,
           purpose
         }
@@ -54,7 +54,7 @@ export const useOTP = (): UseOTPReturn => {
 
       toast({
         title: "OTP Sent",
-        description: `OTP sent to +919565526767 for ${purpose}`,
+        description: `OTP sent to +917007017256 for ${purpose}`,
       });
 
       return true;

@@ -188,7 +188,7 @@ const Auth = () => {
                 {!otpSent ? (
                   <div className="text-center space-y-4">
                     <p className="text-white text-sm">
-                      An OTP will be sent to +919565526767
+                      An OTP will be sent to +917007017256
                     </p>
                     <Button
                       onClick={handleSendOTP}
@@ -213,7 +213,7 @@ const Auth = () => {
                     <div className="text-center">
                       <Label className="text-white">Enter 6-digit OTP</Label>
                       <p className="text-sm text-gray-300 mt-1">
-                        Sent to +919565526767
+                        Sent to +917007017256
                       </p>
                     </div>
                     

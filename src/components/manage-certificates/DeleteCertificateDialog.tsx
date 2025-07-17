@@ -116,7 +116,7 @@ export const DeleteCertificateDialog: React.FC<DeleteCertificateDialogProps> = (
               {!otpSent ? (
                 <div className="text-center space-y-2">
                   <p className="text-sm text-gray-600">
-                    An OTP will be sent to +919565526767
+                    An OTP will be sent to +917007017256
                   </p>
                   <Button
                     onClick={handleSendOTP}
@@ -142,7 +142,7 @@ export const DeleteCertificateDialog: React.FC<DeleteCertificateDialogProps> = (
                   <div className="text-center">
                     <Label>Enter 6-digit OTP</Label>
                     <p className="text-sm text-gray-600 mt-1">
-                      Sent to +919565526767
+                      Sent to +917007017256
                     </p>
                   </div>
                   
