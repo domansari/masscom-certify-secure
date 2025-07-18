@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,6 +17,7 @@ const Auth = () => {
   const [authMode, setAuthMode] = useState<'email' | 'otp'>('email');
   const [otpValue, setOtpValue] = useState("");
   const [otpSent, setOtpSent] = useState(false);
+  const [otpError, setOtpError] = useState("");
   
   const { signIn } = useAuth();
   const navigate = useNavigate();
@@ -56,6 +56,8 @@ const Auth = () => {
   };
 
   const handleSendOTP = async () => {
+    console.log('Attempting to send OTP for login');
+    setOtpError("");
     const success = await sendOTP('login');
     if (success) {
       setOtpSent(true);
@@ -63,18 +65,24 @@ const Auth = () => {
   };
 
   const handleVerifyOTP = async () => {
-    if (verifyOTP(otpValue)) {
+    console.log('Attempting to verify OTP for login:', otpValue);
+    
+    if (otpValue.length !== 6) {
+      setOtpError("Please enter a complete 6-digit OTP");
+      return;
+    }
+    
+    const isValid = verifyOTP(otpValue);
+    console.log('OTP verification result for login:', isValid);
+    
+    if (isValid) {
       // For demo purposes, we'll sign in with a default admin account
       // In production, you'd have a proper OTP verification system
       try {
         const { error } = await signIn("admin@masscom.com", "admin123");
         
         if (error) {
-          toast({
-            title: "OTP Verification Failed",
-            description: "Unable to complete OTP login",
-            variant: "destructive",
-          });
+          setOtpError("Unable to complete OTP login. Please try again.");
         } else {
           toast({
             title: "OTP Verified!",
@@ -83,18 +91,10 @@ const Auth = () => {
           navigate("/");
         }
       } catch (error: any) {
-        toast({
-          title: "OTP Verification Failed",
-          description: error.message,
-          variant: "destructive",
-        });
+        setOtpError("OTP verification failed. Please try again.");
       }
     } else {
-      toast({
-        title: "Invalid OTP",
-        description: "Please check the OTP and try again.",
-        variant: "destructive",
-      });
+      setOtpError("Invalid OTP. Please check the code and try again.");
     }
   };
 
@@ -121,14 +121,22 @@ const Auth = () => {
               <div className="flex space-x-2">
                 <Button
                   variant={authMode === 'email' ? 'default' : 'outline'}
-                  onClick={() => setAuthMode('email')}
+                  onClick={() => {
+                    setAuthMode('email');
+                    setOtpSent(false);
+                    setOtpValue("");
+                    setOtpError("");
+                  }}
                   className="flex-1"
                 >
                   Email Login
                 </Button>
                 <Button
                   variant={authMode === 'otp' ? 'default' : 'outline'}
-                  onClick={() => setAuthMode('otp')}
+                  onClick={() => {
+                    setAuthMode('otp');
+                    setOtpError("");
+                  }}
                   className="flex-1"
                 >
                   <Smartphone className="mr-2 h-4 w-4" />
@@ -220,7 +228,10 @@ const Auth = () => {
                     <div className="flex justify-center">
                       <OTPInput
                         value={otpValue}
-                        onChange={setOtpValue}
+                        onChange={(value) => {
+                          setOtpValue(value);
+                          setOtpError(""); // Clear error when user starts typing
+                        }}
                       />
                     </div>
 
@@ -228,6 +239,10 @@ const Auth = () => {
                       <p className="text-center text-sm text-gray-300">
                         Time remaining: {formatTime(timeLeft)}
                       </p>
+                    )}
+
+                    {otpError && (
+                      <p className="text-center text-sm text-red-400">{otpError}</p>
                     )}
 
                     <div className="space-y-2">
@@ -246,7 +261,7 @@ const Auth = () => {
                           disabled={otpLoading}
                           className="w-full"
                         >
-                          Resend OTP
+                          {otpLoading ? 'Sending...' : 'Resend OTP'}
                         </Button>
                       )}
                     </div>
@@ -257,7 +272,6 @@ const Auth = () => {
           </CardContent>
         </Card>
 
-        {/* Verify Certificate Card */}
         <Card className="backdrop-blur-lg bg-white/10 border-white/20 shadow-2xl">
           <CardContent className="pt-6">
             <div className="text-center space-y-4">

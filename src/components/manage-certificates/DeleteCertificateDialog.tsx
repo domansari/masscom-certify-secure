@@ -42,17 +42,31 @@ export const DeleteCertificateDialog: React.FC<DeleteCertificateDialogProps> = (
   const { sendOTP, verifyOTP, isLoading: otpLoading, timeLeft, canResend } = useOTP();
 
   const handleSendOTP = async () => {
+    console.log('Attempting to send OTP for delete operation');
     const success = await sendOTP('delete');
     if (success) {
       setOtpSent(true);
+      setPasswordError(""); // Clear any previous errors
     }
   };
 
   const handleOTPConfirm = () => {
-    if (verifyOTP(otpValue)) {
+    console.log('Attempting to verify OTP:', otpValue);
+    
+    if (otpValue.length !== 6) {
+      setPasswordError("Please enter a complete 6-digit OTP");
+      return;
+    }
+    
+    const isValid = verifyOTP(otpValue);
+    console.log('OTP verification result:', isValid);
+    
+    if (isValid) {
+      console.log('OTP verified successfully, proceeding with deletion');
+      setPasswordError("");
       onConfirm();
     } else {
-      setPasswordError("Invalid OTP. Please try again.");
+      setPasswordError("Invalid OTP. Please check and try again.");
     }
   };
 
@@ -62,8 +76,16 @@ export const DeleteCertificateDialog: React.FC<DeleteCertificateDialogProps> = (
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  // Reset states when dialog closes
+  const handleClose = () => {
+    setOtpValue("");
+    setOtpSent(false);
+    setPasswordError("");
+    onClose();
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="bg-white border border-gray-200 shadow-lg">
         <DialogHeader>
           <DialogTitle>Confirm Permanent Deletion</DialogTitle>
@@ -77,7 +99,12 @@ export const DeleteCertificateDialog: React.FC<DeleteCertificateDialogProps> = (
           <div className="flex space-x-2">
             <Button
               variant={verificationMethod === 'password' ? 'default' : 'outline'}
-              onClick={() => setVerificationMethod('password')}
+              onClick={() => {
+                setVerificationMethod('password');
+                setOtpSent(false);
+                setOtpValue("");
+                setPasswordError("");
+              }}
               className="flex-1"
               size="sm"
             >
@@ -85,7 +112,10 @@ export const DeleteCertificateDialog: React.FC<DeleteCertificateDialogProps> = (
             </Button>
             <Button
               variant={verificationMethod === 'otp' ? 'default' : 'outline'}
-              onClick={() => setVerificationMethod('otp')}
+              onClick={() => {
+                setVerificationMethod('otp');
+                setPasswordError("");
+              }}
               className="flex-1"
               size="sm"
             >
@@ -149,7 +179,10 @@ export const DeleteCertificateDialog: React.FC<DeleteCertificateDialogProps> = (
                   <div className="flex justify-center">
                     <OTPInput
                       value={otpValue}
-                      onChange={setOtpValue}
+                      onChange={(value) => {
+                        setOtpValue(value);
+                        setPasswordError(""); // Clear error when user starts typing
+                      }}
                     />
                   </div>
 
@@ -167,7 +200,7 @@ export const DeleteCertificateDialog: React.FC<DeleteCertificateDialogProps> = (
                       className="w-full"
                       size="sm"
                     >
-                      Resend OTP
+                      {otpLoading ? 'Sending...' : 'Resend OTP'}
                     </Button>
                   )}
 
@@ -183,7 +216,7 @@ export const DeleteCertificateDialog: React.FC<DeleteCertificateDialogProps> = (
         <DialogFooter>
           <Button
             variant="outline"
-            onClick={onClose}
+            onClick={handleClose}
             className="hover:bg-gray-100 transition-colors"
           >
             Cancel
