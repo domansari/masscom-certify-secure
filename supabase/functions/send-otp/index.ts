@@ -31,18 +31,18 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error("Missing required fields: phoneNumber, otp, or purpose");
     }
 
-    const twilioAccountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
-    const twilioAuthToken = Deno.env.get("TWILIO_AUTH_TOKEN");
-    const twilioPhoneNumber = Deno.env.get("TWILIO_PHONE_NUMBER");
+    const msg91AuthKey = Deno.env.get("MSG91_AUTH_KEY");
+    const msg91SenderId = Deno.env.get("MSG91_SENDER_ID");
+    const msg91Route = Deno.env.get("MSG91_ROUTE") || "4"; // Default to transactional route
 
-    console.log('Twilio config check:', {
-      hasAccountSid: !!twilioAccountSid,
-      hasAuthToken: !!twilioAuthToken,
-      hasPhoneNumber: !!twilioPhoneNumber
+    console.log('MSG91 config check:', {
+      hasAuthKey: !!msg91AuthKey,
+      hasSenderId: !!msg91SenderId,
+      hasRoute: !!msg91Route
     });
 
-    if (!twilioAccountSid || !twilioAuthToken || !twilioPhoneNumber) {
-      throw new Error("Twilio credentials not configured properly");
+    if (!msg91AuthKey || !msg91SenderId) {
+      throw new Error("MSG91 credentials not configured properly");
     }
 
     const message = purpose === 'login' 
@@ -51,35 +51,42 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log('Sending SMS with message:', message);
 
-    const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${twilioAccountSid}/Messages.json`;
+    // Clean phone number - remove country code if present for MSG91
+    const cleanPhoneNumber = phoneNumber.startsWith('+91') 
+      ? phoneNumber.substring(3) 
+      : phoneNumber.replace(/^\+/, '');
+
+    const msg91Url = 'https://api.msg91.com/api/v5/flow/';
     
-    const formData = new URLSearchParams({
-      From: twilioPhoneNumber,
-      To: phoneNumber,
-      Body: message,
-    });
+    const payload = {
+      flow_id: "YOUR_FLOW_ID", // This will need to be configured
+      sender: msg91SenderId,
+      mobiles: cleanPhoneNumber,
+      VAR1: otp, // OTP variable
+      route: msg91Route
+    };
 
-    console.log('Making request to Twilio API');
+    console.log('Making request to MSG91 API for phone:', cleanPhoneNumber);
 
-    const response = await fetch(twilioUrl, {
+    const response = await fetch(msg91Url, {
       method: 'POST',
       headers: {
-        'Authorization': `Basic ${btoa(`${twilioAccountSid}:${twilioAuthToken}`)}`,
-        'Content-Type': 'application/x-www-form-urlencoded',
+        'authkey': msg91AuthKey,
+        'Content-Type': 'application/json',
       },
-      body: formData.toString(),
+      body: JSON.stringify(payload),
     });
 
-    console.log('Twilio response status:', response.status);
+    console.log('MSG91 response status:', response.status);
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Twilio API error response:', errorText);
-      throw new Error(`Twilio API error (${response.status}): ${errorText}`);
+      console.error('MSG91 API error response:', errorText);
+      throw new Error(`MSG91 API error (${response.status}): ${errorText}`);
     }
 
     const result = await response.json();
-    console.log("SMS sent successfully:", result.sid);
+    console.log("SMS sent successfully via MSG91:", result);
 
     return new Response(
       JSON.stringify({ 
