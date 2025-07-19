@@ -56,14 +56,13 @@ const handler = async (req: Request): Promise<Response> => {
       ? phoneNumber.substring(3) 
       : phoneNumber.replace(/^\+/, '');
 
-    const msg91Url = 'https://api.msg91.com/api/v5/flow/';
+    const msg91Url = 'https://control.msg91.com/api/v5/otp';
     
     const payload = {
-      flow_id: "YOUR_FLOW_ID", // This will need to be configured
-      sender: msg91SenderId,
-      mobiles: cleanPhoneNumber,
-      VAR1: otp, // OTP variable
-      route: msg91Route
+      template_id: "YOUR_TEMPLATE_ID", // You'll need to create an OTP template in MSG91 dashboard
+      mobile: cleanPhoneNumber,
+      authkey: msg91AuthKey,
+      otp: otp
     };
 
     console.log('Making request to MSG91 API for phone:', cleanPhoneNumber);
