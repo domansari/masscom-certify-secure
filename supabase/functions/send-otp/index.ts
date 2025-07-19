@@ -34,14 +34,16 @@ const handler = async (req: Request): Promise<Response> => {
     const msg91AuthKey = Deno.env.get("MSG91_AUTH_KEY");
     const msg91SenderId = Deno.env.get("MSG91_SENDER_ID");
     const msg91Route = Deno.env.get("MSG91_ROUTE") || "4"; // Default to transactional route
+    const msg91TemplateId = Deno.env.get("MSG91_TEMPLATE_ID");
 
     console.log('MSG91 config check:', {
       hasAuthKey: !!msg91AuthKey,
       hasSenderId: !!msg91SenderId,
-      hasRoute: !!msg91Route
+      hasRoute: !!msg91Route,
+      hasTemplateId: !!msg91TemplateId
     });
 
-    if (!msg91AuthKey || !msg91SenderId) {
+    if (!msg91AuthKey || !msg91SenderId || !msg91TemplateId) {
       throw new Error("MSG91 credentials not configured properly");
     }
 
@@ -59,7 +61,7 @@ const handler = async (req: Request): Promise<Response> => {
     const msg91Url = 'https://control.msg91.com/api/v5/otp';
     
     const payload = {
-      template_id: "YOUR_TEMPLATE_ID", // You'll need to create an OTP template in MSG91 dashboard
+      template_id: msg91TemplateId,
       mobile: cleanPhoneNumber,
       authkey: msg91AuthKey,
       otp: otp
