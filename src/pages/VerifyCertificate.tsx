@@ -1,11 +1,11 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, Search, Loader2 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import CertificatePreview from "@/components/CertificatePreview";
@@ -28,13 +28,24 @@ interface Certificate {
 
 const VerifyCertificate = () => {
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
   const [certificateId, setCertificateId] = useState("");
   const [certificate, setCertificate] = useState<Certificate | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
 
-  const handleVerify = async () => {
-    if (!certificateId.trim()) {
+  // Auto-extract certificate ID from URL parameters and verify
+  useEffect(() => {
+    const idFromUrl = searchParams.get('id');
+    if (idFromUrl && idFromUrl.trim()) {
+      setCertificateId(idFromUrl.trim());
+      // Auto-verify if we have an ID from URL
+      handleVerifyWithId(idFromUrl.trim());
+    }
+  }, [searchParams]);
+
+  const handleVerifyWithId = async (id: string) => {
+    if (!id.trim()) {
       toast({
         title: "Invalid Input",
         description: "Please enter a certificate ID.",
@@ -50,7 +61,7 @@ const VerifyCertificate = () => {
       const { data, error } = await supabase
         .from('certificates')
         .select('*')
-        .eq('certificate_id', certificateId.trim())
+        .eq('certificate_id', id.trim())
         .single();
 
       if (error) {
@@ -82,6 +93,10 @@ const VerifyCertificate = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleVerify = async () => {
+    await handleVerifyWithId(certificateId);
   };
 
   // Convert database Certificate to CertificateData format
